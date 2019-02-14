@@ -33,9 +33,9 @@ public class SimpleProcessor extends AbstractProcessor {
 
     private Map<String, List<Parameter>> nameObjectMap = new HashMap<>();
 
-    private DocGenerator docGenerator = new DocGenerator();
-
     private ParameterTypeHelper typeHelper;
+
+    private ResourceInfoStore resourceInfoStore;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -44,18 +44,26 @@ public class SimpleProcessor extends AbstractProcessor {
         this.messager = processingEnv.getMessager();
         typeUtils = processingEnv.getTypeUtils();
         typeHelper = new ParameterTypeHelper(elementUtils, typeUtils);
+
+        resourceInfoStore = new ResourceInfoStore(processingEnv);
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        for (final TypeElement annotation : annotations) {
-            for (final Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
-                // 因为 Controller 和 RestController 都只能放在类上，所以这里可以无伤强转
-                Resource resource = getResource((TypeElement) element);
-
-                String doc = docGenerator.generate(resource);
-                messager.printMessage(Diagnostic.Kind.NOTE, doc);
+        try {
+            for (final TypeElement annotation : annotations) {
+                for (final Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
+                    // 因为 Controller 和 RestController 都只能放在类上，所以这里可以无伤强转
+                    Resource resource = getResource((TypeElement) element);
+                    resourceInfoStore.addResource(resource);
+                }
             }
+
+            if (roundEnv.processingOver()) {
+                resourceInfoStore.write();
+            }
+        } catch (Exception e) {
+            messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
         }
         return false;
     }
@@ -100,25 +108,24 @@ public class SimpleProcessor extends AbstractProcessor {
     }
 
     private Action getAction(ExecutableElement element, String path, HttpMethod method) {
-        Action action = new Action();
-        action.setPath(path);
-        action.setName(element.getSimpleName().toString());
-        action.setMethod(method);
 
+        String actionName = element.getSimpleName().toString();
         String docCommentString = elementUtils.getDocComment(element);
         DocComment docComment = DocComment.create(docCommentString);
 
-        action.setDescription(docComment.getDescription());
+        Action action = new Action(actionName, docComment.getDescription());
+        action.setPath(path);
+        action.setMethod(method);
 
         for (VariableElement parameterElement : element.getParameters()) {
 
             RequestParam requestParam = parameterElement.getAnnotation(RequestParam.class);
             if (requestParam != null) {
 
-                String name = findString(parameterElement.getSimpleName().toString(),
+                String parameterName = findString(parameterElement.getSimpleName().toString(),
                         requestParam.value(), requestParam.name());
                 List<String> description = docComment.getParam(parameterElement);
-                action.addPathVariable(getParameter(name, description, parameterElement));
+                action.addPathVariable(getParameter(parameterName, description, parameterElement));
                 continue;
             }
 
@@ -211,7 +218,6 @@ public class SimpleProcessor extends AbstractProcessor {
         private final TypeMirror integerType;
         private final TypeMirror longType;
         private final TypeMirror doubleType;
-
         private final TypeMirror bigDecimal;
         private final TypeMirror bigInteger;
 
@@ -276,6 +282,7 @@ public class SimpleProcessor extends AbstractProcessor {
             if (types.isSameType(type, doubleType)) {
                 return ParameterType.NUMBER;
             }
+
             if (types.isSameType(type, bigDecimal)) {
                 return ParameterType.NUMBER;
             }

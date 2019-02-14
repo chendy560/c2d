@@ -12,12 +12,12 @@ public class DocComment {
     /**
      * 匹配 " @param name desc "
      */
-    private static final Pattern PARAM_PATTERN = Pattern.compile(" ?@param +(.*?) ?(.*?)?");
+    private static final Pattern PARAM_PATTERN = Pattern.compile(" ?@param +(.*?) +(.*?)?");
 
     /**
      * 匹配 " @return blah blah"
      */
-    private static final Pattern RETURN_PATTERN = Pattern.compile(" ?@return ?(.*?)?");
+    private static final Pattern RETURN_PATTERN = Pattern.compile(" ?@return +(.*?)?");
 
     /**
      * 注释本身在map中的key，使用 this 避免和参数名字重复
@@ -77,7 +77,7 @@ public class DocComment {
             if (paramMatcher.matches()) {
                 currentParameterName = paramMatcher.group(1);
                 ArrayList<String> paramLines = new ArrayList<>();
-                if (paramMatcher.groupCount() == 3) {
+                if (paramMatcher.groupCount() == 2) {
                     paramLines.add(paramMatcher.group(2));
                 }
                 commentsMap.put(currentParameterName, paramLines);
@@ -88,7 +88,7 @@ public class DocComment {
             if (returnMatcher.matches()) {
                 currentParameterName = RETURN_KEY;
                 ArrayList<String> returnLines = new ArrayList<>();
-                if (returnMatcher.groupCount() == 2) {
+                if (returnMatcher.groupCount() == 1) {
                     returnLines.add(returnMatcher.group(1));
                 }
                 commentsMap.put(currentParameterName, returnLines);

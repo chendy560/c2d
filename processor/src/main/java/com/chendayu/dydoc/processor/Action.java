@@ -8,9 +8,11 @@ import java.util.List;
 
 class Action {
 
-    private String name;
+    private final String name;
 
-    private List<String> description;
+    private final List<String> description;
+
+    private final String hash;
 
     private String path;
 
@@ -21,6 +23,12 @@ class Action {
     private List<Parameter> urlParameters = Collections.emptyList();
 
     private List<Parameter> bodyFields = Collections.emptyList();
+
+    public Action(String name, List<String> description) {
+        this.name = name;
+        this.description = description;
+        this.hash = Sha256.shortHash(name);
+    }
 
     public void addPathVariable(Parameter parameter) {
         if (pathVariables.isEmpty()) {
@@ -40,16 +48,8 @@ class Action {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public List<String> getDescription() {
         return description;
-    }
-
-    public void setDescription(List<String> description) {
-        this.description = description;
     }
 
     public String getPath() {

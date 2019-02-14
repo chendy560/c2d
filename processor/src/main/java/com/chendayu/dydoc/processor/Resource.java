@@ -10,12 +10,15 @@ public class Resource {
 
     private String description = "";
 
+    private String hash;
+
     private List<Action> actions = Collections.emptyList();
 
     private String path;
 
     public Resource(String name) {
         this.name = name;
+        this.hash = Sha256.shortHash(name);
     }
 
     public void addAction(Action action) {
@@ -51,6 +54,10 @@ public class Resource {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getHash() {
+        return hash;
     }
 }
 

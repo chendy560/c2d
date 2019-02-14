@@ -28,6 +28,8 @@ public class DocGenerator {
             title3(action.getName());
 
             action.getDescription().forEach(this::appendLine);
+            separator();
+
             title4("Request");
 
             builder.append("[source,http]\n")
@@ -102,13 +104,16 @@ public class DocGenerator {
         for (Parameter parameter : parameters) {
             builder.append("\n| ").append(parameter.getName())
                     .append("\n| ").append(parameter.getType())
-                    .append("\n|");
+                    .append("\n| ");
 
-            for (String s : parameter.getDescription()) {
-                builder.append(s).append(" +\n");
+            List<String> description = parameter.getDescription();
+            if (!description.isEmpty()) {
+                for (String s : description) {
+                    builder.append(s).append(" +\n");
+                }
+                builder.setLength(builder.length() - 3);
             }
 
-            builder.setLength(builder.length() - 3);
             builder.append('\n');
             builder.append('\n');
         }
