@@ -49,10 +49,10 @@ public class SimpleProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (final TypeElement annotation : annotations) {
-            Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(annotation);
-            for (final Element element : elements) {
-                TypeElement typeElement = (TypeElement) element;
-                Resource resource = parseResource(typeElement);
+            for (final Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
+                // 因为 Controller 和 RestController 都只能放在类上，所以这里可以无伤强转
+                Resource resource = getResource((TypeElement) element);
+
                 String doc = docGenerator.generate(resource);
                 messager.printMessage(Diagnostic.Kind.NOTE, doc);
             }
@@ -60,33 +60,31 @@ public class SimpleProcessor extends AbstractProcessor {
         return false;
     }
 
-    private Resource parseResource(TypeElement typeElement) {
+    private Resource getResource(TypeElement typeElement) {
         Resource resource = new Resource(findResourceName(typeElement));
+        resource.setPath(getControllerPath(typeElement));
 
-        resource.setPath(findRootPath(typeElement));
-
-        List<? extends Element> allMembers = elementUtils.getAllMembers(typeElement);
-        for (final Element memberElement : allMembers) {
-            Action action = findAction(memberElement);
-            if (action != null) {
-                resource.addAction(action);
-            }
-        }
+        elementUtils.getAllMembers(typeElement).stream()
+                .filter(e -> e.getKind() == ElementKind.METHOD)
+                .map(e -> findAction((ExecutableElement) e))
+                .forEach(a -> {
+                    if (a != null) {
+                        resource.addAction(a);
+                    }
+                });
 
         return resource;
     }
 
+    /**
+     * 其实就是把 XxController 的 Controller 剪掉了
+     */
     private String findResourceName(TypeElement typeElement) {
         Name simpleName = typeElement.getSimpleName();
         return simpleName.subSequence(0, simpleName.length() - 10).toString();
     }
 
-    private Action findAction(Element memberElement) {
-        if (memberElement.getKind() != ElementKind.METHOD) {
-            return null;
-        }
-
-        ExecutableElement element = (ExecutableElement) memberElement;
+    private Action findAction(ExecutableElement element) {
 
         GetMapping getMapping = element.getAnnotation(GetMapping.class);
         if (getMapping != null) {
@@ -112,7 +110,6 @@ public class SimpleProcessor extends AbstractProcessor {
 
         action.setDescription(docComment.getDescription());
 
-
         for (VariableElement parameterElement : element.getParameters()) {
 
             RequestParam requestParam = parameterElement.getAnnotation(RequestParam.class);
@@ -120,7 +117,7 @@ public class SimpleProcessor extends AbstractProcessor {
 
                 String name = findString(parameterElement.getSimpleName().toString(),
                         requestParam.value(), requestParam.name());
-                String description = docComment.getParam(parameterElement.getSimpleName().toString());
+                List<String> description = docComment.getParam(parameterElement);
                 action.addPathVariable(getParameter(name, description, parameterElement));
                 continue;
             }
@@ -129,7 +126,7 @@ public class SimpleProcessor extends AbstractProcessor {
             if (pathVariable != null) {
                 String name = findString(parameterElement.getSimpleName().toString(),
                         pathVariable.value(), pathVariable.name());
-                String description = docComment.getParam(parameterElement.getSimpleName().toString());
+                List<String> description = docComment.getParam(parameterElement);
                 action.addUrlParameter(getParameter(name, description, parameterElement));
             }
 
@@ -141,8 +138,7 @@ public class SimpleProcessor extends AbstractProcessor {
         return action;
     }
 
-
-    private String findRootPath(TypeElement element) {
+    private String getControllerPath(TypeElement element) {
         RequestMapping requestMapping = element.getAnnotation(RequestMapping.class);
         if (requestMapping != null) {
             return findString(requestMapping.value(), requestMapping.path());
@@ -171,7 +167,7 @@ public class SimpleProcessor extends AbstractProcessor {
         return "";
     }
 
-    private Parameter getParameter(String name, String description, VariableElement element) {
+    private Parameter getParameter(String name, List<String> description, VariableElement element) {
         Parameter parameter = new Parameter();
         parameter.setName(name);
         parameter.setDescription(description);
@@ -195,7 +191,7 @@ public class SimpleProcessor extends AbstractProcessor {
         List<VariableElement> variableElements = ElementFilter.fieldsIn(elementUtils.getAllMembers(typeElement));
 
         List<Parameter> parameters = variableElements.stream()
-                .map(e -> getParameter(e.getSimpleName().toString(), commentFirstLine(e), e)).
+                .map(e -> getParameter(e.getSimpleName().toString(), findDocComment(e).getDescription(), e)).
                         collect(Collectors.toList());
 
         nameObjectMap.put(typeName, parameterList);
@@ -204,10 +200,6 @@ public class SimpleProcessor extends AbstractProcessor {
 
     private DocComment findDocComment(Element element) {
         return DocComment.create(elementUtils.getDocComment(element));
-    }
-
-    private String commentFirstLine(Element element) {
-        return findDocComment(element).getDescription();
     }
 
     private static class ParameterTypeHelper {
@@ -228,18 +220,24 @@ public class SimpleProcessor extends AbstractProcessor {
         private final TypeMirror date;
         private final TypeMirror instant;
 
+        private final TypeMirror list;
+
         ParameterTypeHelper(Elements elements, Types types) {
             this.types = types;
 
             this.string = elements.getTypeElement(String.class.getName()).asType();
+
             this.booleanType = elements.getTypeElement(Boolean.class.getName()).asType();
+
             this.integerType = elements.getTypeElement(Integer.class.getName()).asType();
             this.longType = elements.getTypeElement(Long.class.getName()).asType();
             this.doubleType = elements.getTypeElement(Double.class.getName()).asType();
             this.bigDecimal = elements.getTypeElement(BigDecimal.class.getName()).asType();
             this.bigInteger = elements.getTypeElement(BigInteger.class.getName()).asType();
+
             this.date = elements.getTypeElement(Date.class.getName()).asType();
             this.instant = elements.getTypeElement(Instant.class.getName()).asType();
+            this.list = types.erasure(elements.getTypeElement(List.class.getName()).asType());
         }
 
         ParameterType findType(TypeMirror typeMirror) {
@@ -261,11 +259,14 @@ public class SimpleProcessor extends AbstractProcessor {
                     return findType(((DeclaredType) typeMirror));
 
                 default:
-                    throw new IllegalArgumentException("unsupport type: " + typeMirror.toString());
+                    throw new IllegalArgumentException("unsupported type: " + typeMirror.toString());
             }
         }
 
-        ParameterType findType(DeclaredType type) {
+        ParameterType findType(DeclaredType declaredType) {
+
+            TypeMirror type = types.erasure(declaredType);
+
             if (types.isSameType(type, integerType)) {
                 return ParameterType.NUMBER;
             }
@@ -295,6 +296,10 @@ public class SimpleProcessor extends AbstractProcessor {
 
             if (types.isSameType(type, booleanType)) {
                 return ParameterType.BOOLEAN;
+            }
+
+            if (types.isSameType(type, list)) {
+                return ParameterType.ARRAY;
             }
 
             return ParameterType.OBJECT;

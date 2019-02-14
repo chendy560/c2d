@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>com.chendayu.dydoc</groupId>
-            <artifactId>dydoc-processor</artifactId>
+            <artifactId>processor</artifactId>
             <version>${v}</version>
         </dependency>
     </dependencies>

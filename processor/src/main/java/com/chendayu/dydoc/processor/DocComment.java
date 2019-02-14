@@ -1,7 +1,7 @@
 package com.chendayu.dydoc.processor;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.lang.model.element.Element;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,118 +9,119 @@ public class DocComment {
 
     private static final Pattern SPLIT = Pattern.compile("\n");
 
-    private static final Pattern PARAM_PATTERN = Pattern.compile(" ?@param +(.*?) +(.*?)");
+    /**
+     * 匹配 " @param name desc "
+     */
+    private static final Pattern PARAM_PATTERN = Pattern.compile(" ?@param +(.*?) ?(.*?)?");
 
-    private static final Pattern RETURN_PATTERN = Pattern.compile(" ?@return +(.*?)");
+    /**
+     * 匹配 " @return blah blah"
+     */
+    private static final Pattern RETURN_PATTERN = Pattern.compile(" ?@return ?(.*?)?");
 
+    /**
+     * 注释本身在map中的key，使用 this 避免和参数名字重复
+     */
+    private static final String DESCRIPTION_KEY = "@this";
+
+    /**
+     * "@return" 注释，使用 return 避免和参数重复
+     */
+    private static final String RETURN_KEY = "@return";
+
+    /**
+     * 没有注释时的注释
+     */
     private static final DocComment EMPTY = new DocComment() {
         @Override
-        public String getDescription() {
-            return "";
+        public List<String> getDescription() {
+            return Collections.emptyList();
         }
 
         @Override
-        public String getParam(String name) {
-            return "";
+        public List<String> getParam(String name) {
+            return Collections.emptyList();
         }
 
         @Override
-        public String getReturn() {
-            return "";
+        public List<String> getReturn() {
+            return Collections.emptyList();
         }
     };
 
-    private String description;
-
-    private Map<String, String> param;
-
-    private String returnValue;
+    private Map<String, List<String>> comments;
 
     private DocComment() {
 
     }
 
-    public static DocComment create(String comment) {
+    static DocComment create(String comment) {
         if (comment == null) {
             return EMPTY;
         }
 
         DocComment docComment = new DocComment();
         String[] commentLines = SPLIT.split(comment);
-        StringBuilder builder = new StringBuilder();
 
-        int i = 0;
-        int length = commentLines.length;
+        HashMap<String, List<String>> commentsMap = new HashMap<>();
 
-        String line;
-        while (i < length) {
-            line = commentLines[i].trim();
+        String currentParameterName = DESCRIPTION_KEY;
+        ArrayList<String> descriptionLines = new ArrayList<>();
 
-            if (line.startsWith("@")) {
-                break;
-            }
+        commentsMap.put(currentParameterName, descriptionLines);
 
-            builder.append(line).append(' ');
+        for (String l : commentLines) {
 
-            i += 1;
-        }
-
-        docComment.description = builder.toString().trim();
-
-        HashMap<String, String> params = new HashMap<>();
-
-        while (i < length) {
-            line = commentLines[i].trim();
-            i += 1;
-
+            String line = l.trim();
             Matcher paramMatcher = PARAM_PATTERN.matcher(line);
             if (paramMatcher.matches()) {
-                String name = paramMatcher.group(1);
-                String desc = paramMatcher.group(2);
-                params.put(name, desc);
+                currentParameterName = paramMatcher.group(1);
+                ArrayList<String> paramLines = new ArrayList<>();
+                if (paramMatcher.groupCount() == 3) {
+                    paramLines.add(paramMatcher.group(2));
+                }
+                commentsMap.put(currentParameterName, paramLines);
                 continue;
             }
 
             Matcher returnMatcher = RETURN_PATTERN.matcher(line);
             if (returnMatcher.matches()) {
-                docComment.returnValue = returnMatcher.group(1);
+                currentParameterName = RETURN_KEY;
+                ArrayList<String> returnLines = new ArrayList<>();
+                if (returnMatcher.groupCount() == 2) {
+                    returnLines.add(returnMatcher.group(1));
+                }
+                commentsMap.put(currentParameterName, returnLines);
+                continue;
             }
+
+            commentsMap.get(currentParameterName).add(line);
         }
-        docComment.param = params;
+
+        docComment.comments = commentsMap;
         return docComment;
     }
 
-    public String getDescription() {
+    public List<String> getDescription() {
 
-        if (description != null) {
-            return description;
-        }
-        return "";
+        return getParam(DESCRIPTION_KEY);
     }
 
-    public String getParam(String name) {
+    public List<String> getParam(Element element) {
+        return getParam(element.getSimpleName().toString());
+    }
 
-        String comment = param.get(name);
+    public List<String> getParam(String name) {
+
+        List<String> comment = comments.get(name);
         if (comment != null) {
             return comment;
         }
-        return "";
+        return Collections.emptyList();
     }
 
-    public String getReturn() {
+    public List<String> getReturn() {
 
-        if (returnValue != null) {
-            return returnValue;
-        }
-        return "";
-    }
-
-    @Override
-    public String toString() {
-        return "DocComment{" +
-                "description='" + description + '\'' +
-                ", param=" + param +
-                ", returnValue='" + returnValue + '\'' +
-                '}';
+        return getParam(RETURN_KEY);
     }
 }

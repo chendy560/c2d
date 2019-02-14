@@ -10,7 +10,7 @@ class Action {
 
     private String name;
 
-    private String description = "";
+    private List<String> description;
 
     private String path;
 
@@ -44,11 +44,11 @@ class Action {
         this.name = name;
     }
 
-    public String getDescription() {
+    public List<String> getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(List<String> description) {
         this.description = description;
     }
 

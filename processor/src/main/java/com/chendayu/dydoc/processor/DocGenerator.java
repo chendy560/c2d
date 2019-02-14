@@ -26,9 +26,8 @@ public class DocGenerator {
 
         for (Action action : resource.getActions()) {
             title3(action.getName());
-            if (!action.getDescription().isEmpty()) {
-                appendLine(action.getDescription());
-            }
+
+            action.getDescription().forEach(this::appendLine);
             title4("Request");
 
             builder.append("[source,http]\n")
@@ -53,13 +52,14 @@ public class DocGenerator {
                 title5("Body Fields");
                 parameterTable(action.getBodyFields());
             }
+
+            title4("Response");
         }
     }
 
 
     private void appendLine(String line) {
-        builder.append(line);
-        separator();
+        builder.append(line).append(" +\n");
     }
 
     private void title2(String title) {
@@ -100,10 +100,17 @@ public class DocGenerator {
         builder.append("| Name | Type | Description\n");
 
         for (Parameter parameter : parameters) {
-            builder.append("| ").append(parameter.getName())
-                    .append(" | ").append(parameter.getType())
-                    .append(" | ").append(parameter.getDescription())
-                    .append('\n');
+            builder.append("\n| ").append(parameter.getName())
+                    .append("\n| ").append(parameter.getType())
+                    .append("\n|");
+
+            for (String s : parameter.getDescription()) {
+                builder.append(s).append(" +\n");
+            }
+
+            builder.setLength(builder.length() - 3);
+            builder.append('\n');
+            builder.append('\n');
         }
 
         builder.append("|===\n\n");

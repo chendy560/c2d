@@ -1,5 +1,7 @@
 package com.chendayu.dydoc.processor;
 
+import java.util.List;
+
 class Parameter {
 
     private String name;
@@ -8,7 +10,7 @@ class Parameter {
 
     private String objectName;
 
-    private String description;
+    private List<String> description;
 
     public String getName() {
         return name;
@@ -34,12 +36,11 @@ class Parameter {
         this.objectName = objectName;
     }
 
-    public String getDescription() {
+    public List<String> getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(List<String> description) {
         this.description = description;
     }
-
 }
