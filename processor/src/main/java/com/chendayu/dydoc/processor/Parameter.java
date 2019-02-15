@@ -10,6 +10,8 @@ class Parameter {
 
     private String objectName;
 
+    private String objectHash;
+
     private List<String> description;
 
     public String getName() {
@@ -34,6 +36,14 @@ class Parameter {
 
     public void setObjectName(String objectName) {
         this.objectName = objectName;
+    }
+
+    public String getObjectHash() {
+        return objectHash;
+    }
+
+    public void setObjectHash(String objectHash) {
+        this.objectHash = objectHash;
     }
 
     public List<String> getDescription() {

@@ -23,6 +23,9 @@ public class User {
      */
     private List<User> friends;
 
+
+    private Dog dog;
+
     public String getName() {
         return name;
     }

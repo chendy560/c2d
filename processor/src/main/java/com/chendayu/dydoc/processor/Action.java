@@ -22,7 +22,9 @@ class Action {
 
     private List<Parameter> urlParameters = Collections.emptyList();
 
-    private List<Parameter> bodyFields = Collections.emptyList();
+    private Parameter requestBody;
+
+    private Parameter returnBody;
 
     public Action(String name, List<String> description) {
         this.name = name;
@@ -64,6 +66,10 @@ class Action {
         return method;
     }
 
+    public String getHash() {
+        return hash;
+    }
+
     public void setMethod(HttpMethod method) {
         this.method = method;
     }
@@ -76,11 +82,19 @@ class Action {
         return urlParameters;
     }
 
-    public List<Parameter> getBodyFields() {
-        return bodyFields;
+    public Parameter getRequestBody() {
+        return requestBody;
     }
 
-    public void setBodyFields(List<Parameter> bodyFields) {
-        this.bodyFields = bodyFields;
+    public Parameter getResponseBody() {
+        return returnBody;
+    }
+
+    public void setResponseBody(Parameter requestBody) {
+        this.requestBody = requestBody;
+    }
+
+    public void setReturnBody(Parameter returnBody) {
+        this.returnBody = returnBody;
     }
 }
