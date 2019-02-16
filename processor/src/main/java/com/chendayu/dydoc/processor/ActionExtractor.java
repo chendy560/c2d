@@ -47,7 +47,8 @@ public class ActionExtractor extends InfoExtractor {
         action.setPath(path);
         action.setMethod(method);
 
-        for (VariableElement parameterElement : element.getParameters()) {
+        List<? extends VariableElement> parameters = element.getParameters();
+        for (VariableElement parameterElement : parameters) {
 
             RequestParam requestParam = parameterElement.getAnnotation(RequestParam.class);
             if (requestParam != null) {
@@ -71,7 +72,7 @@ public class ActionExtractor extends InfoExtractor {
             if (requestBody != null) {
                 String name = parameterElement.getSimpleName().toString();
                 List<String> description = docComment.getParam(parameterElement);
-                action.addUrlParameter(parameterExtractor.getParameter(name, description, parameterElement));
+                action.setRequestBody(parameterExtractor.getParameter(name, description, parameterElement));
             }
 
         }

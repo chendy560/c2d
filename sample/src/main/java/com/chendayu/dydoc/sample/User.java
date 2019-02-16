@@ -4,12 +4,12 @@ import java.util.List;
 
 /**
  * 用户
+ * 一定要有用户
  */
 public class User {
 
     /**
      * 用户名
-     * 我就是要在这里写一个多行
      */
     private String name;
 
@@ -19,11 +19,20 @@ public class User {
     private int age;
 
     /**
+     * 性别
+     * 1 -> ♂
+     * 2 -> ♀
+     * 3 -> ?
+     */
+    private int gender;
+    /**
      * ta的小伙伴们
      */
     private List<User> friends;
 
-
+    /**
+     * ta的狗
+     */
     private Dog dog;
 
     public String getName() {
@@ -32,6 +41,14 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getGender() {
+        return gender;
+    }
+
+    public void setGender(int gender) {
+        this.gender = gender;
     }
 
     public int getAge() {
@@ -48,5 +65,13 @@ public class User {
 
     public void setFriends(List<User> friends) {
         this.friends = friends;
+    }
+
+    public Dog getDog() {
+        return dog;
+    }
+
+    public void setDog(Dog dog) {
+        this.dog = dog;
     }
 }

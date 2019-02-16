@@ -24,10 +24,10 @@ class Action {
 
     private Parameter requestBody;
 
-    private Parameter returnBody;
+    private Parameter responseBody;
 
     public Action(String name, List<String> description) {
-        this.name = name;
+        this.name = Utils.upperCaseFirst(name);
         this.description = description;
         this.hash = Sha256.shortHash(name);
     }
@@ -66,12 +66,12 @@ class Action {
         return method;
     }
 
-    public String getHash() {
-        return hash;
-    }
-
     public void setMethod(HttpMethod method) {
         this.method = method;
+    }
+
+    public String getHash() {
+        return hash;
     }
 
     public List<Parameter> getPathVariables() {
@@ -86,15 +86,15 @@ class Action {
         return requestBody;
     }
 
-    public Parameter getResponseBody() {
-        return returnBody;
-    }
-
-    public void setResponseBody(Parameter requestBody) {
+    public void setRequestBody(Parameter requestBody) {
         this.requestBody = requestBody;
     }
 
-    public void setReturnBody(Parameter returnBody) {
-        this.returnBody = returnBody;
+    public Parameter getResponseBody() {
+        return responseBody;
+    }
+
+    public void setResponseBody(Parameter responseBody) {
+        this.responseBody = responseBody;
     }
 }

@@ -11,11 +11,11 @@ public class ObjectStruct {
 
     private final List<Parameter> parameters = new ArrayList<>();
 
-    private String description;
+    private List<String> description;
 
     public ObjectStruct(String name) {
         this.name = name;
-        this.hash = Sha256.shortHash(name);
+        this.hash = 'o' + Sha256.shortHash(name);
     }
 
     public void addParameter(Parameter parameter) {
@@ -32,5 +32,13 @@ public class ObjectStruct {
 
     public String getHash() {
         return hash;
+    }
+
+    public List<String> getDescription() {
+        return description;
+    }
+
+    public void setDescription(List<String> description) {
+        this.description = description;
     }
 }

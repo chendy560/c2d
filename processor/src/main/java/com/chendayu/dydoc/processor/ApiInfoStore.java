@@ -20,7 +20,7 @@ public class ApiInfoStore {
 
     private final TreeMap<String, Resource> resources = new TreeMap<>();
 
-    private final AsciiDocGenerator asciiDocGenerator = new AsciiDocGenerator();
+    private final DocGenerator docGenerator = new DocGenerator();
 
     private final TreeMap<String, ObjectStruct> objects = new TreeMap<>();
 
@@ -61,21 +61,21 @@ public class ApiInfoStore {
             throw new IllegalStateException("doc ready wrote");
         }
         wrote = true;
-        AsciiDocGenerator.Index index = new AsciiDocGenerator.Index();
+        DocGenerator.Index index = new DocGenerator.Index();
         for (Resource resource : resources.values()) {
-            String fileName = "r" + resource.getHash() + ".adoc";
+            String fileName = resource.getHash() + ".adoc";
             index.addResourceFile(fileName);
-            String content = asciiDocGenerator.generateResourcePages(resource);
+            String content = docGenerator.generateResourcePages(resource);
             write(RESOURCES_PACKAGE, fileName, content);
         }
 
         for (ObjectStruct objectStruct : objects.values()) {
-            String fileName = "o" + objectStruct.getHash() + ".adoc";
+            String fileName = objectStruct.getHash() + ".adoc";
             index.addObjectFile(fileName);
-            String content = asciiDocGenerator.generateObjectPages(objectStruct);
+            String content = docGenerator.generateObjectPages(objectStruct);
             write(OBJECTS_PACKAGE, fileName, content);
         }
-        String indexString = asciiDocGenerator.generateIndex(index);
+        String indexString = docGenerator.generateIndex(index);
         write(BASE_PACKAGE, "index.adoc", indexString);
     }
 

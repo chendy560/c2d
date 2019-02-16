@@ -15,7 +15,7 @@ public class DocComment {
     private static final Pattern PARAM_PATTERN = Pattern.compile(" ?@param +(.*?) +(.*?)?");
 
     /**
-     * 匹配 " @return blah blah"
+     * 匹配 " @return blah"
      */
     private static final Pattern RETURN_PATTERN = Pattern.compile(" ?@return +(.*?)?");
 
@@ -30,9 +30,10 @@ public class DocComment {
     private static final String RETURN_KEY = "@return";
 
     /**
-     * 没有注释时的注释
+     * 没有注释时返回一个空对象
      */
     private static final DocComment EMPTY = new DocComment() {
+
         @Override
         public List<String> getDescription() {
             return Collections.emptyList();
@@ -52,7 +53,6 @@ public class DocComment {
     private Map<String, List<String>> comments;
 
     private DocComment() {
-
     }
 
     static DocComment create(String comment) {
@@ -65,14 +65,22 @@ public class DocComment {
 
         HashMap<String, List<String>> commentsMap = new HashMap<>();
 
-        String currentParameterName = DESCRIPTION_KEY;
+        boolean skipEmptyLine = true;
+
         ArrayList<String> descriptionLines = new ArrayList<>();
+        String currentParameterName = DESCRIPTION_KEY;
 
         commentsMap.put(currentParameterName, descriptionLines);
 
         for (String l : commentLines) {
 
             String line = l.trim();
+
+            if (line.isEmpty() && skipEmptyLine) {
+                continue;
+            }
+            skipEmptyLine = false;
+
             Matcher paramMatcher = PARAM_PATTERN.matcher(line);
             if (paramMatcher.matches()) {
                 currentParameterName = paramMatcher.group(1);
@@ -81,6 +89,7 @@ public class DocComment {
                     paramLines.add(paramMatcher.group(2));
                 }
                 commentsMap.put(currentParameterName, paramLines);
+                skipEmptyLine = true;
                 continue;
             }
 
@@ -92,6 +101,7 @@ public class DocComment {
                     returnLines.add(returnMatcher.group(1));
                 }
                 commentsMap.put(currentParameterName, returnLines);
+                skipEmptyLine = true;
                 continue;
             }
 
@@ -100,15 +110,6 @@ public class DocComment {
 
         docComment.comments = commentsMap;
         return docComment;
-    }
-
-    public List<String> getDescription() {
-
-        return getParam(DESCRIPTION_KEY);
-    }
-
-    public List<String> getParam(Element element) {
-        return getParam(element.getSimpleName().toString());
     }
 
     public List<String> getParam(String name) {
@@ -120,8 +121,15 @@ public class DocComment {
         return Collections.emptyList();
     }
 
-    public List<String> getReturn() {
+    public List<String> getParam(Element element) {
+        return getParam(element.getSimpleName().toString());
+    }
 
+    public List<String> getDescription() {
+        return getParam(DESCRIPTION_KEY);
+    }
+
+    public List<String> getReturn() {
         return getParam(RETURN_KEY);
     }
 }

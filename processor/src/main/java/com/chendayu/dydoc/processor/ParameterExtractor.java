@@ -3,6 +3,7 @@ package com.chendayu.dydoc.processor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import java.util.List;
@@ -32,9 +33,21 @@ public class ParameterExtractor extends InfoExtractor {
             ObjectStruct objectStruct = getAndSaveObject(typeMirror);
             parameter.setObjectName(objectStruct.getName());
             parameter.setObjectHash(objectStruct.getHash());
+            return parameter;
         }
 
+        if (parameterType == ParameterType.ARRAY) {
+            ObjectStruct objectStruct = getAndSaveObjectGeneric(typeMirror);
+            parameter.setObjectName(objectStruct.getName());
+            parameter.setObjectHash(objectStruct.getHash());
+            return parameter;
+        }
         return parameter;
+    }
+
+    private ObjectStruct getAndSaveObjectGeneric(TypeMirror typeMirror) {
+        DeclaredType declaredType = (DeclaredType) typeMirror;
+        return getAndSaveObject(declaredType.getTypeArguments().get(0));
     }
 
     private ObjectStruct getAndSaveObject(TypeMirror typeMirror) {
@@ -45,6 +58,8 @@ public class ParameterExtractor extends InfoExtractor {
             return savedObject;
         }
         ObjectStruct objectStruct = new ObjectStruct(name);
+        List<String> description = DocComment.create(elementUtils.getDocComment(typeElement)).getDescription();
+        objectStruct.setDescription(description);
         store.addObject(objectStruct);
 
         for (VariableElement variableElement : ElementFilter.fieldsIn(elementUtils.getAllMembers(typeElement))) {

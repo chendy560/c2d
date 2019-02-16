@@ -1,8 +1,7 @@
 package com.chendayu.dydoc.processor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Comparator;
+import java.util.TreeSet;
 
 public class Resource {
 
@@ -12,19 +11,16 @@ public class Resource {
 
     private String hash;
 
-    private List<Action> actions = Collections.emptyList();
+    private TreeSet<Action> actions = new TreeSet<>(Comparator.comparing(Action::getName));
 
     private String path;
 
     public Resource(String name) {
-        this.name = name;
-        this.hash = Sha256.shortHash(name);
+        this.name = Utils.upperCaseFirst(name);
+        this.hash = 'r' + Sha256.shortHash(name);
     }
 
     public void addAction(Action action) {
-        if (actions.isEmpty()) {
-            actions = new ArrayList<>();
-        }
         actions.add(action);
     }
 
@@ -40,12 +36,8 @@ public class Resource {
         this.description = description;
     }
 
-    public List<Action> getActions() {
+    public TreeSet<Action> getActions() {
         return actions;
-    }
-
-    public void setActions(List<Action> actions) {
-        this.actions = actions;
     }
 
     public String getPath() {
