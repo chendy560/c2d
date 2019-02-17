@@ -1,11 +1,12 @@
 package com.chendayu.dydoc.processor;
 
+import java.util.List;
+
 public class AdocGenerator {
 
     private static final String INCLUDE_BEGIN = "include::";
     private static final String INCLUDE_END = "[]";
 
-    private static final String HARDBREAKS = "[%hardbreaks]";
     private static final String HARD_NEW_LINE = " +\n";
 
     private static final String LINK_END = ">>";
@@ -31,10 +32,6 @@ public class AdocGenerator {
         builder.setLength(0);
         safeLine();
         return result;
-    }
-
-    public AdocGenerator newLine(String s) {
-        return append(s).append(NEW_LINE);
     }
 
     public AdocGenerator tableBoundary() {
@@ -78,36 +75,36 @@ public class AdocGenerator {
         return this;
     }
 
-    public AdocGenerator beginHardBreaks() {
-        return append(HARDBREAKS);
-    }
-
     private void safeLine() {
         newLine().append("// new file begin").newLine();
     }
 
+    public AdocGenerator title(String t, String title) {
+        return append(t).append(title).dualNewLine();
+    }
+
     public AdocGenerator title0(String title) {
-        return append("= ").append(title);
+        return title("= ", title);
     }
 
     public AdocGenerator title1(String title) {
-        return append("== ").append(title);
+        return title("== ", title);
     }
 
     public AdocGenerator title2(String title) {
-        return append("=== ").append(title);
+        return title("=== ", title);
     }
 
     public AdocGenerator title3(String title) {
-        return append("==== ").append(title);
+        return title("=== ", title);
     }
 
     public AdocGenerator title4(String title) {
-        return append("===== ").append(title);
+        return title("=== ", title);
     }
 
     public AdocGenerator title5(String title) {
-        return append("====== ").append(title);
+        return title("=== ", title);
     }
 
     public AdocGenerator include(String file) {
@@ -115,11 +112,11 @@ public class AdocGenerator {
     }
 
     public AdocGenerator sourceCode(String type) {
-        return append(CODE_BEGIN).append(type).append(CODE_END);
+        return append(CODE_BEGIN).append(type).append(CODE_END).newLine();
     }
 
     public AdocGenerator codeBoundary() {
-        return append(CODE_BOUNDARY);
+        return append(CODE_BOUNDARY).dualNewLine();
     }
 
     public AdocGenerator space() {
@@ -128,5 +125,19 @@ public class AdocGenerator {
 
     public AdocGenerator hardNewLine() {
         return append(HARD_NEW_LINE);
+    }
+
+    public AdocGenerator appendLines(List<String> ss) {
+        if (ss.isEmpty()) {
+            return newLine();
+        }
+
+        for (String s : ss) {
+            if (!s.isEmpty()) {
+                append(s).hardNewLine();
+            }
+        }
+
+        return shrink(3).dualNewLine();
     }
 }

@@ -41,6 +41,10 @@ public class ApiInfoStore {
         if (containsResource(name)) {
             throw new IllegalStateException("resource '" + name + "' already exists");
         }
+        ObjectStruct objectStruct = objects.get(name);
+        if (objectStruct != null) {
+            resource.setDescription(objectStruct.getDescription());
+        }
         resources.put(name, resource);
     }
 
@@ -52,6 +56,10 @@ public class ApiInfoStore {
         String name = objectStruct.getName();
         if (getObject(name) != null) {
             throw new IllegalArgumentException("object '" + name + "' already exists");
+        }
+        Resource resource = resources.get(name);
+        if (resource != null) {
+            resource.setDescription(objectStruct.getDescription());
         }
         this.objects.put(name, objectStruct);
     }

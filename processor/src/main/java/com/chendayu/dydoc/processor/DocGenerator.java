@@ -9,16 +9,13 @@ public class DocGenerator {
 
     public String generateIndex(Index index) {
         generator.title0("Index")
-                .dualNewLine()
-                .title1("Resources")
-                .dualNewLine();
+                .title1("Resources");
 
         for (String resource : index.getResources()) {
             generator.include("resources/" + resource).newLine();
         }
 
-        generator.title1("Objects")
-                .dualNewLine();
+        generator.title1("Objects");
         for (String object : index.getObjects()) {
             generator.include("objects/" + object).newLine();
         }
@@ -28,41 +25,39 @@ public class DocGenerator {
     public String generateResourcePages(Resource resource) {
 
         generator.title2(resource.getName())
-                .newLine();
+                .appendLines(resource.getDescription());
 
         for (Action action : resource.getActions()) {
-            generator.title3(action.getName()).dualNewLine();
-            appendLines(action.getDescription());
-
+            generator.title3(action.getName())
+                    .appendLines(action.getDescription());
 
             generator.title4("Request")
-                    .dualNewLine()
                     .sourceCode("http")
-                    .newLine()
                     .codeBoundary()
-                    .newLine()
-                    .append(action.getMethod().toString()).space().append(resource.getPath()).append(action.getPath())
+                    .append(action.getMethod().toString())
+                    .space()
+                    .append(resource.getPath())
+                    .append(action.getPath())
                     .newLine().
-                    codeBoundary().newLine();
+                    codeBoundary();
 
             if (!action.getUrlParameters().isEmpty()) {
-                generator.title5("Path Parameters").dualNewLine();
+                generator.title5("Path Parameters");
                 parameterTable(action.getUrlParameters());
             }
 
             if (!action.getPathVariables().isEmpty()) {
-                generator.title5("URL Parameters").dualNewLine();
+                generator.title5("URL Parameters");
                 parameterTable(action.getPathVariables());
             }
 
             if (action.getRequestBody() != null) {
-                generator.title5("Request Body").dualNewLine()
-                        .newLine();
+                generator.title5("Request Body").newLine();
                 objectLink(action.getRequestBody());
                 generator.dualNewLine();
             }
             if (action.getResponseBody() != null) {
-                generator.title5("Response").dualNewLine();
+                generator.title5("Response");
                 objectLink(action.getResponseBody());
                 generator.dualNewLine();
             }
@@ -75,8 +70,7 @@ public class DocGenerator {
         generator.anchor(objectStruct.getHash())
                 .newLine()
                 .title2(objectStruct.getName())
-                .newLine();
-        appendLines(objectStruct.getDescription());
+                .appendLines(objectStruct.getDescription());
         parameterTable(objectStruct.getParameters());
         return generator.getAndReset();
     }
@@ -98,8 +92,8 @@ public class DocGenerator {
                 objectLink(parameter);
                 generator.newLine();
             }
-            generator.tableSeparator();
-            appendLines(parameter.getDescription());
+            generator.tableSeparator()
+                    .appendLines(parameter.getDescription());
         }
 
         generator.tableBoundary().dualNewLine();
@@ -108,22 +102,6 @@ public class DocGenerator {
     private void objectLink(Parameter p) {
         generator.link(p.getObjectHash(), p.getObjectName())
                 .append(p.getType().getName());
-    }
-
-    public void appendLines(List<String> ss) {
-        if (ss.isEmpty()) {
-            generator.newLine();
-            return;
-        }
-
-        for (String s : ss) {
-            if (!s.isEmpty()) {
-                generator.append(s).hardNewLine();
-            }
-        }
-
-        generator.shrink(3);
-        generator.dualNewLine();
     }
 
     public static class Index {

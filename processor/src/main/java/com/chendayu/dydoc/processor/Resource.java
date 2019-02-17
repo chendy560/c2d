@@ -1,19 +1,21 @@
 package com.chendayu.dydoc.processor;
 
 import java.util.Comparator;
+import java.util.List;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class Resource {
 
     private String name;
 
-    private String description = "";
-
     private String hash;
 
-    private TreeSet<Action> actions = new TreeSet<>(Comparator.comparing(Action::getName));
+    private SortedSet<Action> actions = new TreeSet<>(Comparator.comparing(Action::getName));
 
     private String path;
+
+    private List<String> description;
 
     public Resource(String name) {
         this.name = Utils.upperCaseFirst(name);
@@ -28,15 +30,11 @@ public class Resource {
         return name;
     }
 
-    public String getDescription() {
-        return description;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public TreeSet<Action> getActions() {
+    public SortedSet<Action> getActions() {
         return actions;
     }
 
@@ -50,6 +48,14 @@ public class Resource {
 
     public String getHash() {
         return hash;
+    }
+
+    public List<String> getDescription() {
+        return description;
+    }
+
+    public void setDescription(List<String> description) {
+        this.description = description;
     }
 }
 

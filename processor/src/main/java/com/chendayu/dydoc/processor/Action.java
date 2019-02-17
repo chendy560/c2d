@@ -12,8 +12,6 @@ class Action {
 
     private final List<String> description;
 
-    private final String hash;
-
     private String path;
 
     private HttpMethod method;
@@ -29,7 +27,6 @@ class Action {
     public Action(String name, List<String> description) {
         this.name = Utils.upperCaseFirst(name);
         this.description = description;
-        this.hash = Sha256.shortHash(name);
     }
 
     public void addPathVariable(Parameter parameter) {
@@ -68,10 +65,6 @@ class Action {
 
     public void setMethod(HttpMethod method) {
         this.method = method;
-    }
-
-    public String getHash() {
-        return hash;
     }
 
     public List<Parameter> getPathVariables() {
