@@ -5,11 +5,18 @@ import java.util.List;
 
 public class DocGenerator {
 
+    public static final String API_DOC = "API Doc";
     private AdocGenerator generator = new AdocGenerator();
 
     public String generateIndex(Index index) {
-        generator.title0("Index")
-                .title1("Resources");
+        String projectName = index.getProjectName();
+
+        if (projectName != null) {
+            generator.title0(projectName + ' ' + API_DOC);
+        } else {
+            generator.title0(API_DOC);
+        }
+        generator.title1("Resources");
 
         for (String resource : index.getResources()) {
             generator.include("resources/" + resource).newLine();
@@ -106,9 +113,19 @@ public class DocGenerator {
 
     public static class Index {
 
+        private String projectName;
+
         private List<String> resources = new ArrayList<>();
 
         private List<String> objects = new ArrayList<>();
+
+        public String getProjectName() {
+            return projectName;
+        }
+
+        public void setProjectName(String projectName) {
+            this.projectName = projectName;
+        }
 
         public void addResourceFile(String f) {
             resources.add(f);

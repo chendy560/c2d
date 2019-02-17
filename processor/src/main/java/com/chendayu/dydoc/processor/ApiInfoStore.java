@@ -4,8 +4,10 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Properties;
 import java.util.TreeMap;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -18,6 +20,8 @@ public class ApiInfoStore {
 
     private static final String OBJECTS_PACKAGE = BASE_PACKAGE + ".objects";
 
+    private static final String PROJECT_NAME_KEY = "project.name";
+
     private final TreeMap<String, Resource> resources = new TreeMap<>();
 
     private final DocGenerator docGenerator = new DocGenerator();
@@ -26,10 +30,13 @@ public class ApiInfoStore {
 
     private final Filer filer;
 
+    private Properties properties = new Properties();
+
     private boolean wrote;
 
     public ApiInfoStore(ProcessingEnvironment processingEnvironment) {
         this.filer = processingEnvironment.getFiler();
+        initProperties();
     }
 
     public boolean containsResource(String name) {
@@ -70,6 +77,7 @@ public class ApiInfoStore {
         }
         wrote = true;
         DocGenerator.Index index = new DocGenerator.Index();
+        index.setProjectName(properties.getProperty(PROJECT_NAME_KEY));
         for (Resource resource : resources.values()) {
             String fileName = resource.getHash() + ".adoc";
             index.addResourceFile(fileName);
@@ -95,6 +103,21 @@ public class ApiInfoStore {
             }
         } catch (IOException e) {
             throw new IllegalStateException("failed write file: " + e.getMessage());
+        }
+    }
+
+    private void initProperties() {
+        try {
+            FileObject propertiesFile = filer.getResource(StandardLocation.CLASS_OUTPUT,
+                    "", "dydoc.properties");
+            if (propertiesFile != null) {
+                properties.load(propertiesFile.openReader(false));
+            }
+
+        } catch (FileNotFoundException e) {
+            // ignore
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
         }
     }
 }
