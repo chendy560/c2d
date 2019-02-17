@@ -29,6 +29,7 @@ class ParameterTypeHelper {
     private final TypeMirror instant;
 
     private final TypeMirror list;
+    private final TypeMirror enumType;
 
     ParameterTypeHelper(ProcessingEnvironment processEnv) {
         this.types = processEnv.getTypeUtils();
@@ -47,6 +48,8 @@ class ParameterTypeHelper {
         this.date = elements.getTypeElement(Date.class.getName()).asType();
         this.instant = elements.getTypeElement(Instant.class.getName()).asType();
         this.list = types.erasure(elements.getTypeElement(List.class.getName()).asType());
+
+        this.enumType = types.erasure(elements.getTypeElement(Enum.class.getName()).asType());
     }
 
     ParameterType findType(TypeMirror typeMirror) {
@@ -112,6 +115,9 @@ class ParameterTypeHelper {
             return ParameterType.ARRAY;
         }
 
+        if (types.isSubtype(type, enumType)) {
+            return ParameterType.ENUM;
+        }
         return ParameterType.OBJECT;
     }
 }

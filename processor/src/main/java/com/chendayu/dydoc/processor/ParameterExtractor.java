@@ -1,6 +1,8 @@
 package com.chendayu.dydoc.processor;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
@@ -22,14 +24,13 @@ public class ParameterExtractor extends InfoExtractor {
     }
 
     public Parameter getParameter(String name, List<String> description, TypeMirror typeMirror) {
-        Parameter parameter = new Parameter();
-        parameter.setName(name);
+        Parameter parameter = new Parameter(name);
         parameter.setDescription(description);
 
         ParameterType parameterType = typeHelper.findType(typeMirror);
         parameter.setType(parameterType);
 
-        if (parameterType == ParameterType.OBJECT) {
+        if (parameterType == ParameterType.OBJECT || parameterType == ParameterType.ENUM) {
             ObjectStruct objectStruct = getAndSaveObject(typeMirror);
             parameter.setObjectName(objectStruct.getName());
             parameter.setObjectHash(objectStruct.getHash());
@@ -62,9 +63,27 @@ public class ParameterExtractor extends InfoExtractor {
         objectStruct.setDescription(description);
         store.addObject(objectStruct);
 
-        for (VariableElement variableElement : ElementFilter.fieldsIn(elementUtils.getAllMembers(typeElement))) {
+        List<VariableElement> fields = ElementFilter.fieldsIn(elementUtils.getAllMembers(typeElement));
+
+        if (typeElement.getKind() == ElementKind.ENUM) {
+            for (Element field : fields) {
+                if (field.getKind() == ElementKind.ENUM_CONSTANT) {
+                    String fieldName = field.getSimpleName().toString();
+                    List<String> fieldDescription = DocComment.create(elementUtils.getDocComment(field))
+                            .getDescription();
+                    Parameter parameter = new Parameter(fieldName);
+                    parameter.setType(ParameterType.ENUM_CONST);
+                    parameter.setDescription(fieldDescription);
+                    objectStruct.addParameter(parameter);
+                }
+            }
+            return objectStruct;
+        }
+
+        for (VariableElement variableElement : fields) {
             String filedName = variableElement.getSimpleName().toString();
-            List<String> fieldDescription = DocComment.create(elementUtils.getDocComment(variableElement)).getDescription();
+            List<String> fieldDescription = DocComment.create(elementUtils.getDocComment(variableElement))
+                    .getDescription();
             Parameter parameter = getParameter(filedName, fieldDescription, variableElement);
             objectStruct.addParameter(parameter);
         }

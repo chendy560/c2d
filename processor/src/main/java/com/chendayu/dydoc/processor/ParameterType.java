@@ -6,7 +6,9 @@ enum ParameterType {
     NUMBER("数字", true),
     TIMESTAMP("时间戳", true),
     BOOLEAN("布尔", true),
+    ENUM_CONST("枚举值", true),
 
+    ENUM("枚举", false),
     ARRAY("数组", false),
     OBJECT("对象", false);
 

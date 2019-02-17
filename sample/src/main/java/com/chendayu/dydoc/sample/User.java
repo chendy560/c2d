@@ -31,9 +31,9 @@ public class User {
     private List<User> friends;
 
     /**
-     * ta的狗
+     * 宠物
      */
-    private Dog dog;
+    private Pet pet;
 
     public String getName() {
         return name;
@@ -67,11 +67,11 @@ public class User {
         this.friends = friends;
     }
 
-    public Dog getDog() {
-        return dog;
+    public Pet getPet() {
+        return pet;
     }
 
-    public void setDog(Dog dog) {
-        this.dog = dog;
+    public void setPet(Pet pet) {
+        this.pet = pet;
     }
 }

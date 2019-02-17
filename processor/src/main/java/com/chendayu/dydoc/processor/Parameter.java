@@ -4,7 +4,7 @@ import java.util.List;
 
 class Parameter {
 
-    private String name;
+    private final String name;
 
     private ParameterType type;
 
@@ -14,12 +14,12 @@ class Parameter {
 
     private List<String> description;
 
-    public String getName() {
-        return name;
+    Parameter(String name) {
+        this.name = name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getName() {
+        return name;
     }
 
     public ParameterType getType() {
