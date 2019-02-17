@@ -1,24 +1,39 @@
 package com.chendayu.dydoc.processor;
 
-import javax.annotation.processing.*;
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@SupportedAnnotationTypes({
-        "org.springframework.stereotype.Controller",
-        "org.springframework.web.bind.annotation.RestController"
-})
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class SimpleProcessor extends AbstractProcessor {
+
+    private static final Set<String> SUPPORTED_ANNOTATIONS =
+            Stream.of("org.springframework.stereotype.Controller",
+                    "org.springframework.web.bind.annotation.RestController"
+            ).collect(Collectors.toSet());
 
     private Messager messager;
 
     private ApiInfoStore apiInfoStore;
 
     private ResourceExtractor resourceExtractor;
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latest();
+    }
+
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        return SUPPORTED_ANNOTATIONS;
+    }
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -41,6 +56,7 @@ public class SimpleProcessor extends AbstractProcessor {
             if (roundEnv.processingOver()) {
                 apiInfoStore.write();
             }
+
         } catch (Exception e) {
             messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
         }
