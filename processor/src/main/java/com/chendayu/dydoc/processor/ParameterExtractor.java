@@ -52,7 +52,14 @@ public class ParameterExtractor extends InfoExtractor {
     }
 
     private ObjectStruct getAndSaveObject(TypeMirror typeMirror) {
-        TypeElement typeElement = (TypeElement) typesUtils.asElement(typeMirror);
+        // MUST DECLARED
+        Element typeMirrorElement = typesUtils.asElement(typeMirror);
+        TypeElement typeElement = null;
+        try {
+            typeElement = (TypeElement) typeMirrorElement;
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException(e);
+        }
         String name = typeElement.getSimpleName().toString();
         ObjectStruct savedObject = store.getObject(name);
         if (savedObject != null) {
@@ -63,7 +70,9 @@ public class ParameterExtractor extends InfoExtractor {
         objectStruct.setDescription(description);
         store.addObject(objectStruct);
 
-        List<VariableElement> fields = ElementFilter.fieldsIn(elementUtils.getAllMembers(typeElement));
+        List<? extends Element> allMembers = elementUtils.getAllMembers(typeElement);
+
+        List<VariableElement> fields = ElementFilter.fieldsIn(allMembers);
 
         if (typeElement.getKind() == ElementKind.ENUM) {
             for (Element field : fields) {
@@ -90,5 +99,4 @@ public class ParameterExtractor extends InfoExtractor {
 
         return objectStruct;
     }
-
 }

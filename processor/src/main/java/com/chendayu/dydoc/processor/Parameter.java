@@ -1,5 +1,6 @@
 package com.chendayu.dydoc.processor;
 
+import java.util.Collections;
 import java.util.List;
 
 class Parameter {
@@ -12,7 +13,7 @@ class Parameter {
 
     private String objectHash;
 
-    private List<String> description;
+    private List<String> description = Collections.emptyList();
 
     Parameter(String name) {
         this.name = name;

@@ -1,9 +1,6 @@
 package com.chendayu.dydoc.processor;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 public class Resource {
 
@@ -15,7 +12,7 @@ public class Resource {
 
     private String path;
 
-    private List<String> description;
+    private List<String> description = Collections.emptyList();
 
     public Resource(String name) {
         this.name = Utils.upperCaseFirst(name);

@@ -128,6 +128,9 @@ public class AdocGenerator {
     }
 
     public AdocGenerator appendLines(List<String> ss) {
+        if (ss == null) {
+            return this;
+        }
         if (ss.isEmpty()) {
             return newLine();
         }
