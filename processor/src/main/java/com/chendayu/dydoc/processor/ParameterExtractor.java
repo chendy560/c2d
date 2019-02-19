@@ -31,27 +31,27 @@ public class ParameterExtractor extends InfoExtractor {
         parameter.setType(parameterType);
 
         if (parameterType == ParameterType.OBJECT || parameterType == ParameterType.ENUM) {
-            ObjectStruct objectStruct = getAndSaveObject(typeMirror);
-            parameter.setObjectName(objectStruct.getName());
-            parameter.setObjectHash(objectStruct.getHash());
+            ObjectStructure objectStructure = getAndSaveObject(typeMirror);
+            parameter.setObjectName(objectStructure.getName());
+            parameter.setObjectHash(objectStructure.getHash());
             return parameter;
         }
 
         if (parameterType == ParameterType.ARRAY) {
-            ObjectStruct objectStruct = getAndSaveObjectGeneric(typeMirror);
-            parameter.setObjectName(objectStruct.getName());
-            parameter.setObjectHash(objectStruct.getHash());
+            ObjectStructure objectStructure = getAndSaveObjectGeneric(typeMirror);
+            parameter.setObjectName(objectStructure.getName());
+            parameter.setObjectHash(objectStructure.getHash());
             return parameter;
         }
         return parameter;
     }
 
-    private ObjectStruct getAndSaveObjectGeneric(TypeMirror typeMirror) {
+    private ObjectStructure getAndSaveObjectGeneric(TypeMirror typeMirror) {
         DeclaredType declaredType = (DeclaredType) typeMirror;
         return getAndSaveObject(declaredType.getTypeArguments().get(0));
     }
 
-    private ObjectStruct getAndSaveObject(TypeMirror typeMirror) {
+    private ObjectStructure getAndSaveObject(TypeMirror typeMirror) {
         // MUST DECLARED
         Element typeMirrorElement = typesUtils.asElement(typeMirror);
         TypeElement typeElement = null;
@@ -61,14 +61,14 @@ public class ParameterExtractor extends InfoExtractor {
             throw new IllegalArgumentException(e);
         }
         String name = typeElement.getSimpleName().toString();
-        ObjectStruct savedObject = store.getObject(name);
+        ObjectStructure savedObject = store.getObject(name);
         if (savedObject != null) {
             return savedObject;
         }
-        ObjectStruct objectStruct = new ObjectStruct(name);
+        ObjectStructure objectStructure = new ObjectStructure(name);
         List<String> description = DocComment.create(elementUtils.getDocComment(typeElement)).getDescription();
-        objectStruct.setDescription(description);
-        store.addObject(objectStruct);
+        objectStructure.setDescription(description);
+        store.addObject(objectStructure);
 
         List<? extends Element> allMembers = elementUtils.getAllMembers(typeElement);
 
@@ -83,10 +83,10 @@ public class ParameterExtractor extends InfoExtractor {
                     Parameter parameter = new Parameter(fieldName);
                     parameter.setType(ParameterType.ENUM_CONST);
                     parameter.setDescription(fieldDescription);
-                    objectStruct.addParameter(parameter);
+                    objectStructure.addParameter(parameter);
                 }
             }
-            return objectStruct;
+            return objectStructure;
         }
 
         for (VariableElement variableElement : fields) {
@@ -94,9 +94,9 @@ public class ParameterExtractor extends InfoExtractor {
             List<String> fieldDescription = DocComment.create(elementUtils.getDocComment(variableElement))
                     .getDescription();
             Parameter parameter = getParameter(filedName, fieldDescription, variableElement);
-            objectStruct.addParameter(parameter);
+            objectStructure.addParameter(parameter);
         }
 
-        return objectStruct;
+        return objectStructure;
     }
 }

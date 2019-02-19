@@ -6,6 +6,7 @@ import java.util.List;
 public class DocGenerator {
 
     public static final String API_DOC = "API Doc";
+
     private AdocGenerator generator = new AdocGenerator();
 
     public String generateIndex(Index index) {
@@ -72,13 +73,13 @@ public class DocGenerator {
         return generator.getAndReset();
     }
 
-    public String generateObjectPages(ObjectStruct objectStruct) {
+    public String generateObjectPages(ObjectStructure objectStructure) {
 
-        generator.anchor(objectStruct.getHash())
+        generator.anchor(objectStructure.getHash())
                 .newLine()
-                .title2(objectStruct.getName())
-                .appendLines(objectStruct.getDescription());
-        parameterTable(objectStruct.getParameters());
+                .title2(objectStructure.getName())
+                .appendLines(objectStructure.getDescription());
+        parameterTable(objectStructure.getParameters());
         return generator.getAndReset();
     }
 

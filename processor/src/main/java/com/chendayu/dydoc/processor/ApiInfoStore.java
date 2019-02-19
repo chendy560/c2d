@@ -26,7 +26,7 @@ public class ApiInfoStore {
 
     private final DocGenerator docGenerator = new DocGenerator();
 
-    private final TreeMap<String, ObjectStruct> objects = new TreeMap<>();
+    private final TreeMap<String, ObjectStructure> objects = new TreeMap<>();
 
     private final Filer filer;
 
@@ -48,27 +48,27 @@ public class ApiInfoStore {
         if (containsResource(name)) {
             throw new IllegalStateException("resource '" + name + "' already exists");
         }
-        ObjectStruct objectStruct = objects.get(name);
-        if (objectStruct != null) {
-            resource.setDescription(objectStruct.getDescription());
+        ObjectStructure objectStructure = objects.get(name);
+        if (objectStructure != null) {
+            resource.setDescription(objectStructure.getDescription());
         }
         resources.put(name, resource);
     }
 
-    public ObjectStruct getObject(String name) {
+    public ObjectStructure getObject(String name) {
         return objects.get(name);
     }
 
-    public void addObject(ObjectStruct objectStruct) {
-        String name = objectStruct.getName();
+    public void addObject(ObjectStructure objectStructure) {
+        String name = objectStructure.getName();
         if (getObject(name) != null) {
             throw new IllegalArgumentException("object '" + name + "' already exists");
         }
         Resource resource = resources.get(name);
         if (resource != null) {
-            resource.setDescription(objectStruct.getDescription());
+            resource.setDescription(objectStructure.getDescription());
         }
-        this.objects.put(name, objectStruct);
+        this.objects.put(name, objectStructure);
     }
 
     public void write() {
@@ -85,10 +85,10 @@ public class ApiInfoStore {
             write(RESOURCES_PACKAGE, fileName, content);
         }
 
-        for (ObjectStruct objectStruct : objects.values()) {
-            String fileName = objectStruct.getHash() + ".adoc";
+        for (ObjectStructure objectStructure : objects.values()) {
+            String fileName = objectStructure.getHash() + ".adoc";
             index.addObjectFile(fileName);
-            String content = docGenerator.generateObjectPages(objectStruct);
+            String content = docGenerator.generateObjectPages(objectStructure);
             write(OBJECTS_PACKAGE, fileName, content);
         }
         String indexString = docGenerator.generateIndex(index);

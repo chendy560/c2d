@@ -1,30 +1,21 @@
 package com.chendayu.dydoc.processor;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class ObjectStruct {
+public abstract class DocElement {
 
     private final String name;
 
     private final String hash;
 
-    private final List<Parameter> parameters = new ArrayList<>();
-
     private List<String> description;
 
-    public ObjectStruct(String name) {
+    protected DocElement(String name) {
         this.name = name;
-        this.hash = 'o' + Sha256.shortHash(name);
+        this.hash = getPrefix() + Sha256.shortHash(name);
     }
 
-    public void addParameter(Parameter parameter) {
-        parameters.add(parameter);
-    }
-
-    public List<Parameter> getParameters() {
-        return parameters;
-    }
+    protected abstract String getPrefix();
 
     public String getName() {
         return name;

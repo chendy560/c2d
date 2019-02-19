@@ -1,34 +1,32 @@
 package com.chendayu.dydoc.processor;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-public class Resource {
+/**
+ * 类似于 entity 的概念，API中的被操作对象
+ * 对同种 Resource 的 Action 应该在同一个 Controller 中
+ */
+public class Resource extends DocElement {
 
-    private String name;
-
-    private String hash;
+    private static final String PREFIX = "r";
 
     private SortedSet<Action> actions = new TreeSet<>(Comparator.comparing(Action::getName));
 
     private String path;
 
-    private List<String> description = Collections.emptyList();
-
     public Resource(String name) {
-        this.name = Utils.upperCaseFirst(name);
-        this.hash = 'r' + Sha256.shortHash(name);
+        super(name);
+    }
+
+    @Override
+    protected String getPrefix() {
+        return PREFIX;
     }
 
     public void addAction(Action action) {
         actions.add(action);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public SortedSet<Action> getActions() {
@@ -41,18 +39,6 @@ public class Resource {
 
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public String getHash() {
-        return hash;
-    }
-
-    public List<String> getDescription() {
-        return description;
-    }
-
-    public void setDescription(List<String> description) {
-        this.description = description;
     }
 }
 

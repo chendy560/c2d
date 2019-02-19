@@ -6,11 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class Action {
+public class Action extends DocElement {
 
-    private final String name;
-
-    private final List<String> description;
+    private static final String PREFIX = "a";
 
     private String path;
 
@@ -25,8 +23,8 @@ class Action {
     private Parameter responseBody;
 
     public Action(String name, List<String> description) {
-        this.name = Utils.upperCaseFirst(name);
-        this.description = description;
+        super(name);
+        setDescription(description);
     }
 
     public void addPathVariable(Parameter parameter) {
@@ -43,12 +41,9 @@ class Action {
         urlParameters.add(parameter);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public List<String> getDescription() {
-        return description;
+    @Override
+    protected String getPrefix() {
+        return PREFIX;
     }
 
     public String getPath() {

@@ -1,11 +1,8 @@
 package com.chendayu.dydoc.processor;
 
-import java.util.Collections;
-import java.util.List;
+class Parameter extends DocElement {
 
-class Parameter {
-
-    private final String name;
+    private static final String PREFIX = "p";
 
     private ParameterType type;
 
@@ -13,14 +10,13 @@ class Parameter {
 
     private String objectHash;
 
-    private List<String> description = Collections.emptyList();
-
     Parameter(String name) {
-        this.name = name;
+        super(name);
     }
 
-    public String getName() {
-        return name;
+    @Override
+    protected String getPrefix() {
+        return PREFIX;
     }
 
     public ParameterType getType() {
@@ -45,13 +41,5 @@ class Parameter {
 
     public void setObjectHash(String objectHash) {
         this.objectHash = objectHash;
-    }
-
-    public List<String> getDescription() {
-        return description;
-    }
-
-    public void setDescription(List<String> description) {
-        this.description = description;
     }
 }
