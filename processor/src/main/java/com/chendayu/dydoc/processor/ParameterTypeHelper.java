@@ -8,8 +8,9 @@ import javax.lang.model.util.Types;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
 class ParameterTypeHelper {
 
@@ -28,7 +29,8 @@ class ParameterTypeHelper {
     private final TypeMirror date;
     private final TypeMirror instant;
 
-    private final TypeMirror list;
+    private final TypeMirror collection;
+    private final TypeMirror map;
     private final TypeMirror enumType;
 
     ParameterTypeHelper(ProcessingEnvironment processEnv) {
@@ -47,7 +49,8 @@ class ParameterTypeHelper {
 
         this.date = elements.getTypeElement(Date.class.getName()).asType();
         this.instant = elements.getTypeElement(Instant.class.getName()).asType();
-        this.list = types.erasure(elements.getTypeElement(List.class.getName()).asType());
+        this.collection = types.erasure(elements.getTypeElement(Collection.class.getName()).asType());
+        this.map = types.erasure(elements.getTypeElement(Map.class.getName()).asType());
 
         this.enumType = types.erasure(elements.getTypeElement(Enum.class.getName()).asType());
     }
@@ -111,13 +114,18 @@ class ParameterTypeHelper {
             return ParameterType.BOOLEAN;
         }
 
-        if (types.isSameType(type, list)) {
+        if (types.isSubtype(type, collection)) {
             return ParameterType.ARRAY;
+        }
+
+        if (types.isSubtype(type, map)) {
+            return ParameterType.DYNAMIC_OBJECT;
         }
 
         if (types.isSubtype(type, enumType)) {
             return ParameterType.ENUM;
         }
+
         return ParameterType.OBJECT;
     }
 }

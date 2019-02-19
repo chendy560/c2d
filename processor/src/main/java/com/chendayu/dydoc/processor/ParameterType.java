@@ -7,6 +7,7 @@ enum ParameterType {
     TIMESTAMP("时间戳", true),
     BOOLEAN("布尔", true),
     ENUM_CONST("枚举值", true),
+    DYNAMIC_OBJECT("动态对象", true),
 
     ENUM("枚举", false),
     ARRAY("数组", false),
