@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.chendayu.dydoc.processor.Utils.upperCaseFirst;
+
 public class Action extends DocElement {
 
     private static final String PREFIX = "a";
@@ -23,7 +25,7 @@ public class Action extends DocElement {
     private Parameter responseBody;
 
     public Action(String name, List<String> description) {
-        super(name);
+        super(upperCaseFirst(name));
         setDescription(description);
     }
 
