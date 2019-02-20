@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class SimpleProcessor extends AbstractProcessor {
+public class SpringWebAnnotationProcessor extends AbstractProcessor {
 
     private static final Set<String> SUPPORTED_ANNOTATIONS =
             Stream.of("org.springframework.stereotype.Controller",
