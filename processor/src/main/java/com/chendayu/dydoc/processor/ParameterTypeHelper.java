@@ -5,8 +5,6 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
@@ -16,41 +14,33 @@ class ParameterTypeHelper {
 
     private final Types types;
 
-    private final TypeMirror string;
+    private final TypeMirror charSequenceType;
 
-    private final TypeMirror integerType;
-    private final TypeMirror longType;
-    private final TypeMirror doubleType;
-    private final TypeMirror bigDecimal;
-    private final TypeMirror bigInteger;
+    private final TypeMirror numberType;
 
     private final TypeMirror booleanType;
 
-    private final TypeMirror date;
-    private final TypeMirror instant;
+    private final TypeMirror dateType;
+    private final TypeMirror instantType;
 
-    private final TypeMirror collection;
-    private final TypeMirror map;
+    private final TypeMirror collectionType;
+    private final TypeMirror mapType;
     private final TypeMirror enumType;
 
     ParameterTypeHelper(ProcessingEnvironment processEnv) {
         this.types = processEnv.getTypeUtils();
         Elements elements = processEnv.getElementUtils();
 
-        this.string = elements.getTypeElement(String.class.getName()).asType();
+        this.charSequenceType = elements.getTypeElement(CharSequence.class.getName()).asType();
 
         this.booleanType = elements.getTypeElement(Boolean.class.getName()).asType();
 
-        this.integerType = elements.getTypeElement(Integer.class.getName()).asType();
-        this.longType = elements.getTypeElement(Long.class.getName()).asType();
-        this.doubleType = elements.getTypeElement(Double.class.getName()).asType();
-        this.bigDecimal = elements.getTypeElement(BigDecimal.class.getName()).asType();
-        this.bigInteger = elements.getTypeElement(BigInteger.class.getName()).asType();
+        this.numberType = elements.getTypeElement(Number.class.getName()).asType();
 
-        this.date = elements.getTypeElement(Date.class.getName()).asType();
-        this.instant = elements.getTypeElement(Instant.class.getName()).asType();
-        this.collection = types.erasure(elements.getTypeElement(Collection.class.getName()).asType());
-        this.map = types.erasure(elements.getTypeElement(Map.class.getName()).asType());
+        this.dateType = elements.getTypeElement(Date.class.getName()).asType();
+        this.instantType = elements.getTypeElement(Instant.class.getName()).asType();
+        this.collectionType = types.erasure(elements.getTypeElement(Collection.class.getName()).asType());
+        this.mapType = types.erasure(elements.getTypeElement(Map.class.getName()).asType());
 
         this.enumType = types.erasure(elements.getTypeElement(Enum.class.getName()).asType());
     }
@@ -82,31 +72,18 @@ class ParameterTypeHelper {
 
         TypeMirror type = types.erasure(declaredType);
 
-        if (types.isSameType(type, integerType)) {
-            return ParameterType.NUMBER;
-        }
-        if (types.isSameType(type, longType)) {
-            return ParameterType.NUMBER;
-        }
-        if (types.isSameType(type, doubleType)) {
+        if (types.isSubtype(type, numberType)) {
             return ParameterType.NUMBER;
         }
 
-        if (types.isSameType(type, bigDecimal)) {
-            return ParameterType.NUMBER;
-        }
-        if (types.isSameType(type, bigInteger)) {
-            return ParameterType.NUMBER;
-        }
-
-        if (types.isSameType(type, string)) {
+        if (types.isSubtype(type, charSequenceType)) {
             return ParameterType.STRING;
         }
 
-        if (types.isSameType(type, date)) {
+        if (types.isSameType(type, dateType)) {
             return ParameterType.TIMESTAMP;
         }
-        if (types.isSameType(type, instant)) {
+        if (types.isSameType(type, instantType)) {
             return ParameterType.TIMESTAMP;
         }
 
@@ -114,11 +91,11 @@ class ParameterTypeHelper {
             return ParameterType.BOOLEAN;
         }
 
-        if (types.isSubtype(type, collection)) {
+        if (types.isSubtype(type, collectionType)) {
             return ParameterType.ARRAY;
         }
 
-        if (types.isSubtype(type, map)) {
+        if (types.isSubtype(type, mapType)) {
             return ParameterType.DYNAMIC_OBJECT;
         }
 
