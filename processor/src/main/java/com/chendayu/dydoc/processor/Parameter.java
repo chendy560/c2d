@@ -1,10 +1,14 @@
 package com.chendayu.dydoc.processor;
 
+import java.util.List;
+
 class Parameter extends DocElement {
 
     private static final String PREFIX = "p";
 
     private ParameterType type;
+
+    private List<Parameter> typeArgs;
 
     private String objectName;
 
@@ -25,6 +29,14 @@ class Parameter extends DocElement {
 
     public void setType(ParameterType type) {
         this.type = type;
+    }
+
+    public List<Parameter> getTypeArgs() {
+        return typeArgs;
+    }
+
+    public void setTypeArgs(List<Parameter> typeArgs) {
+        this.typeArgs = typeArgs;
     }
 
     public String getObjectName() {

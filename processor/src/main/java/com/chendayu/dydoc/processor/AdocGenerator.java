@@ -88,11 +88,11 @@ public class AdocGenerator {
     }
 
     public AdocGenerator title1(String title) {
-        return title("== ", title);
+        return title("= ", title);
     }
 
     public AdocGenerator title2(String title) {
-        return title("=== ", title);
+        return title("== ", title);
     }
 
     public AdocGenerator title3(String title) {
@@ -100,11 +100,11 @@ public class AdocGenerator {
     }
 
     public AdocGenerator title4(String title) {
-        return title("=== ", title);
+        return title("==== ", title);
     }
 
     public AdocGenerator title5(String title) {
-        return title("=== ", title);
+        return title("===== ", title);
     }
 
     public AdocGenerator include(String file) {
