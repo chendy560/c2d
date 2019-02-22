@@ -7,4 +7,8 @@ public class Warehouse {
     public Declaration getDeclaration(String qualifiedName) {
         return null;
     }
+
+    public void addDeclaration(Declaration declaration) {
+
+    }
 }

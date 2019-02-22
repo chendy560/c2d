@@ -1,24 +1,16 @@
 package com.chendayu.dydoc.processor;
 
-import java.util.List;
-
-public class ArrayDeclaration extends Declaration {
+public class ArrayDeclaration implements Declaration {
 
     private final Declaration componentType;
 
-    public ArrayDeclaration(List<String> description, Declaration componentType) {
-        super(description);
-        this.componentType = componentType;
-    }
-
-    public ArrayDeclaration(String name, List<String> description, Declaration componentType) {
-        super(name, description);
+    public ArrayDeclaration(Declaration componentType) {
         this.componentType = componentType;
     }
 
     @Override
-    public ParamType getType() {
-        return ParamType.ARRAY;
+    public Type getType() {
+        return Type.ARRAY;
     }
 
     public Declaration getComponentType() {
