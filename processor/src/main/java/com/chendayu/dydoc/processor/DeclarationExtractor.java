@@ -51,7 +51,6 @@ public class DeclarationExtractor {
         this.mapType = toolbox.erasure(toolbox.getTypeElement(Map.class.getName()).asType());
 
         this.enumType = toolbox.erasure(toolbox.getTypeElement(Enum.class.getName()).asType());
-
     }
 
     private Set<Element> initObjectMethods() {
@@ -185,7 +184,7 @@ public class DeclarationExtractor {
 
         processParents(typeElement, result);
         processTypeParameters(typeElement, docComment, result);
-
+        processFieldAndGetters(typeElement, result);
 
         return result;
     }
@@ -262,7 +261,9 @@ public class DeclarationExtractor {
         return declarations;
     }
 
-    public List<ObjectProperty> gerProperties(List<? extends Element> members) {
+    public void processFieldAndGetters(TypeElement typeElement, ObjectDeclaration result) {
+
+        List<? extends Element> members = toolbox.getAllMembers(typeElement);
 
         LinkedHashMap<String, VariableElement> fieldMap = new LinkedHashMap<>();
         ArrayList<ExecutableElement> getters = new ArrayList<>();
@@ -276,36 +277,76 @@ public class DeclarationExtractor {
             String name = member.getSimpleName().toString();
             switch (member.getKind()) {
                 case FIELD:
-                    fieldMap.put(name, (VariableElement) member);
+                    VariableElement field = (VariableElement) member;
+                    if (isInstanceField(field)) {
+                        fieldMap.put(name, field);
+                    }
                     break;
                 case METHOD:
                     ExecutableElement method = (ExecutableElement) member;
-                    getters.add(method);
+                    if (isGetter(method)) {
+                        getters.add(method);
+                    }
                     break;
                 default:
                     break;
             }
         }
 
+        result.setGetters(getters);
+        result.setFields(fieldMap);
+
         if (getters.isEmpty()) {
-            return Collections.emptyList();
+            result.setProperties(Collections.emptyList());
+            return;
         }
 
+        ArrayList<ObjectProperty> properties = new ArrayList<>(getters.size());
         for (ExecutableElement getter : getters) {
+            ObjectProperty property = createProperty(getter, fieldMap);
+            properties.add(property);
+        }
+        result.setProperties(properties);
+    }
 
+    private ObjectProperty createProperty(ExecutableElement getter, Map<String, VariableElement> fieldMap) {
+        String getterName = getter.getSimpleName().toString();
+        String name = getterToPropertyName(getterName);
+        VariableElement field = fieldMap.get(name);
 
+        List<String> description = findDescription(getter, field);
+
+        TypeMirror typeMirror = field.asType();
+        Declaration declaration = extractAndSave(typeMirror);
+
+        return new ObjectProperty(name, description, declaration, field, getter);
+    }
+
+    private Declaration extractAndSave(TypeMirror typeMirror) {
+        TypeKind kind = typeMirror.getKind();
+        switch (kind) {
+            case DECLARED:
+                return extractAndSave((TypeElement) toolbox.asElement(typeMirror));
+            case TYPEVAR:
+                String name = toolbox.asElement(typeMirror).getSimpleName().toString();
+                return Declaration.typeArgOf(name);
+            default:
+                throw new IllegalArgumentException("unsupported type kind: " + kind +
+                        ", for type mirror:" + typeMirror);
+        }
+    }
+
+    private List<String> findDescription(ExecutableElement getter, VariableElement field) {
+        List<String> methodReturnComment = DocComment.create(toolbox.getDocComment(getter)).getReturn();
+        if (!methodReturnComment.isEmpty()) {
+            return methodReturnComment;
+        }
+
+        if (field != null) {
+            return DocComment.create(toolbox.getDocComment(field)).getReturn();
         }
 
         return Collections.emptyList();
-    }
-
-    private Property createProperty(ExecutableElement getter, Map<String, VariableElement> fieldMap) {
-        String name = getter.getSimpleName().toString();
-        List<String> methodReturnDescription = DocComment.create(toolbox.getDocComment(getter)).getReturn();
-
-        //TODO
-        return null;
-
     }
 
     private boolean isGetter(ExecutableElement element) {
@@ -331,6 +372,11 @@ public class DeclarationExtractor {
 
     private boolean isJavaPackageClass(String qualifiedName) {
         return qualifiedName.startsWith(JAVA_PREFIX);
+    }
+
+    private boolean isInstanceField(VariableElement field) {
+        char firstChar = field.getSimpleName().toString().charAt(0);
+        return Character.isLowerCase(firstChar);
     }
 
     private TypeElement getOriginTypeElement(DeclaredType typeMirror) {

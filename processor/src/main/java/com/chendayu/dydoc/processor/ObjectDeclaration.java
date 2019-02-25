@@ -17,13 +17,13 @@ public class ObjectDeclaration implements Declaration {
 
     private List<Property> typeParameters;
 
-    private List<Property> properties;
+    private List<ObjectProperty> properties;
 
     private List<Parent> parents;
 
     private Map<String, VariableElement> fields;
 
-    private Map<String, ExecutableElement> getters;
+    private List<ExecutableElement> getters;
 
     public ObjectDeclaration(TypeElement typeElement) {
         this.typeElement = typeElement;
@@ -42,6 +42,18 @@ public class ObjectDeclaration implements Declaration {
 
     public void setTypeParameters(List<Property> typeParameters) {
         this.typeParameters = typeParameters;
+    }
+
+    public void setProperties(List<ObjectProperty> properties) {
+        this.properties = properties;
+    }
+
+    public void setFields(Map<String, VariableElement> fields) {
+        this.fields = fields;
+    }
+
+    public void setGetters(List<ExecutableElement> getters) {
+        this.getters = getters;
     }
 
     public static class Parent {
