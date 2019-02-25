@@ -8,7 +8,7 @@ import javax.lang.model.type.TypeMirror;
 import java.time.Instant;
 import java.util.*;
 
-public class DecalarationExtractor {
+public class DeclarationExtractor {
 
     private static final String JAVA_PREFIX = "java.";
 
@@ -20,7 +20,7 @@ public class DecalarationExtractor {
 
     private final Toolbox toolbox;
 
-    private final Set<ExecutableElement> objectMethods;
+    private final Set<Element> objectMethods;
 
     private final TypeMirror charSequenceType;
     private final TypeMirror numberType;
@@ -34,7 +34,7 @@ public class DecalarationExtractor {
     private final TypeMirror mapType;
     private final TypeMirror enumType;
 
-    public DecalarationExtractor(Toolbox toolbox, Warehouse warehouse) {
+    public DeclarationExtractor(Toolbox toolbox, Warehouse warehouse) {
         this.toolbox = toolbox;
         this.warehouse = warehouse;
         this.objectMethods = initObjectMethods();
@@ -54,15 +54,15 @@ public class DecalarationExtractor {
 
     }
 
-    private Set<ExecutableElement> initObjectMethods() {
+    private Set<Element> initObjectMethods() {
 
-        HashSet<ExecutableElement> objectMethodsSet = new HashSet<>(32, 0.5f);
+        HashSet<Element> objectMethodsSet = new HashSet<>(32, 0.5f);
 
         TypeElement objectElement = toolbox.getTypeElement(Object.class.getName());
         List<? extends Element> objectMembers = toolbox.getAllMembers(objectElement);
         for (Element objectMember : objectMembers) {
             if (objectElement.getKind() == ElementKind.METHOD) {
-                objectMethodsSet.add((ExecutableElement) objectMember);
+                objectMethodsSet.add(objectMember);
             }
         }
         return Collections.unmodifiableSet(objectMethodsSet);
@@ -113,7 +113,7 @@ public class DecalarationExtractor {
             return Declaration.ENUM;
         }
 
-        return doExtractAndSave(typeElement, (DeclaredType) elementType);
+        return doExtractAndSave(typeElement);
     }
 
     private boolean isEnum(TypeMirror erasedType) {
@@ -171,67 +171,108 @@ public class DecalarationExtractor {
         //todo
     }
 
-    private ObjectDeclaration doExtractAndSave(TypeElement typeElement, DeclaredType type) {
-        //todo
-        return null;
-    }
-
-    private ObjectDeclaration findSuperclass(TypeElement typeElement) {
-        TypeMirror superclassType = typeElement.getSuperclass();
-        if (superclassType.getKind() == TypeKind.DECLARED) {
-            TypeElement superclassElement = ((TypeElement) toolbox.asElement(superclassType));
-            String qualifiedName = superclassElement.getQualifiedName().toString();
-            if (isJavaPackageClass(qualifiedName)) {
-                return null;
-            }
-            return (ObjectDeclaration) extractAndSave(superclassElement);
+    private ObjectDeclaration doExtractAndSave(TypeElement typeElement) {
+        String qualifiedName = typeElement.getQualifiedName().toString();
+        ObjectDeclaration existsDeclaration = warehouse.getDeclaration(qualifiedName);
+        if (existsDeclaration != null) {
+            return existsDeclaration;
         }
-        return null;
+
+        ObjectDeclaration result = new ObjectDeclaration(typeElement);
+        warehouse.addDeclaration(result);
+
+        DocComment docComment = DocComment.create(toolbox.getDocComment(typeElement));
+
+        processParents(typeElement, result);
+        processTypeParameters(typeElement, docComment, result);
+
+
+        return result;
     }
 
-    public List<Declaration> findInterfaces(List<? extends TypeMirror> interfaces) {
-        if (interfaces.isEmpty()) {
+    private void processParents(TypeElement typeElement, ObjectDeclaration result) {
+
+        List<? extends TypeMirror> parentTypes = toolbox.directSupertypes(typeElement.asType());
+        ArrayList<ObjectDeclaration.Parent> parents = new ArrayList<>(parentTypes.size());
+
+        for (TypeMirror parentType : parentTypes) {
+            DeclaredType declaredType = (DeclaredType) parentType;
+            TypeElement parentElement = getOriginTypeElement(declaredType);
+
+            String qualifiedName = parentElement.getQualifiedName().toString();
+            if (isJavaPackageClass(qualifiedName)) {
+                break;
+            }
+
+            List<Declaration> typeArgs = findTypeArgs(declaredType);
+            Declaration declaration = extractAndSave(parentElement);
+
+            Declaration[] ts = typeArgs.toArray(new Declaration[]{});
+            ObjectDeclaration.Parent parent = new ObjectDeclaration.Parent(ts, declaration);
+            parents.add(parent);
+        }
+
+        result.setParents(parents);
+    }
+
+    private void processTypeParameters(TypeElement typeElement, DocComment docComment,
+                                       ObjectDeclaration result) {
+        List<? extends TypeParameterElement> typeParameters = typeElement.getTypeParameters();
+        if (typeParameters.isEmpty()) {
+            result.setTypeParameters(Collections.emptyList());
+            return;
+        }
+
+        ArrayList<Property> typeProperties = new ArrayList<>(typeParameters.size());
+        for (TypeParameterElement typeParameter : typeParameters) {
+            String name = typeParameter.getSimpleName().toString();
+            List<String> description = docComment.getParam(name);
+            Property property = new Property(name, description, Declaration.typeArgOf(name));
+            typeProperties.add(property);
+        }
+
+        result.setTypeParameters(typeProperties);
+    }
+
+    private List<Declaration> findTypeArgs(DeclaredType declaredType) {
+        List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
+        if (typeArguments.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<Declaration> objects = new ArrayList<>();
-        for (TypeMirror i : interfaces) {
-            TypeElement element = (TypeElement) toolbox.asElement(i);
-            String qualifiedName = element.getQualifiedName().toString();
-            if (qualifiedName.startsWith(JAVA_PREFIX)) {
+        ArrayList<Declaration> declarations = new ArrayList<>();
+        for (TypeMirror typeArgument : typeArguments) {
+            TypeKind kind = typeArgument.getKind();
+            Element element = toolbox.asElement(typeArgument);
+            switch (kind) {
+                case TYPEVAR:
+                    String name = element.getSimpleName().toString();
+                    Declaration.TypeArgDeclaration typeArgDeclaration = Declaration.typeArgOf(name);
+                    declarations.add(typeArgDeclaration);
+                    break;
+                case DECLARED:
+                    TypeElement typeElement = (TypeElement) element;
+                    Declaration declaration = extractAndSave(typeElement);
+                    declarations.add(declaration);
+                    break;
+                default:
+                    throw new IllegalArgumentException("unknown type kind for type argument: " + kind.name());
+            }
+        }
+        return declarations;
+    }
+
+    public List<ObjectProperty> gerProperties(List<? extends Element> members) {
+
+        LinkedHashMap<String, VariableElement> fieldMap = new LinkedHashMap<>();
+        ArrayList<ExecutableElement> getters = new ArrayList<>();
+
+        for (Element member : members) {
+
+            if (objectMethods.contains(member)) {
                 continue;
             }
 
-            objects.add(extractAndSave(element));
-        }
-
-        return objects;
-    }
-
-    public Map<String, Property> getTypeParameters(List<? extends TypeParameterElement> toolbox,
-                                                   DocComment docComment) {
-        if (toolbox.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        HashMap<String, Property> parameterMap = new HashMap<>(toolbox.size() * 2);
-        for (TypeParameterElement element : toolbox) {
-            String name = element.getSimpleName().toString();
-            List<String> description = docComment.getParam(name);
-            Property property = new Property(name, description, Declaration.TYPE_PARAMETER);
-            parameterMap.put(name, property);
-        }
-        return parameterMap;
-    }
-
-    public List<ObjectProperty> gerProperties(List<? extends Element> members,
-                                              Map<String, Parameter> typeParameters,
-                                              DocComment docComment) {
-
-        LinkedHashMap<String, VariableElement> fieldMap = new LinkedHashMap<>();
-        LinkedHashMap<String, ExecutableElement> gettersMap = new LinkedHashMap<>();
-
-        for (Element member : members) {
             String name = member.getSimpleName().toString();
             switch (member.getKind()) {
                 case FIELD:
@@ -239,38 +280,32 @@ public class DecalarationExtractor {
                     break;
                 case METHOD:
                     ExecutableElement method = (ExecutableElement) member;
-                    String methodName = method.getSimpleName().toString();
-                    if (isGetter(method)) {
-                        gettersMap.put(methodName, method);
-                    }
+                    getters.add(method);
                     break;
                 default:
-                    throw new IllegalArgumentException("illegal member type '" + member.getKind() + "' for " + name);
+                    break;
             }
         }
 
-        if (gettersMap.isEmpty()) {
+        if (getters.isEmpty()) {
             return Collections.emptyList();
         }
 
-        for (Map.Entry<String, ExecutableElement> entry : gettersMap.entrySet()) {
-            String name = entry.getKey();
-            String propertyName = getterToPropertyName(name);
-            Parameter parameter = new Parameter(propertyName);
-            ExecutableElement getter = entry.getValue();
-            List<String> returnComment = DocComment.create(toolbox.getDocComment(getter)).getReturn();
-            if (!returnComment.isEmpty()) {
-                parameter.setDescription(returnComment);
-            } else {
-                VariableElement field = fieldMap.get(name);
-                if (field != null) {
-                    List<String> description = DocComment.create(toolbox.getDocComment(field)).getDescription();
-                    parameter.setDescription(description);
-                }
-            }
+        for (ExecutableElement getter : getters) {
+
+
         }
 
         return Collections.emptyList();
+    }
+
+    private Property createProperty(ExecutableElement getter, Map<String, VariableElement> fieldMap) {
+        String name = getter.getSimpleName().toString();
+        List<String> methodReturnDescription = DocComment.create(toolbox.getDocComment(getter)).getReturn();
+
+        //TODO
+        return null;
+
     }
 
     private boolean isGetter(ExecutableElement element) {
@@ -296,5 +331,11 @@ public class DecalarationExtractor {
 
     private boolean isJavaPackageClass(String qualifiedName) {
         return qualifiedName.startsWith(JAVA_PREFIX);
+    }
+
+    private TypeElement getOriginTypeElement(DeclaredType typeMirror) {
+        TypeElement typeElement = (TypeElement) typeMirror.asElement();
+        DeclaredType declaredType = (DeclaredType) typeElement.asType();
+        return ((TypeElement) declaredType.asElement());
     }
 }

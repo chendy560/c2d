@@ -4,11 +4,11 @@ public class Warehouse {
 
 
     //TODO
-    public Declaration getDeclaration(String qualifiedName) {
+    public ObjectDeclaration getDeclaration(String qualifiedName) {
         return null;
     }
 
-    public void addDeclaration(Declaration declaration) {
+    public void addDeclaration(ObjectDeclaration declaration) {
 
     }
 }

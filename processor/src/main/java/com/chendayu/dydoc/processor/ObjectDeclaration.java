@@ -3,87 +3,56 @@ package com.chendayu.dydoc.processor;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import java.util.List;
 import java.util.Map;
 
 public class ObjectDeclaration implements Declaration {
 
-    private String qualifiedName;
+    private final TypeElement typeElement;
 
-    private ObjectDeclaration superClass;
+    private final String qualifiedName;
 
-    private List<ObjectDeclaration> interfaces;
+    private final DeclaredType declarationType;
 
-    private List<Declaration> typeArgs;
+    private List<Property> typeParameters;
 
     private List<Property> properties;
 
-    private TypeElement clazzElement;
+    private List<Parent> parents;
 
     private Map<String, VariableElement> fields;
 
     private Map<String, ExecutableElement> getters;
 
+    public ObjectDeclaration(TypeElement typeElement) {
+        this.typeElement = typeElement;
+        this.qualifiedName = typeElement.getQualifiedName().toString();
+        this.declarationType = ((DeclaredType) typeElement.asType());
+    }
+
     @Override
-    public Type getType() {
-        return Type.OBJECT;
+    public DeclarationType getType() {
+        return DeclarationType.OBJECT;
     }
 
-    public void initFieldAndGetters() {
-
+    public void setParents(List<Parent> parents) {
+        this.parents = parents;
     }
 
-
-    public String getQualifiedName() {
-        return qualifiedName;
+    public void setTypeParameters(List<Property> typeParameters) {
+        this.typeParameters = typeParameters;
     }
 
-    public void setQualifiedName(String qualifiedName) {
-        this.qualifiedName = qualifiedName;
-    }
+    public static class Parent {
 
-    public ObjectDeclaration getSuperClass() {
-        return superClass;
-    }
+        private final Declaration[] typeArgs;
 
-    public void setSuperClass(ObjectDeclaration superClass) {
-        this.superClass = superClass;
-    }
+        private final Declaration declaration;
 
-    public List<ObjectDeclaration> getInterfaces() {
-        return interfaces;
+        public Parent(Declaration[] typeArgs, Declaration declaration) {
+            this.typeArgs = typeArgs;
+            this.declaration = declaration;
+        }
     }
-
-    public void setInterfaces(List<ObjectDeclaration> interfaces) {
-        this.interfaces = interfaces;
-    }
-
-    public List<Declaration> getTypeArgs() {
-        return typeArgs;
-    }
-
-    public void setTypeArgs(List<Declaration> typeArgs) {
-        this.typeArgs = typeArgs;
-    }
-
-    public TypeElement getClazzElement() {
-        return clazzElement;
-    }
-
-    public void setClazzElement(TypeElement clazzElement) {
-        this.clazzElement = clazzElement;
-    }
-
-    public Map<String, VariableElement> getFields() {
-        return fields;
-    }
-
-    public Map<String, ExecutableElement> getGetters() {
-        return getters;
-    }
-
-    public void setGetters(Map<String, ExecutableElement> getters) {
-        this.getters = getters;
-    }
-
 }

@@ -9,8 +9,8 @@ public class ArrayDeclaration implements Declaration {
     }
 
     @Override
-    public Type getType() {
-        return Type.ARRAY;
+    public DeclarationType getType() {
+        return DeclarationType.ARRAY;
     }
 
     public Declaration getComponentType() {
