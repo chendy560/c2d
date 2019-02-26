@@ -91,6 +91,11 @@ public class DeclarationExtractor extends InfoExtractor {
 
     public Declaration extractAndSave(VariableElement variableElement) {
         TypeMirror typeMirror = variableElement.asType();
+        TypeKind kind = typeMirror.getKind();
+        if (kind == TypeKind.TYPEVAR) {
+            String name = variableElement.getSimpleName().toString();
+            return Declaration.typeArgOf(name);
+        }
         return extractAndSave(typeMirror);
     }
 
@@ -101,17 +106,15 @@ public class DeclarationExtractor extends InfoExtractor {
             case LONG:
             case FLOAT:
             case DOUBLE:
-            case SHORT:
-            case BYTE:
+            case SHORT: // 真的有人会用吗？
+            case BYTE: // 真的有人会用吗？
                 return Declaration.NUMBER;
             case BOOLEAN:
                 return Declaration.BOOLEAN;
             case CHAR:
-                return Declaration.STRING;
+                return Declaration.STRING; // 真的有人会用吗？
             case VOID:
-                return Declaration.VOID;
-            case TYPEVAR:
-                return Declaration.typeArgOf("");
+                return Declaration.VOID; // void 和 Void 不是一个东西，这里的是 void
             case DECLARED:
                 TypeElement typeElement = (TypeElement) typeUtils.asElement(typeMirror);
                 return extractAndSave(typeElement);
