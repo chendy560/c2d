@@ -370,6 +370,11 @@ public class DeclarationExtractor extends InfoExtractor {
     }
 
     private boolean isGetter(ExecutableElement element) {
+        Set<Modifier> modifiers = element.getModifiers();
+        if (modifiers.contains(Modifier.STATIC)) {
+            return false;
+        }
+
         String name = element.getSimpleName().toString();
         TypeMirror returnType = element.getReturnType();
 

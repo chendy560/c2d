@@ -12,12 +12,45 @@ public class SimpleController {
 
     /**
      * 测试方法
-     * 并没有什么乱用
      *
-     * @param i 假装我是一个参数
+     * @param i 并没有什么意义的参数
      */
     @GetMapping("/")
-    public SimpleData testInt(@RequestParam int i) {
+    public TestResponse testInt(@RequestParam int i) {
         return null;
+    }
+
+    /**
+     * 我是测试数据
+     */
+    public static class TestResponse {
+
+        /**
+         * 测试用名字
+         */
+        private String name;
+
+        /**
+         * 测试用年龄
+         */
+        private int age;
+
+        /**
+         * 另一个测试
+         *
+         * @return 名字
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * 另一个测试
+         *
+         * @return 年龄
+         */
+        public int getAge() {
+            return age;
+        }
     }
 }
