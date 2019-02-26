@@ -1,5 +1,6 @@
 package com.chendayu.dydoc.processor;
 
+import java.util.Collection;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -23,5 +24,9 @@ public class Warehouse {
 
     public void addResource(Resource resource) {
         resourceMap.put(resource.getName(), resource);
+    }
+
+    public Collection<Resource> getResources() {
+        return resourceMap.values();
     }
 }

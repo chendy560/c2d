@@ -1,13 +1,15 @@
 package com.chendayu.dydoc;
 
-import com.chendayu.dydoc.controller.EmptyController;
-import com.chendayu.dydoc.processor.SpringWebAnnotationProcessor;
+import com.chendayu.dydoc.processor.Warehouse;
+import com.chendayu.dydoc.testapp.controller.EmptyController;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProcessorTests {
 
@@ -23,11 +25,13 @@ public class ProcessorTests {
 
     @Test
     public void compileEmpty() {
-        compile(EmptyController.class);
+        Warehouse warehouse = compile(EmptyController.class);
+        assertThat(warehouse.getResources()).isEmpty();
     }
 
-    private void compile(Class<?>... types) {
-        SpringWebAnnotationProcessor processor = new SpringWebAnnotationProcessor();
+    private Warehouse compile(Class<?>... types) {
+        TestSpringWebAnnotationProcessor processor = new TestSpringWebAnnotationProcessor();
         this.compiler.getTask(types).call(processor);
+        return processor.getWarehouse();
     }
 }

@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 import java.util.List;
-import java.util.Set;
 
 import static com.chendayu.dydoc.processor.Utils.findRequestMapping;
 
@@ -39,9 +38,9 @@ public class ResourceExtractor extends InfoExtractor {
             }
         }
 
-        Set<Modifier> modifiers = typeElement.getModifiers();
-
-        warehouse.addResource(resource);
+        if (!resource.getActions().isEmpty()) {
+            warehouse.addResource(resource);
+        }
     }
 
     /**

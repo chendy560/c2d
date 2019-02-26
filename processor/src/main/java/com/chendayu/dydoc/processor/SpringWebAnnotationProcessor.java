@@ -65,4 +65,11 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
         }
         return false;
     }
+
+    /**
+     * 用于为子类暴露 Warehouse 进行测试的方法
+     */
+    protected Warehouse getWarehouse() {
+        return warehouse;
+    }
 }
