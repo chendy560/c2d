@@ -5,21 +5,27 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+/**
+ * 简单实现以下，把常用api弄进来
+ */
 public abstract class AbstractObjectDeclarationPostProcessor implements ObjectDeclarationPostProcessor {
 
-    protected ProcessingEnvironment processingEnv;
+    protected final ProcessingEnvironment processingEnv;
 
-    protected Elements elementUtils;
+    protected final Elements elementUtils;
 
-    protected Types typeUtils;
+    protected final Types typeUtils;
 
-    protected Messager messager;
+    protected final Messager messager;
 
-    @Override
-    public void setProcessionEnv(ProcessingEnvironment processingEnv) {
+    public AbstractObjectDeclarationPostProcessor(ProcessingEnvironment processingEnv) {
         this.processingEnv = processingEnv;
         this.elementUtils = processingEnv.getElementUtils();
         this.typeUtils = processingEnv.getTypeUtils();
         this.messager = processingEnv.getMessager();
+    }
+
+    protected final int highestOrder() {
+        return Integer.MIN_VALUE;
     }
 }

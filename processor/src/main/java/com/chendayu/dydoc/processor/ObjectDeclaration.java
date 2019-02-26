@@ -4,10 +4,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ObjectDeclaration implements Declaration {
 
@@ -17,15 +14,17 @@ public class ObjectDeclaration implements Declaration {
 
     private final DeclaredType declarationType;
 
+    private final List<ObjectProperty> properties = new ArrayList<>();
+
+    private final Map<String, ObjectProperty> propertyMap = new HashMap<>();
+
+    private List<String> description;
+
     private List<Property> typeParameters;
-
-    private List<ObjectProperty> properties;
-
-    private Map<String, ObjectProperty> propertyMap;
 
     private List<Parent> parents;
 
-    private Map<String, VariableElement> fieldMap;
+    private Map<String, VariableElement> fieldMap = new HashMap<>();
 
     private List<ExecutableElement> getters;
 
@@ -42,6 +41,14 @@ public class ObjectDeclaration implements Declaration {
     @Override
     public DeclarationType getType() {
         return DeclarationType.OBJECT;
+    }
+
+    public List<String> getDescription() {
+        return description;
+    }
+
+    public void setDescription(List<String> description) {
+        this.description = description;
     }
 
     public TypeElement getTypeElement() {
@@ -64,14 +71,17 @@ public class ObjectDeclaration implements Declaration {
         this.typeParameters = typeParameters;
     }
 
-    public void setProperties(List<ObjectProperty> properties) {
-        this.properties = properties;
-        if (!properties.isEmpty()) {
-            propertyMap = new HashMap<>(properties.size() * 2);
-            for (ObjectProperty property : properties) {
-                propertyMap.put(property.getName(), property);
-            }
+    public void addProperty(ObjectProperty property) {
+        String name = property.getName();
+        if (this.containsProperty(name)) {
+            throw new IllegalArgumentException("property '" + name + "' already exists in '" + name + "'");
         }
+        this.properties.add(property);
+        this.propertyMap.put(name, property);
+    }
+
+    public List<Property> getProperties() {
+        return Collections.unmodifiableList(properties);
     }
 
     public void setFieldMap(Map<String, VariableElement> fieldMap) {

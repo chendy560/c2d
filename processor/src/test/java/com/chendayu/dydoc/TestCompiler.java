@@ -10,6 +10,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * 从 spring-boot 复制粘贴过来的测试工具类，封装编译器api
+ */
 public class TestCompiler {
 
     /**

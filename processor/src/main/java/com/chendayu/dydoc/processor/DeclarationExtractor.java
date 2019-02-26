@@ -11,18 +11,20 @@ import java.util.*;
 
 public class DeclarationExtractor extends InfoExtractor {
 
+    private static final String LOMBOK_DATA = "lombok.Data";
+
     private static final String JAVA_PREFIX = "java.";
 
     private static final String GETTER_PREFIX = "get";
 
     private static final String BOOLEAN_GETTER_PREFIX = "is";
 
-    private final Warehouse warehouse;
-
     private final Set<Element> objectMethods;
 
     private final TypeMirror voidType;
+
     private final TypeMirror charSequenceType;
+
     private final TypeMirror numberType;
 
     private final TypeMirror booleanType;
@@ -34,9 +36,10 @@ public class DeclarationExtractor extends InfoExtractor {
     private final TypeMirror mapType;
     private final TypeMirror enumType;
 
+    private final SortedSet<ObjectDeclarationPostProcessor> postProcessors;
+
     public DeclarationExtractor(ProcessingEnvironment environment, Warehouse warehouse) {
         super(environment, warehouse);
-        this.warehouse = warehouse;
         this.objectMethods = initObjectMethodNames();
 
         this.voidType = elementUtils.getTypeElement(Void.class.getName()).asType();
@@ -52,6 +55,9 @@ public class DeclarationExtractor extends InfoExtractor {
         this.mapType = typeUtils.erasure(elementUtils.getTypeElement(Map.class.getName()).asType());
 
         this.enumType = typeUtils.erasure(elementUtils.getTypeElement(Enum.class.getName()).asType());
+
+        this.postProcessors = initPostProcessors(environment);
+
     }
 
     private Set<Element> initObjectMethodNames() {
@@ -68,6 +74,20 @@ public class DeclarationExtractor extends InfoExtractor {
         }
         return Collections.unmodifiableSet(objectMethodsSet);
     }
+
+    private SortedSet<ObjectDeclarationPostProcessor> initPostProcessors(ProcessingEnvironment environment) {
+        TreeSet<ObjectDeclarationPostProcessor> processors = new TreeSet<>(Comparator.comparing(ObjectDeclarationPostProcessor::getOrder));
+
+        TypeElement lombokData = elementUtils.getTypeElement(LOMBOK_DATA);
+        if (lombokData != null) {
+            LombokObjectDeclarationPostProcessor lombokProcessor =
+                    new LombokObjectDeclarationPostProcessor(environment, this);
+            processors.add(lombokProcessor);
+        }
+
+        return Collections.unmodifiableSortedSet(processors);
+    }
+
 
     public Declaration extractAndSave(VariableElement variableElement) {
         TypeMirror typeMirror = variableElement.asType();
@@ -213,12 +233,20 @@ public class DeclarationExtractor extends InfoExtractor {
         warehouse.addDeclaration(result);
 
         DocComment docComment = DocComment.create(elementUtils.getDocComment(typeElement));
+        result.setDescription(docComment.getDescription());
 
         processParents(typeElement, result);
         processTypeParameters(typeElement, docComment, result);
         processFieldAndGetters(typeElement, result);
+        postProcess(result);
 
         return result;
+    }
+
+    private void postProcess(ObjectDeclaration result) {
+        for (ObjectDeclarationPostProcessor postProcessor : postProcessors) {
+            postProcessor.process(result);
+        }
     }
 
     private void processParents(TypeElement typeElement, ObjectDeclaration result) {
@@ -329,16 +357,13 @@ public class DeclarationExtractor extends InfoExtractor {
         result.setFieldMap(fieldMap);
 
         if (getters.isEmpty()) {
-            result.setProperties(Collections.emptyList());
             return;
         }
 
-        ArrayList<ObjectProperty> properties = new ArrayList<>(getters.size());
         for (ExecutableElement getter : getters) {
             ObjectProperty property = createProperty(getter, fieldMap);
-            properties.add(property);
+            result.addProperty(property);
         }
-        result.setProperties(properties);
     }
 
     private ObjectProperty createProperty(ExecutableElement getter, Map<String, VariableElement> fieldMap) {
@@ -387,11 +412,11 @@ public class DeclarationExtractor extends InfoExtractor {
 
     private String getterToPropertyName(String methodName) {
         if (methodName.startsWith(GETTER_PREFIX)) {
-            String propertyName = methodName.substring(3);
+            String propertyName = methodName.substring(GETTER_PREFIX.length());
             return Utils.lowerCaseFirst(propertyName);
         }
 
-        String propertyName = methodName.substring(2);
+        String propertyName = methodName.substring(BOOLEAN_GETTER_PREFIX.length());
         return Utils.lowerCaseFirst(propertyName);
     }
 

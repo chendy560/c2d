@@ -1,17 +1,16 @@
 package com.chendayu.dydoc;
 
 import com.chendayu.dydoc.processor.Warehouse;
-import com.chendayu.dydoc.testapp.controller.EmptyController;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class ProcessorTests {
+/**
+ * 本项目的 ut 整体逻辑都差不多，所以就把公用的部分抽离出来了
+ */
+public class AbstractTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -23,13 +22,7 @@ public class ProcessorTests {
         this.compiler = new TestCompiler(this.temporaryFolder);
     }
 
-    @Test
-    public void compileEmpty() {
-        Warehouse warehouse = compile(EmptyController.class);
-        assertThat(warehouse.getResources()).isEmpty();
-    }
-
-    private Warehouse compile(Class<?>... types) {
+    Warehouse compile(Class<?>... types) {
         TestSpringWebAnnotationProcessor processor = new TestSpringWebAnnotationProcessor();
         this.compiler.getTask(types).call(processor);
         return processor.getWarehouse();

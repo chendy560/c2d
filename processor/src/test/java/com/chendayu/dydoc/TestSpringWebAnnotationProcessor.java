@@ -3,6 +3,9 @@ package com.chendayu.dydoc;
 import com.chendayu.dydoc.processor.SpringWebAnnotationProcessor;
 import com.chendayu.dydoc.processor.Warehouse;
 
+/**
+ * 测试用 processor，把 warehouse 暴露出来
+ */
 public class TestSpringWebAnnotationProcessor extends SpringWebAnnotationProcessor {
 
     @Override
