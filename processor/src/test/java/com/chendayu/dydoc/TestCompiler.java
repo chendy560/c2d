@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 public class TestCompiler {
 
@@ -31,7 +32,7 @@ public class TestCompiler {
         this.compiler = compiler;
         this.fileManager = compiler.getStandardFileManager(null, null, null);
         this.outputLocation = temporaryFolder.newFolder();
-        Iterable<? extends File> temp = Arrays.asList(this.outputLocation);
+        Iterable<? extends File> temp = Collections.singleton(this.outputLocation);
         this.fileManager.setLocation(StandardLocation.CLASS_OUTPUT, temp);
         this.fileManager.setLocation(StandardLocation.SOURCE_OUTPUT, temp);
     }
