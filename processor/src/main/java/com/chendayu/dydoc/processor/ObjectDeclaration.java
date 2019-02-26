@@ -4,6 +4,8 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,9 +21,11 @@ public class ObjectDeclaration implements Declaration {
 
     private List<ObjectProperty> properties;
 
+    private Map<String, ObjectProperty> propertyMap;
+
     private List<Parent> parents;
 
-    private Map<String, VariableElement> fields;
+    private Map<String, VariableElement> fieldMap;
 
     private List<ExecutableElement> getters;
 
@@ -31,9 +35,21 @@ public class ObjectDeclaration implements Declaration {
         this.declarationType = ((DeclaredType) typeElement.asType());
     }
 
+    public Collection<VariableElement> getFields() {
+        return fieldMap.values();
+    }
+
     @Override
     public DeclarationType getType() {
         return DeclarationType.OBJECT;
+    }
+
+    public TypeElement getTypeElement() {
+        return typeElement;
+    }
+
+    public boolean containsProperty(String name) {
+        return propertyMap.containsKey(name);
     }
 
     public String getQualifiedName() {
@@ -50,10 +66,16 @@ public class ObjectDeclaration implements Declaration {
 
     public void setProperties(List<ObjectProperty> properties) {
         this.properties = properties;
+        if (!properties.isEmpty()) {
+            propertyMap = new HashMap<>(properties.size() * 2);
+            for (ObjectProperty property : properties) {
+                propertyMap.put(property.getName(), property);
+            }
+        }
     }
 
-    public void setFields(Map<String, VariableElement> fields) {
-        this.fields = fields;
+    public void setFieldMap(Map<String, VariableElement> fieldMap) {
+        this.fieldMap = fieldMap;
     }
 
     public void setGetters(List<ExecutableElement> getters) {

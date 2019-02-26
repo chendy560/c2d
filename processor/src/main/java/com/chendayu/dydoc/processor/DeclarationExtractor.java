@@ -326,7 +326,7 @@ public class DeclarationExtractor extends InfoExtractor {
         }
 
         result.setGetters(getters);
-        result.setFields(fieldMap);
+        result.setFieldMap(fieldMap);
 
         if (getters.isEmpty()) {
             result.setProperties(Collections.emptyList());
