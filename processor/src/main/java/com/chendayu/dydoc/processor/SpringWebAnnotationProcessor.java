@@ -1,12 +1,14 @@
 package com.chendayu.dydoc.processor;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,13 +21,13 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
                     "org.springframework.web.bind.annotation.RestController"
             ).collect(Collectors.toSet());
 
-    private Toolbox toolbox;
-
     private Warehouse warehouse;
 
     private ResourceExtractor resourceExtractor;
 
     private DocGenerator docGenerator;
+
+    private Messager messager;
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -40,10 +42,10 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-        this.toolbox = new Toolbox(processingEnv);
         this.warehouse = new Warehouse();
-        this.resourceExtractor = new ResourceExtractor(toolbox, warehouse);
+        this.resourceExtractor = new ResourceExtractor(processingEnv, warehouse);
         this.docGenerator = new DocGenerator(processingEnv);
+        this.messager = processingEnv.getMessager();
     }
 
     @Override
@@ -61,7 +63,9 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
             }
 
         } catch (Exception e) {
-            toolbox.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
+            String message = e.getMessage();
+            String trace = Arrays.toString(e.getStackTrace());
+            messager.printMessage(Diagnostic.Kind.ERROR, message + trace);
         }
         return false;
     }

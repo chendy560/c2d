@@ -2,6 +2,7 @@ package com.chendayu.dydoc.processor;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 import java.util.List;
@@ -12,7 +13,7 @@ public class ResourceExtractor extends InfoExtractor {
 
     private final ActionExtractor actionExtractor;
 
-    public ResourceExtractor(Toolbox toolbox, Warehouse warehouse) {
+    public ResourceExtractor(ProcessingEnvironment toolbox, Warehouse warehouse) {
         super(toolbox, warehouse);
         this.actionExtractor = new ActionExtractor(toolbox, warehouse);
     }
@@ -20,7 +21,7 @@ public class ResourceExtractor extends InfoExtractor {
     public void getAndSave(TypeElement typeElement) {
         String resourceName = findResourceName(typeElement);
         if (warehouse.containsResource(resourceName)) {
-            toolbox.printMessage(Diagnostic.Kind.WARNING,
+            messager.printMessage(Diagnostic.Kind.WARNING,
                     "resource '" + resourceName + " already exists");
             return;
         }
@@ -28,7 +29,7 @@ public class ResourceExtractor extends InfoExtractor {
         Resource resource = new Resource(resourceName);
         resource.setPath(getControllerPath(typeElement));
 
-        List<? extends Element> members = toolbox.getAllMembers(typeElement);
+        List<? extends Element> members = elementUtils.getAllMembers(typeElement);
         for (Element e : members) {
             if (e.getKind() == ElementKind.METHOD) {
                 Action action = actionExtractor.findAction((ExecutableElement) e);

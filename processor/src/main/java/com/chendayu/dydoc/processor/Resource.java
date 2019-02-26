@@ -40,4 +40,3 @@ public class Resource {
         this.path = path;
     }
 }
-

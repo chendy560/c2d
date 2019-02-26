@@ -48,7 +48,7 @@ public class Utils {
     }
 
     public static String lowerCaseFirst(String s) {
-        if (Character.isLowerCase(s.charAt(0))) {
+        if (Character.isUpperCase(s.charAt(0))) {
             char[] chars = s.toCharArray();
             chars[0] = Character.toLowerCase(chars[0]);
             return new String(chars);

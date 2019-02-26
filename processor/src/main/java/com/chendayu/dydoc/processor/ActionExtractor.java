@@ -3,9 +3,9 @@ package com.chendayu.dydoc.processor;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import java.util.List;
 
@@ -16,8 +16,7 @@ public class ActionExtractor extends InfoExtractor {
 
     private final DeclarationExtractor declarationExtractor;
 
-
-    public ActionExtractor(Toolbox toolbox, Warehouse warehouse) {
+    public ActionExtractor(ProcessingEnvironment toolbox, Warehouse warehouse) {
         super(toolbox, warehouse);
         this.declarationExtractor = new DeclarationExtractor(toolbox, warehouse);
     }
@@ -42,7 +41,7 @@ public class ActionExtractor extends InfoExtractor {
     private Action createAction(ExecutableElement element, String path, HttpMethod method) {
 
         String actionName = element.getSimpleName().toString();
-        String docCommentString = toolbox.getDocComment(element);
+        String docCommentString = elementUtils.getDocComment(element);
         DocComment docComment = DocComment.create(docCommentString);
 
         Action action = new Action(actionName, docComment.getDescription());
@@ -55,12 +54,10 @@ public class ActionExtractor extends InfoExtractor {
         }
 
         TypeMirror returnType = element.getReturnType();
-        if (returnType.getKind() == TypeKind.DECLARED) {
-            List<String> returnComment = docComment.getReturn();
-            Declaration declaration = declarationExtractor.extractAndSave(returnType);
-            Property responseBody = new Property(returnComment, declaration);
-            action.setResponseBody(responseBody);
-        }
+        List<String> returnComment = docComment.getReturn();
+        Declaration declaration = declarationExtractor.extractAndSave(returnType);
+        Property responseBody = new Property(returnComment, declaration);
+        action.setResponseBody(responseBody);
 
         return action;
     }

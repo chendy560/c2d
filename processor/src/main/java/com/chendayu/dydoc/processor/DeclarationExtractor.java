@@ -1,5 +1,6 @@
 package com.chendayu.dydoc.processor;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
@@ -8,7 +9,7 @@ import javax.lang.model.type.TypeMirror;
 import java.time.Instant;
 import java.util.*;
 
-public class DeclarationExtractor {
+public class DeclarationExtractor extends InfoExtractor {
 
     private static final String JAVA_PREFIX = "java.";
 
@@ -18,10 +19,9 @@ public class DeclarationExtractor {
 
     private final Warehouse warehouse;
 
-    private final Toolbox toolbox;
-
     private final Set<Element> objectMethods;
 
+    private final TypeMirror voidType;
     private final TypeMirror charSequenceType;
     private final TypeMirror numberType;
 
@@ -34,33 +34,35 @@ public class DeclarationExtractor {
     private final TypeMirror mapType;
     private final TypeMirror enumType;
 
-    public DeclarationExtractor(Toolbox toolbox, Warehouse warehouse) {
-        this.toolbox = toolbox;
+    public DeclarationExtractor(ProcessingEnvironment environment, Warehouse warehouse) {
+        super(environment, warehouse);
         this.warehouse = warehouse;
-        this.objectMethods = initObjectMethods();
+        this.objectMethods = initObjectMethodNames();
 
-        this.charSequenceType = toolbox.getTypeElement(CharSequence.class.getName()).asType();
+        this.voidType = elementUtils.getTypeElement(Void.class.getName()).asType();
+        this.charSequenceType = elementUtils.getTypeElement(CharSequence.class.getName()).asType();
 
-        this.booleanType = toolbox.getTypeElement(Boolean.class.getName()).asType();
+        this.booleanType = elementUtils.getTypeElement(Boolean.class.getName()).asType();
 
-        this.numberType = toolbox.getTypeElement(Number.class.getName()).asType();
+        this.numberType = elementUtils.getTypeElement(Number.class.getName()).asType();
 
-        this.dateType = toolbox.getTypeElement(Date.class.getName()).asType();
-        this.instantType = toolbox.getTypeElement(Instant.class.getName()).asType();
-        this.collectionType = toolbox.erasure(toolbox.getTypeElement(Collection.class.getName()).asType());
-        this.mapType = toolbox.erasure(toolbox.getTypeElement(Map.class.getName()).asType());
+        this.dateType = elementUtils.getTypeElement(Date.class.getName()).asType();
+        this.instantType = elementUtils.getTypeElement(Instant.class.getName()).asType();
+        this.collectionType = typeUtils.erasure(elementUtils.getTypeElement(Collection.class.getName()).asType());
+        this.mapType = typeUtils.erasure(elementUtils.getTypeElement(Map.class.getName()).asType());
 
-        this.enumType = toolbox.erasure(toolbox.getTypeElement(Enum.class.getName()).asType());
+        this.enumType = typeUtils.erasure(elementUtils.getTypeElement(Enum.class.getName()).asType());
     }
 
-    private Set<Element> initObjectMethods() {
+    private Set<Element> initObjectMethodNames() {
 
         HashSet<Element> objectMethodsSet = new HashSet<>(32, 0.5f);
 
-        TypeElement objectElement = toolbox.getTypeElement(Object.class.getName());
-        List<? extends Element> objectMembers = toolbox.getAllMembers(objectElement);
+        TypeElement objectElement = elementUtils.getTypeElement(Object.class.getName());
+        List<? extends Element> objectMembers = elementUtils.getAllMembers(objectElement);
         for (Element objectMember : objectMembers) {
-            if (objectElement.getKind() == ElementKind.METHOD) {
+            ElementKind kind = objectMember.getKind();
+            if (kind == ElementKind.METHOD) {
                 objectMethodsSet.add(objectMember);
             }
         }
@@ -69,20 +71,50 @@ public class DeclarationExtractor {
 
     public Declaration extractAndSave(VariableElement variableElement) {
         TypeMirror typeMirror = variableElement.asType();
-        return extractAndSave((TypeElement) toolbox.asElement(typeMirror));
+        return extractAndSave(typeMirror);
     }
 
+    public Declaration extractAndSave(TypeMirror typeMirror) {
+        TypeKind kind = typeMirror.getKind();
+        switch (kind) {
+            case INT:
+            case LONG:
+            case FLOAT:
+            case DOUBLE:
+            case SHORT:
+            case BYTE:
+                return Declaration.NUMBER;
+            case BOOLEAN:
+                return Declaration.BOOLEAN;
+            case CHAR:
+                return Declaration.STRING;
+            case VOID:
+                return Declaration.VOID;
+            case TYPEVAR:
+                return Declaration.typeArgOf("");
+            case DECLARED:
+                TypeElement typeElement = (TypeElement) typeUtils.asElement(typeMirror);
+                return extractAndSave(typeElement);
+            default:
+                throw new IllegalStateException("unknown type kind: " + kind +
+                        " for type mirror: " + typeMirror);
+        }
+    }
+
+    /**
+     * 这里有一个坑，基本类型木有 TypeElement
+     */
     public Declaration extractAndSave(TypeElement typeElement) {
 
         TypeMirror elementType = typeElement.asType();
-        TypeMirror erasedType = toolbox.erasure(elementType);
+        TypeMirror erasedType = typeUtils.erasure(elementType);
         TypeKind kind = erasedType.getKind();
 
-        if (isVoid(kind)) {
+        if (isVoid(erasedType)) {
             return Declaration.VOID;
         }
 
-        if (isNumber(erasedType, kind)) {
+        if (isNumber(erasedType)) {
             return Declaration.NUMBER;
         }
 
@@ -94,7 +126,7 @@ public class DeclarationExtractor {
             return Declaration.TIMESTAMP;
         }
 
-        if (isBoolean(erasedType, kind)) {
+        if (isBoolean(erasedType)) {
             return Declaration.BOOLEAN;
         }
 
@@ -121,44 +153,39 @@ public class DeclarationExtractor {
     }
 
     private boolean isEnum(TypeMirror erasedType) {
-        return toolbox.isSubtype(erasedType, enumType);
+        return typeUtils.isSubtype(erasedType, enumType);
     }
 
     private boolean isDynamic(TypeMirror erasedType) {
-        return toolbox.isSubtype(erasedType, mapType);
+        return typeUtils.isSubtype(erasedType, mapType);
     }
 
     private boolean isCollection(TypeMirror erasedType) {
-        return toolbox.isSubtype(erasedType, collectionType);
+        return typeUtils.isSubtype(erasedType, collectionType);
     }
 
     private boolean isArray(TypeKind kind) {
         return kind == TypeKind.ARRAY;
     }
 
-    private boolean isBoolean(TypeMirror erasedType, TypeKind kind) {
-        return kind == TypeKind.BOOLEAN || toolbox.isSameType(erasedType, booleanType);
+    private boolean isBoolean(TypeMirror erasedType) {
+        return typeUtils.isSameType(erasedType, booleanType);
     }
 
     private boolean isTimestamp(TypeMirror erasedType) {
-        return toolbox.isSameType(erasedType, dateType) || toolbox.isSameType(erasedType, instantType);
+        return typeUtils.isSameType(erasedType, dateType) || typeUtils.isSameType(erasedType, instantType);
     }
 
     private boolean isCharSequence(TypeMirror erasedType) {
-        return toolbox.isSubtype(erasedType, charSequenceType);
+        return typeUtils.isSubtype(erasedType, charSequenceType);
     }
 
-    private boolean isNumber(TypeMirror typeMirror, TypeKind kind) {
-        return kind == TypeKind.INT ||
-                kind == TypeKind.SHORT ||
-                kind == TypeKind.BYTE ||
-                kind == TypeKind.FLOAT ||
-                kind == TypeKind.DOUBLE ||
-                toolbox.isSubtype(typeMirror, numberType);
+    private boolean isNumber(TypeMirror typeMirror) {
+        return typeUtils.isSubtype(typeMirror, numberType);
     }
 
-    private boolean isVoid(TypeKind kind) {
-        return kind == TypeKind.VOID;
+    private boolean isVoid(TypeMirror typeMirror) {
+        return typeUtils.isSameType(typeMirror, voidType);
     }
 
     private ObjectDeclaration extractAndSaveFromArray(ArrayType type) {
@@ -185,7 +212,7 @@ public class DeclarationExtractor {
         ObjectDeclaration result = new ObjectDeclaration(typeElement);
         warehouse.addDeclaration(result);
 
-        DocComment docComment = DocComment.create(toolbox.getDocComment(typeElement));
+        DocComment docComment = DocComment.create(elementUtils.getDocComment(typeElement));
 
         processParents(typeElement, result);
         processTypeParameters(typeElement, docComment, result);
@@ -196,7 +223,7 @@ public class DeclarationExtractor {
 
     private void processParents(TypeElement typeElement, ObjectDeclaration result) {
 
-        List<? extends TypeMirror> parentTypes = toolbox.directSupertypes(typeElement.asType());
+        List<? extends TypeMirror> parentTypes = typeUtils.directSupertypes(typeElement.asType());
         ArrayList<ObjectDeclaration.Parent> parents = new ArrayList<>(parentTypes.size());
 
         for (TypeMirror parentType : parentTypes) {
@@ -247,7 +274,7 @@ public class DeclarationExtractor {
         ArrayList<Declaration> declarations = new ArrayList<>();
         for (TypeMirror typeArgument : typeArguments) {
             TypeKind kind = typeArgument.getKind();
-            Element element = toolbox.asElement(typeArgument);
+            Element element = typeUtils.asElement(typeArgument);
             switch (kind) {
                 case TYPEVAR:
                     String name = element.getSimpleName().toString();
@@ -268,7 +295,7 @@ public class DeclarationExtractor {
 
     public void processFieldAndGetters(TypeElement typeElement, ObjectDeclaration result) {
 
-        List<? extends Element> members = toolbox.getAllMembers(typeElement);
+        List<? extends Element> members = elementUtils.getAllMembers(typeElement);
 
         LinkedHashMap<String, VariableElement> fieldMap = new LinkedHashMap<>();
         ArrayList<ExecutableElement> getters = new ArrayList<>();
@@ -278,8 +305,8 @@ public class DeclarationExtractor {
             if (objectMethods.contains(member)) {
                 continue;
             }
-
             String name = member.getSimpleName().toString();
+
             switch (member.getKind()) {
                 case FIELD:
                     VariableElement field = (VariableElement) member;
@@ -321,34 +348,22 @@ public class DeclarationExtractor {
 
         List<String> description = findDescription(getter, field);
 
-        TypeMirror typeMirror = field.asType();
-        Declaration declaration = extractAndSave(typeMirror);
+        TypeMirror returnType = getter.getReturnType();
+        Declaration declaration = extractAndSave(returnType);
 
         return new ObjectProperty(name, description, declaration, field, getter);
     }
 
-    public Declaration extractAndSave(TypeMirror typeMirror) {
-        TypeKind kind = typeMirror.getKind();
-        switch (kind) {
-            case DECLARED:
-                return extractAndSave((TypeElement) toolbox.asElement(typeMirror));
-            case TYPEVAR:
-                String name = toolbox.asElement(typeMirror).getSimpleName().toString();
-                return Declaration.typeArgOf(name);
-            default:
-                throw new IllegalArgumentException("unsupported type kind: " + kind +
-                        ", for type mirror:" + typeMirror);
-        }
-    }
-
     private List<String> findDescription(ExecutableElement getter, VariableElement field) {
-        List<String> methodReturnComment = DocComment.create(toolbox.getDocComment(getter)).getReturn();
+        List<String> methodReturnComment = DocComment.create(elementUtils.getDocComment(getter)).getReturn();
         if (!methodReturnComment.isEmpty()) {
             return methodReturnComment;
         }
 
         if (field != null) {
-            return DocComment.create(toolbox.getDocComment(field)).getReturn();
+            String docComment = elementUtils.getDocComment(field);
+            DocComment fieldDocComment = DocComment.create(docComment);
+            return fieldDocComment.getDescription();
         }
 
         return Collections.emptyList();
@@ -367,11 +382,11 @@ public class DeclarationExtractor {
 
     private String getterToPropertyName(String methodName) {
         if (methodName.startsWith(GETTER_PREFIX)) {
-            String propertyName = methodName.substring(2);
+            String propertyName = methodName.substring(3);
             return Utils.lowerCaseFirst(propertyName);
         }
 
-        String propertyName = methodName.substring(1);
+        String propertyName = methodName.substring(2);
         return Utils.lowerCaseFirst(propertyName);
     }
 
