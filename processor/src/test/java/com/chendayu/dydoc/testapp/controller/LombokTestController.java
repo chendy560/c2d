@@ -22,6 +22,11 @@ public class LombokTestController {
     }
 
 
+    @GetMapping("/test3")
+    public NoLombokTestClass test3() {
+        return null;
+    }
+
     /**
      * 测试数据
      */
@@ -49,6 +54,14 @@ public class LombokTestController {
          * 电子邮件地址
          */
         private String email;
+    }
+
+    /**
+     * 没有字段的测试数据
+     */
+    public static class NoLombokTestClass {
+
+        private String blah;
     }
 }
 

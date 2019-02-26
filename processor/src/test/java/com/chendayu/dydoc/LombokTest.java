@@ -24,18 +24,16 @@ public class LombokTest extends AbstractTest {
         assertThat(resource.getName()).isEqualTo("LombokTest");
 
         SortedSet<Action> actions = resource.getActions();
-        assertThat(actions).hasSize(2);
+        assertThat(actions).hasSize(3);
 
         Iterator<Action> iterator = actions.iterator();
 
-        Action firstAction = iterator.next();
-        checkFirstAction(firstAction);
-
-        Action secondAction = iterator.next();
-        checkSecondAction(secondAction);
+        checkDataAction(iterator.next());
+        checkGetterAction(iterator.next());
+        checkNoLombokAction(iterator.next());
     }
 
-    private void checkFirstAction(Action action) {
+    private void checkDataAction(Action action) {
         assertThat(action.getName()).isEqualTo("test1");
         Property responseBody = action.getResponseBody();
 
@@ -56,7 +54,7 @@ public class LombokTest extends AbstractTest {
         assertThat(ageProperty.getDeclaration().getType()).isEqualTo(DeclarationType.NUMBER);
     }
 
-    private void checkSecondAction(Action action) {
+    private void checkGetterAction(Action action) {
         assertThat(action.getName()).isEqualTo("test2");
         Property responseBody = action.getResponseBody();
 
@@ -70,5 +68,16 @@ public class LombokTest extends AbstractTest {
         assertThat(emailProperty.getName()).isEqualTo("email");
         assertThat(emailProperty.getDescription()).isEqualTo(singletonList("电子邮件地址"));
         assertThat(emailProperty.getDeclaration().getType()).isEqualTo(DeclarationType.STRING);
+    }
+
+    private void checkNoLombokAction(Action action) {
+        assertThat(action.getName()).isEqualTo("test3");
+        Property responseBody = action.getResponseBody();
+
+        ObjectDeclaration responseDeclaration = (ObjectDeclaration) responseBody.getDeclaration();
+        assertThat(responseDeclaration.getDescription()).isEqualTo(singletonList("没有字段的测试数据"));
+
+        List<Property> properties = responseDeclaration.getProperties();
+        assertThat(properties).hasSize(0);
     }
 }
