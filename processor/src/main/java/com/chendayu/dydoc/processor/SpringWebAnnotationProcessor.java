@@ -1,7 +1,6 @@
 package com.chendayu.dydoc.processor;
 
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
@@ -15,15 +14,18 @@ import java.util.stream.Stream;
 public class SpringWebAnnotationProcessor extends AbstractProcessor {
 
     private static final Set<String> SUPPORTED_ANNOTATIONS =
-            Stream.of("org.springframework.stereotype.Controller",
+            Stream.of(
+                    "org.springframework.stereotype.Controller",
                     "org.springframework.web.bind.annotation.RestController"
             ).collect(Collectors.toSet());
 
-    private Messager messager;
+    private Toolbox toolbox;
 
-    private ApiInfoStore apiInfoStore;
+    private Warehouse warehouse;
 
     private ResourceExtractor resourceExtractor;
+
+    private DocGenerator docGenerator;
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -38,9 +40,10 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-        this.messager = processingEnv.getMessager();
-        this.apiInfoStore = new ApiInfoStore(processingEnv);
-        this.resourceExtractor = new ResourceExtractor(processingEnv, apiInfoStore);
+        this.toolbox = new Toolbox(processingEnv);
+        this.warehouse = new Warehouse();
+        this.resourceExtractor = new ResourceExtractor(toolbox, warehouse);
+        this.docGenerator = new DocGenerator(processingEnv);
     }
 
     @Override
@@ -54,11 +57,11 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
             }
 
             if (roundEnv.processingOver()) {
-                apiInfoStore.write();
+                docGenerator.printDoc(warehouse);
             }
 
         } catch (Exception e) {
-            messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
+            toolbox.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
         }
         return false;
     }

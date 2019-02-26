@@ -67,6 +67,11 @@ public class DeclarationExtractor {
         return Collections.unmodifiableSet(objectMethodsSet);
     }
 
+    public Declaration extractAndSave(VariableElement variableElement) {
+        TypeMirror typeMirror = variableElement.asType();
+        return extractAndSave((TypeElement) toolbox.asElement(typeMirror));
+    }
+
     public Declaration extractAndSave(TypeElement typeElement) {
 
         TypeMirror elementType = typeElement.asType();
@@ -322,7 +327,7 @@ public class DeclarationExtractor {
         return new ObjectProperty(name, description, declaration, field, getter);
     }
 
-    private Declaration extractAndSave(TypeMirror typeMirror) {
+    public Declaration extractAndSave(TypeMirror typeMirror) {
         TypeKind kind = typeMirror.getKind();
         switch (kind) {
             case DECLARED:

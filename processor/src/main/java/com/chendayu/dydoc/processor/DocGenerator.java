@@ -1,147 +1,21 @@
 package com.chendayu.dydoc.processor;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.ProcessingEnvironment;
 
 public class DocGenerator {
 
-    public static final String API_DOC = "API Doc";
+    private final Filer filer;
 
-    private AdocGenerator generator = new AdocGenerator();
+    private final Messager messager;
 
-    public String generateIndex(Index index) {
-        String projectName = index.getProjectName();
-
-        if (projectName != null) {
-            generator.title0(projectName + ' ' + API_DOC);
-        } else {
-            generator.title0(API_DOC);
-        }
-        generator.title1("Resources");
-
-        for (String resource : index.getResources()) {
-            generator.include("resources/" + resource).newLine();
-        }
-
-        generator.title1("Objects");
-        for (String object : index.getObjects()) {
-            generator.include("objects/" + object).newLine();
-        }
-        return generator.getAndReset();
+    public DocGenerator(ProcessingEnvironment processingEnvironment) {
+        this.filer = processingEnvironment.getFiler();
+        this.messager = processingEnvironment.getMessager();
     }
 
-    public String generateResourcePages(Resource resource) {
-
-        generator.title2(resource.getName())
-                .appendLines(resource.getDescription());
-
-        for (Action action : resource.getActions()) {
-            generator.title3(action.getName())
-                    .appendLines(action.getDescription());
-
-            generator.title4("Request")
-                    .sourceCode("http")
-                    .codeBoundary()
-                    .append(action.getMethod().toString())
-                    .space()
-                    .append(resource.getPath())
-                    .append(action.getPath())
-                    .newLine().
-                    codeBoundary();
-
-            if (!action.getUrlParameters().isEmpty()) {
-                generator.title5("Path Parameters");
-                parameterTable(action.getUrlParameters());
-            }
-
-            if (!action.getPathVariables().isEmpty()) {
-                generator.title5("URL Parameters");
-                parameterTable(action.getPathVariables());
-            }
-
-            if (action.getRequestBody() != null) {
-                generator.title5("Request Body").newLine();
-                objectLink(action.getRequestBody());
-                generator.dualNewLine();
-            }
-            if (action.getResponseBody() != null) {
-                generator.title5("Response");
-                objectLink(action.getResponseBody());
-                generator.dualNewLine();
-            }
-        }
-        return generator.getAndReset();
-    }
-
-    public String generateObjectPages(ObjectStructure objectStructure) {
-
-        generator.anchor(objectStructure.getHash())
-                .newLine()
-                .title2(objectStructure.getName())
-                .appendLines(objectStructure.getDescription());
-        parameterTable(objectStructure.getParameters());
-        return generator.getAndReset();
-    }
-
-    private void parameterTable(List<Parameter> parameters) {
-
-        generator.tableBoundary().newLine()
-                .tableSeparator().append("Name").space()
-                .tableSeparator().append("Type").space()
-                .tableSeparator().append("Description").dualNewLine();
-
-        for (Parameter parameter : parameters) {
-            generator.tableSeparator().append(parameter.getName()).newLine();
-            ParameterType type = parameter.getType();
-            if (type.isSimpleType()) {
-                generator.tableSeparator().append(type.getName()).newLine();
-            } else {
-                generator.tableSeparator();
-                objectLink(parameter);
-                generator.newLine();
-            }
-            generator.tableSeparator()
-                    .appendLines(parameter.getDescription());
-        }
-
-        generator.tableBoundary().dualNewLine();
-    }
-
-    private void objectLink(Parameter p) {
-        generator.link(p.getObjectHash(), p.getObjectName())
-                .append(p.getType().getName());
-    }
-
-    public static class Index {
-
-        private String projectName;
-
-        private List<String> resources = new ArrayList<>();
-
-        private List<String> objects = new ArrayList<>();
-
-        public String getProjectName() {
-            return projectName;
-        }
-
-        public void setProjectName(String projectName) {
-            this.projectName = projectName;
-        }
-
-        public void addResourceFile(String f) {
-            resources.add(f);
-        }
-
-        public void addObjectFile(String f) {
-            objects.add(f);
-        }
-
-        public List<String> getResources() {
-            return resources;
-        }
-
-        public List<String> getObjects() {
-            return objects;
-        }
+    public void printDoc(Warehouse warehouse) {
+        //todo
     }
 }

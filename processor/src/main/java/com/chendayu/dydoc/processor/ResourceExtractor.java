@@ -2,12 +2,10 @@ package com.chendayu.dydoc.processor;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Name;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
+import java.util.List;
+import java.util.Set;
 
 import static com.chendayu.dydoc.processor.Utils.findRequestMapping;
 
@@ -15,30 +13,35 @@ public class ResourceExtractor extends InfoExtractor {
 
     private final ActionExtractor actionExtractor;
 
-    public ResourceExtractor(ProcessingEnvironment processEnv, ApiInfoStore store) {
-        super(processEnv, store);
-        this.actionExtractor = new ActionExtractor(processEnv, store);
+    public ResourceExtractor(Toolbox toolbox, Warehouse warehouse) {
+        super(toolbox, warehouse);
+        this.actionExtractor = new ActionExtractor(toolbox, warehouse);
     }
 
     public void getAndSave(TypeElement typeElement) {
         String resourceName = findResourceName(typeElement);
-        if (store.containsResource(resourceName)) {
-            messager.printMessage(Diagnostic.Kind.WARNING, "resource '" + resourceName + " already exists");
+        if (warehouse.containsResource(resourceName)) {
+            toolbox.printMessage(Diagnostic.Kind.WARNING,
+                    "resource '" + resourceName + " already exists");
             return;
         }
+
         Resource resource = new Resource(resourceName);
         resource.setPath(getControllerPath(typeElement));
 
-        elementUtils.getAllMembers(typeElement).stream()
-                .filter(e -> e.getKind() == ElementKind.METHOD)
-                .map(e -> actionExtractor.findAction((ExecutableElement) e))
-                .forEach(a -> {
-                    if (a != null) {
-                        resource.addAction(a);
-                    }
-                });
+        List<? extends Element> members = toolbox.getAllMembers(typeElement);
+        for (Element e : members) {
+            if (e.getKind() == ElementKind.METHOD) {
+                Action action = actionExtractor.findAction((ExecutableElement) e);
+                if (action != null) {
+                    resource.addAction(action);
+                }
+            }
+        }
 
-        store.addResource(resource);
+        Set<Modifier> modifiers = typeElement.getModifiers();
+
+        warehouse.addResource(resource);
     }
 
     /**

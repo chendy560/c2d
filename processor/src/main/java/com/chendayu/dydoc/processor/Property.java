@@ -10,7 +10,8 @@ public class Property {
 
     private Declaration declaration;
 
-    public Property() {
+    public Property(List<String> description, Declaration declaration) {
+        this(null, description, declaration);
     }
 
     public Property(String name, List<String> description, Declaration declaration) {

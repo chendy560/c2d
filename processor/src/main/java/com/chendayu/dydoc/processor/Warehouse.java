@@ -1,14 +1,27 @@
 package com.chendayu.dydoc.processor;
 
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 public class Warehouse {
 
+    private final SortedMap<String, ObjectDeclaration> declarationMap = new TreeMap<>();
 
-    //TODO
+    private final SortedMap<String, Resource> resourceMap = new TreeMap<>();
+
     public ObjectDeclaration getDeclaration(String qualifiedName) {
-        return null;
+        return declarationMap.get(qualifiedName);
     }
 
     public void addDeclaration(ObjectDeclaration declaration) {
+        declarationMap.put(declaration.getQualifiedName(), declaration);
+    }
 
+    public boolean containsResource(String name) {
+        return resourceMap.containsKey(name);
+    }
+
+    public void addResource(Resource resource) {
+        resourceMap.put(resource.getName(), resource);
     }
 }

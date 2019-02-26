@@ -36,6 +36,10 @@ public class ObjectDeclaration implements Declaration {
         return DeclarationType.OBJECT;
     }
 
+    public String getQualifiedName() {
+        return qualifiedName;
+    }
+
     public void setParents(List<Parent> parents) {
         this.parents = parents;
     }

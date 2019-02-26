@@ -6,46 +6,57 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.chendayu.dydoc.processor.Utils.upperCaseFirst;
+public class Action {
 
-public class Action extends DocElement {
+    private String name;
 
-    private static final String PREFIX = "a";
+    private List<String> description;
 
     private String path;
 
     private HttpMethod method;
 
-    private List<Parameter> pathVariables = Collections.emptyList();
+    private List<Property> pathVariables = Collections.emptyList();
 
-    private List<Parameter> urlParameters = Collections.emptyList();
+    private List<Property> urlParameters = Collections.emptyList();
 
-    private Parameter requestBody;
+    private Property requestBody;
 
-    private Parameter responseBody;
+    private Property responseBody;
 
     public Action(String name, List<String> description) {
-        super(upperCaseFirst(name));
-        setDescription(description);
+        this.name = name;
+        this.description = description;
     }
 
-    public void addPathVariable(Parameter parameter) {
+    public void addPathVariable(Property property) {
         if (pathVariables.isEmpty()) {
             pathVariables = new ArrayList<>();
         }
-        pathVariables.add(parameter);
+        pathVariables.add(property);
     }
 
-    public void addUrlParameter(Parameter parameter) {
+    public void addUrlParameter(Property property) {
         if (urlParameters.isEmpty()) {
             urlParameters = new ArrayList<>();
         }
-        urlParameters.add(parameter);
+        urlParameters.add(property);
     }
 
-    @Override
-    protected String getPrefix() {
-        return PREFIX;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<String> getDescription() {
+        return description;
+    }
+
+    public void setDescription(List<String> description) {
+        this.description = description;
     }
 
     public String getPath() {
@@ -64,27 +75,35 @@ public class Action extends DocElement {
         this.method = method;
     }
 
-    public List<Parameter> getPathVariables() {
+    public List<Property> getPathVariables() {
         return pathVariables;
     }
 
-    public List<Parameter> getUrlParameters() {
+    public void setPathVariables(List<Property> pathVariables) {
+        this.pathVariables = pathVariables;
+    }
+
+    public List<Property> getUrlParameters() {
         return urlParameters;
     }
 
-    public Parameter getRequestBody() {
+    public void setUrlParameters(List<Property> urlParameters) {
+        this.urlParameters = urlParameters;
+    }
+
+    public Property getRequestBody() {
         return requestBody;
     }
 
-    public void setRequestBody(Parameter requestBody) {
+    public void setRequestBody(Property requestBody) {
         this.requestBody = requestBody;
     }
 
-    public Parameter getResponseBody() {
+    public Property getResponseBody() {
         return responseBody;
     }
 
-    public void setResponseBody(Parameter responseBody) {
+    public void setResponseBody(Property responseBody) {
         this.responseBody = responseBody;
     }
 }
