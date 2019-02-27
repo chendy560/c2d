@@ -6,8 +6,7 @@ import lombok.Data;
 public class LombokTestClasses {
 
     @DeclarationTest
-    public DataTestClass test(GetterTestClass g) {
-        return null;
+    public void test(DataTestClass v1, GetterTestClass v2) {
     }
 
     /**

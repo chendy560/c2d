@@ -4,10 +4,8 @@ package com.chendayu.c2d.processor.declaration;
 public class InheritTestClasses {
 
     @DeclarationTest
-    public Child test(SimpleChild sc) {
-        return null;
+    public void test(Child c1, SimpleChild c2) {
     }
-
 
     public interface TestInterface1<T> {
 

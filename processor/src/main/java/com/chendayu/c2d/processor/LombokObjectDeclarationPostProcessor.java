@@ -38,7 +38,7 @@ public class LombokObjectDeclarationPostProcessor extends AbstractObjectDeclarat
                 continue;
             }
 
-            Declaration declaration = declarationExtractor.extractAndSave(field);
+            Declaration declaration = declarationExtractor.extractFromVariableElement(field);
             List<String> description = DocComment.create(elementUtils.getDocComment(field)).getDescription();
             ObjectProperty property = new ObjectProperty(fieldName, description, declaration, field, null);
             objectDeclaration.addProperty(property);

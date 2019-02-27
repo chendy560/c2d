@@ -1,8 +1,8 @@
 package com.chendayu.c2d.processor.declaration;
 
+import com.chendayu.c2d.processor.Declaration;
 import com.chendayu.c2d.processor.DeclarationType;
 import com.chendayu.c2d.processor.Property;
-import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.support.TestCompiler;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,10 +36,10 @@ public abstract class AbstractDeclarationTest {
         assertThat(property.getDescription()).isEqualTo(description);
     }
 
-    Warehouse compile(Class<?>... types) {
+    List<Declaration> compile(Class<?>... types) {
         DeclarationTestProcessor processor = new DeclarationTestProcessor();
         this.compiler.getTask(types).call(processor);
-        return processor.getWarehouse();
+        return processor.getResult();
     }
 
     String getQualifiedName(Class clazz) {

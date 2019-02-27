@@ -1,6 +1,5 @@
 package com.chendayu.c2d.processor;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import java.util.*;
@@ -17,13 +16,11 @@ public class ObjectDeclaration implements Declaration {
 
     private List<String> description;
 
-    private Property[] typeArgs;
+    private List<Declaration> typeArgs;
 
-    private Property[] typeParameters;
+    private List<Property> typeParameters;
 
     private Map<String, VariableElement> fieldMap = new HashMap<>();
-
-    private List<ExecutableElement> getters;
 
     public ObjectDeclaration(TypeElement typeElement) {
         this.typeElement = typeElement;
@@ -51,6 +48,10 @@ public class ObjectDeclaration implements Declaration {
         return typeElement;
     }
 
+    public List<Declaration> getTypeArgs() {
+        return typeArgs;
+    }
+
     public boolean containsProperty(String name) {
         return propertyMap.containsKey(name);
     }
@@ -59,13 +60,13 @@ public class ObjectDeclaration implements Declaration {
         return qualifiedName;
     }
 
-    public void setTypeParameters(Property[] typeParameters) {
+    public void setTypeParameters(List<Property> typeParameters) {
         this.typeParameters = typeParameters;
     }
 
     public int indexOfTypeParameters(String name) {
-        for (int i = 0; i < typeParameters.length; i++) {
-            if (typeParameters[i].getName().equals(name)) {
+        for (int i = 0; i < typeParameters.size(); i++) {
+            if (typeParameters.get(i).getName().equals(name)) {
                 return i;
             }
         }
@@ -102,7 +103,15 @@ public class ObjectDeclaration implements Declaration {
         this.fieldMap = fieldMap;
     }
 
-    public void setGetters(List<ExecutableElement> getters) {
-        this.getters = getters;
+    // todo 不深不浅的拷贝，应该根据实际情况调整
+    public ObjectDeclaration withTypeArgs(List<Declaration> typeArgs) {
+        ObjectDeclaration copy = new ObjectDeclaration(typeElement);
+        copy.properties.addAll(properties);
+        copy.propertyMap.putAll(propertyMap);
+        copy.setDescription(new ArrayList<>(description));
+        copy.typeArgs = typeArgs;
+        copy.typeParameters = new ArrayList<>(this.typeParameters);
+        copy.fieldMap = new HashMap<>(fieldMap);
+        return copy;
     }
 }

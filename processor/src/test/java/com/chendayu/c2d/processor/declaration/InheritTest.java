@@ -1,9 +1,9 @@
 package com.chendayu.c2d.processor.declaration;
 
+import com.chendayu.c2d.processor.Declaration;
 import com.chendayu.c2d.processor.DeclarationType;
 import com.chendayu.c2d.processor.ObjectDeclaration;
 import com.chendayu.c2d.processor.Property;
-import com.chendayu.c2d.processor.Warehouse;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -16,12 +16,10 @@ public class InheritTest extends AbstractDeclarationTest {
 
     @Test
     public void testInherit() {
-        Warehouse warehouse = compile(InheritTestClasses.class);
-        ObjectDeclaration child = warehouse.getDeclaration(getQualifiedName(InheritTestClasses.Child.class));
-        checkChild(child);
+        List<Declaration> declarations = compile(InheritTestClasses.class);
 
-        ObjectDeclaration simpleChild = warehouse.getDeclaration(getQualifiedName(InheritTestClasses.SimpleChild.class));
-        checkSimpleChild(simpleChild);
+        checkChild((ObjectDeclaration) declarations.get(0));
+        checkSimpleChild((ObjectDeclaration) declarations.get(1));
     }
 
     private void checkChild(ObjectDeclaration child) {

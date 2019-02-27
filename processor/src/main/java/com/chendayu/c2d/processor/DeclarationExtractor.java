@@ -19,10 +19,6 @@ public class DeclarationExtractor extends InfoExtractor {
     private static final String BOOLEAN_GETTER_PREFIX = "is";
     private static final int BOOLEAN_GETTER_LENGTH = BOOLEAN_GETTER_PREFIX.length();
 
-    private static final Property[] EMPTY_TYPE_PARAMETERS = new Property[]{};
-
-    private static final Declaration[] EMPTY_TYPE_ARGS = new Declaration[]{};
-
     private final Set<Element> objectMethods;
 
     private final TypeMirror voidType;
@@ -44,7 +40,7 @@ public class DeclarationExtractor extends InfoExtractor {
 
     public DeclarationExtractor(ProcessingEnvironment environment, Warehouse warehouse) {
         super(environment, warehouse);
-        this.objectMethods = initObjectMethodNames();
+        this.objectMethods = initObjectMethods();
 
         this.voidType = elementUtils.getTypeElement(Void.class.getName()).asType();
         this.charSequenceType = elementUtils.getTypeElement(CharSequence.class.getName()).asType();
@@ -61,10 +57,9 @@ public class DeclarationExtractor extends InfoExtractor {
         this.enumType = typeUtils.erasure(elementUtils.getTypeElement(Enum.class.getName()).asType());
 
         this.postProcessors = initPostProcessors(environment);
-
     }
 
-    private Set<Element> initObjectMethodNames() {
+    private Set<Element> initObjectMethods() {
 
         HashSet<Element> objectMethodsSet = new HashSet<>(32, 0.5f);
 
@@ -92,18 +87,17 @@ public class DeclarationExtractor extends InfoExtractor {
         return Collections.unmodifiableSortedSet(processors);
     }
 
-
-    public Declaration extractAndSave(VariableElement variableElement) {
-        TypeMirror typeMirror = variableElement.asType();
-        TypeKind kind = typeMirror.getKind();
-        if (kind == TypeKind.TYPEVAR) {
-            String name = variableElement.getSimpleName().toString();
-            return Declaration.typeArgOf(name);
-        }
-        return extractAndSave(typeMirror);
+    /**
+     * 两个真正的入口之一，需要解析成 Declaration 的东西只有方法参数和方法返回值，这里是方法参数
+     */
+    public Declaration extractFromVariableElement(VariableElement variableElement) {
+        return extractFromTypeMirror(variableElement.asType());
     }
 
-    public Declaration extractAndSave(TypeMirror typeMirror) {
+    /**
+     * 两个真正的入口之一，需要解析成 Declaration 的东西只有方法参数和方法返回值，这里是返回值
+     */
+    public Declaration extractFromTypeMirror(TypeMirror typeMirror) {
         TypeKind kind = typeMirror.getKind();
         switch (kind) {
             case INT:
@@ -112,20 +106,20 @@ public class DeclarationExtractor extends InfoExtractor {
             case DOUBLE:
             case SHORT: // 真的有人会用吗？
             case BYTE: // 真的有人会用吗？
-                return Declaration.NUMBER;
+                return Declarations.NUMBER;
             case BOOLEAN:
-                return Declaration.BOOLEAN;
+                return Declarations.BOOLEAN;
             case CHAR:
-                return Declaration.STRING; // 真的有人会用吗？
+                return Declarations.STRING; // 真的有人会用吗？
             case VOID:
-                return Declaration.VOID; // void 和 Void 不是一个东西，这里的是 void
+                return Declarations.VOID; // void 和 Void 不是一个东西，这里的是 void
             case DECLARED:
-                TypeElement typeElement = (TypeElement) typeUtils.asElement(typeMirror);
-                return extractAndSave(typeElement);
+                DeclaredType declaredType = (DeclaredType) typeMirror;
+                return extractFromDeclaredType(declaredType);
             case TYPEVAR:
                 TypeVariable typeVariable = (TypeVariable) typeMirror;
                 String name = typeVariable.asElement().getSimpleName().toString();
-                return Declaration.typeArgOf(name);
+                return Declarations.typeArgOf(name);
             default:
                 throw new IllegalStateException("unknown type kind: " + kind +
                         " for type mirror: " + typeMirror);
@@ -133,54 +127,73 @@ public class DeclarationExtractor extends InfoExtractor {
     }
 
     /**
-     * 这里有一个坑，基本类型木有 TypeElement
+     * 解析对象的入口，只有这里才能解析出指定的泛型
      */
-    public Declaration extractAndSave(TypeElement typeElement) {
+    private Declaration extractFromDeclaredType(DeclaredType declaredType) {
+        Declaration declaration = extractFromTypeElement(((TypeElement) declaredType.asElement()));
+
+        if (declaration instanceof ObjectDeclaration) {
+            ObjectDeclaration objectDeclaration = (ObjectDeclaration) declaration;
+            List<Declaration> typeArgs = findTypeArgs(declaredType);
+            if (!typeArgs.isEmpty()) {
+                return objectDeclaration.withTypeArgs(typeArgs);
+            }
+        }
+
+        return declaration;
+    }
+
+    /**
+     * 解析对象，有可能是基本类型封装类之类的东西
+     * 这里实际上无法处理指定的泛型，因为这里拿到的东西类似一个 class 对应的 java 文件，
+     * 也就无从得知使用的地方制定了什么泛型
+     */
+    private Declaration extractFromTypeElement(TypeElement typeElement) {
 
         TypeMirror elementType = typeElement.asType();
         TypeMirror erasedType = typeUtils.erasure(elementType);
         TypeKind kind = erasedType.getKind();
 
         if (isVoid(erasedType)) {
-            return Declaration.VOID;
+            return Declarations.VOID;
         }
 
         if (isNumber(erasedType)) {
-            return Declaration.NUMBER;
+            return Declarations.NUMBER;
         }
 
         if (isCharSequence(erasedType)) {
-            return Declaration.STRING;
+            return Declarations.STRING;
         }
 
         if (isTimestamp(erasedType)) {
-            return Declaration.TIMESTAMP;
+            return Declarations.TIMESTAMP;
         }
 
         if (isBoolean(erasedType)) {
-            return Declaration.BOOLEAN;
+            return Declarations.BOOLEAN;
         }
 
         if (isArray(kind)) {
             ObjectDeclaration componentDeclaration = extractAndSaveFromArray((ArrayType) elementType);
-            return Declaration.arrayOf(componentDeclaration);
+            return Declarations.arrayOf(componentDeclaration);
         }
 
         if (isCollection(erasedType)) {
             ObjectDeclaration componentDeclaration = extractAndSaveFromCollection((DeclaredType) elementType);
-            return Declaration.arrayOf(componentDeclaration);
+            return Declarations.arrayOf(componentDeclaration);
         }
 
         if (isDynamic(erasedType)) {
-            return Declaration.DYNAMIC;
+            return Declarations.DYNAMIC;
         }
 
         if (isEnum(erasedType)) {
             extractAndSaveFromEnum((DeclaredType) elementType);
-            return Declaration.ENUM;
+            return Declarations.ENUM;
         }
 
-        return doExtractAndSave(typeElement);
+        return extractObjectDeclarationFromTypeElement(typeElement);
     }
 
     private boolean isEnum(TypeMirror erasedType) {
@@ -233,7 +246,7 @@ public class DeclarationExtractor extends InfoExtractor {
         //todo
     }
 
-    private ObjectDeclaration doExtractAndSave(TypeElement typeElement) {
+    private ObjectDeclaration extractObjectDeclarationFromTypeElement(TypeElement typeElement) {
         String qualifiedName = typeElement.getQualifiedName().toString();
         ObjectDeclaration existsDeclaration = warehouse.getDeclaration(qualifiedName);
         if (existsDeclaration != null) {
@@ -241,15 +254,22 @@ public class DeclarationExtractor extends InfoExtractor {
         }
 
         ObjectDeclaration result = new ObjectDeclaration(typeElement);
+        // 直接塞进仓库，避免无限递归
         warehouse.addDeclaration(result);
 
         DocComment docComment = DocComment.create(elementUtils.getDocComment(typeElement));
         result.setDescription(docComment.getDescription());
 
-        processFieldAndGetters(typeElement, result);
+        // 首先处理自己的字段，父类和接口的 field 和 getter 直接可以在子类中拿到，
+        initFieldsAndProperties(typeElement, result);
 
+        // 获取父类和接口更多是为了在特殊情况下补齐文档
         processParents(typeElement, result);
+
+        // 最后设置好类型参数
         processTypeParameters(typeElement, docComment, result);
+
+        // 后处理器们
         postProcess(result);
 
         return result;
@@ -270,19 +290,20 @@ public class DeclarationExtractor extends InfoExtractor {
             TypeElement parentElement = getOriginTypeElement(declaredType);
 
             String qualifiedName = parentElement.getQualifiedName().toString();
+
+            // 默认情况下，java和javax的东西都不处理，其实这里更多是在优化
             if (isJavaPackageClass(qualifiedName)) {
                 break;
             }
 
-            Declaration[] typeArgs = findTypeArgs(declaredType);
-
             // 能走到这一步的都是对象了
-            ObjectDeclaration declaration = (ObjectDeclaration) extractAndSave(parentElement);
+            ObjectDeclaration declaration = (ObjectDeclaration) extractFromTypeElement(parentElement);
 
             List<Property> properties = declaration.getProperties();
             for (Property property : properties) {
 
                 String propertyName = property.getName();
+
                 if (result.containsProperty(propertyName)) {
                     result.addPropertyDescriptionIfNotExists(property);
                     continue;
@@ -290,24 +311,9 @@ public class DeclarationExtractor extends InfoExtractor {
 
                 Declaration propertyDeclaration = property.getDeclaration();
                 List<String> propertyDescription = property.getDescription();
-                DeclarationType type = propertyDeclaration.getType();
-                if (type == DeclarationType.TYPE_PARAMETER) {
-                    String name = ((Declaration.TypeArgDeclaration) propertyDeclaration).getName();
-                    int index = declaration.indexOfTypeParameters(name);
-                    if (index == -1) {
-                        throw new IllegalStateException("type arg for type parameter "
-                                + declaration.getQualifiedName() +
-                                " " + name + " not found for " + result.getQualifiedName());
-                    }
-                    Declaration typeArg = typeArgs[index];
-                    ObjectProperty typeArgProperty = new ObjectProperty(
-                            propertyName, propertyDescription, typeArg, null, null);
-                    result.addProperty(typeArgProperty);
-                } else {
-                    ObjectProperty newProperty = new ObjectProperty(
-                            propertyName, propertyDescription, propertyDeclaration, null, null);
-                    result.addProperty(newProperty);
-                }
+                ObjectProperty newProperty = new ObjectProperty(
+                        propertyName, propertyDescription, propertyDeclaration, null, null);
+                result.addProperty(newProperty);
             }
         }
     }
@@ -316,7 +322,7 @@ public class DeclarationExtractor extends InfoExtractor {
                                        ObjectDeclaration result) {
         List<? extends TypeParameterElement> typeParameters = typeElement.getTypeParameters();
         if (typeParameters.isEmpty()) {
-            result.setTypeParameters(EMPTY_TYPE_PARAMETERS);
+            result.setTypeParameters(Collections.emptyList());
             return;
         }
 
@@ -324,42 +330,28 @@ public class DeclarationExtractor extends InfoExtractor {
         for (TypeParameterElement typeParameter : typeParameters) {
             String name = typeParameter.getSimpleName().toString();
             List<String> description = docComment.getParam(name);
-            Property property = new Property(name, description, Declaration.typeArgOf(name));
+            Property property = new Property(name, description, Declarations.typeArgOf(name));
             typeProperties.add(property);
         }
 
-        result.setTypeParameters(typeProperties.toArray(EMPTY_TYPE_PARAMETERS));
+        result.setTypeParameters(typeProperties);
     }
 
-    private Declaration[] findTypeArgs(DeclaredType declaredType) {
+    private List<Declaration> findTypeArgs(DeclaredType declaredType) {
         List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
         if (typeArguments.isEmpty()) {
-            return EMPTY_TYPE_ARGS;
+            return Collections.emptyList();
         }
 
-        ArrayList<Declaration> declarations = new ArrayList<>();
+        ArrayList<Declaration> typeArgs = new ArrayList<>();
         for (TypeMirror typeArgument : typeArguments) {
-            TypeKind kind = typeArgument.getKind();
-            Element element = typeUtils.asElement(typeArgument);
-            switch (kind) {
-                case TYPEVAR:
-                    String name = element.getSimpleName().toString();
-                    Declaration.TypeArgDeclaration typeArgDeclaration = Declaration.typeArgOf(name);
-                    declarations.add(typeArgDeclaration);
-                    break;
-                case DECLARED:
-                    TypeElement typeElement = (TypeElement) element;
-                    Declaration declaration = extractAndSave(typeElement);
-                    declarations.add(declaration);
-                    break;
-                default:
-                    throw new IllegalArgumentException("unknown type kind for type argument: " + kind.name());
-            }
+            Declaration declaration = extractFromTypeMirror(typeArgument);
+            typeArgs.add(declaration);
         }
-        return declarations.toArray(EMPTY_TYPE_ARGS);
+        return typeArgs;
     }
 
-    public void processFieldAndGetters(TypeElement typeElement, ObjectDeclaration result) {
+    private void initFieldsAndProperties(TypeElement typeElement, ObjectDeclaration result) {
 
         List<? extends Element> members = elementUtils.getAllMembers(typeElement);
 
@@ -391,12 +383,7 @@ public class DeclarationExtractor extends InfoExtractor {
             }
         }
 
-        result.setGetters(getters);
         result.setFieldMap(fieldMap);
-
-        if (getters.isEmpty()) {
-            return;
-        }
 
         for (ExecutableElement getter : getters) {
             ObjectProperty property = createProperty(getter, fieldMap);
@@ -412,7 +399,7 @@ public class DeclarationExtractor extends InfoExtractor {
         List<String> description = findDescription(getter, field);
 
         TypeMirror returnType = getter.getReturnType();
-        Declaration declaration = extractAndSave(returnType);
+        Declaration declaration = extractFromTypeMirror(returnType);
 
         return new ObjectProperty(name, description, declaration, field, getter);
     }
@@ -439,17 +426,19 @@ public class DeclarationExtractor extends InfoExtractor {
         }
 
         String name = element.getSimpleName().toString();
-        TypeMirror returnType = element.getReturnType();
+        TypeKind kind = element.getReturnType().getKind();
 
-        if (name.startsWith(GETTER_PREFIX)
-                && name.length() > GETTER_LENGTH
-                && returnType.getKind() != TypeKind.VOID) {
+        if (kind == TypeKind.VOID) {
+            return false;
+        }
+
+        if (name.startsWith(GETTER_PREFIX) && name.length() > GETTER_LENGTH) {
             return true;
         }
 
         return name.startsWith(BOOLEAN_GETTER_PREFIX)
                 && name.length() > BOOLEAN_GETTER_LENGTH
-                && returnType.getKind() == TypeKind.BOOLEAN;
+                && kind == TypeKind.BOOLEAN;
     }
 
     private String getterToPropertyName(String methodName) {

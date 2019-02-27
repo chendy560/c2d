@@ -1,6 +1,7 @@
 package com.chendayu.c2d.processor.declaration;
 
 
+import com.chendayu.c2d.processor.Declaration;
 import com.chendayu.c2d.processor.DeclarationExtractor;
 import com.chendayu.c2d.processor.Warehouse;
 
@@ -9,15 +10,15 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 public class DeclarationTestProcessor extends AbstractProcessor {
 
-    private Warehouse warehouse;
+    private List<Declaration> declarations;
 
     private DeclarationExtractor declarationExtractor;
 
@@ -25,8 +26,8 @@ public class DeclarationTestProcessor extends AbstractProcessor {
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
-        this.warehouse = new Warehouse();
-        this.declarationExtractor = new DeclarationExtractor(processingEnv, warehouse);
+        this.declarations = new ArrayList<>();
+        this.declarationExtractor = new DeclarationExtractor(processingEnv, new Warehouse());
         this.elementUtils = processingEnv.getElementUtils();
     }
 
@@ -55,10 +56,9 @@ public class DeclarationTestProcessor extends AbstractProcessor {
                             member.getAnnotation(DeclarationTest.class) != null) {
                         ExecutableElement method = (ExecutableElement) member;
                         for (VariableElement parameter : method.getParameters()) {
-                            declarationExtractor.extractAndSave(parameter);
+                            Declaration declaration = declarationExtractor.extractFromVariableElement(parameter);
+                            declarations.add(declaration);
                         }
-                        TypeMirror returnType = method.getReturnType();
-                        declarationExtractor.extractAndSave(returnType);
                     }
                 }
             }
@@ -66,7 +66,7 @@ public class DeclarationTestProcessor extends AbstractProcessor {
         return false;
     }
 
-    public Warehouse getWarehouse() {
-        return warehouse;
+    public List<Declaration> getResult() {
+        return declarations;
     }
 }
