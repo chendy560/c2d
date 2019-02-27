@@ -11,6 +11,7 @@ public class DeclarationExtractor extends InfoExtractor {
     private static final String LOMBOK_DATA = "lombok.Data";
 
     private static final String JAVA_PREFIX = "java.";
+    private static final String JAVAX_PREFIX = "javax.";
 
     private static final String GETTER_PREFIX = "get";
     private static final int GETTER_LENGTH = GETTER_PREFIX.length();
@@ -462,7 +463,8 @@ public class DeclarationExtractor extends InfoExtractor {
     }
 
     private boolean isJavaPackageClass(String qualifiedName) {
-        return qualifiedName.startsWith(JAVA_PREFIX);
+        return qualifiedName.startsWith(JAVA_PREFIX)
+                || qualifiedName.startsWith(JAVAX_PREFIX);
     }
 
     private boolean isInstanceField(VariableElement field) {
