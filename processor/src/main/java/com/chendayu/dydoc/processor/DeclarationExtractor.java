@@ -2,10 +2,7 @@ package com.chendayu.dydoc.processor;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
-import javax.lang.model.type.ArrayType;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.*;
 import java.time.Instant;
 import java.util.*;
 
@@ -122,6 +119,10 @@ public class DeclarationExtractor extends InfoExtractor {
             case DECLARED:
                 TypeElement typeElement = (TypeElement) typeUtils.asElement(typeMirror);
                 return extractAndSave(typeElement);
+            case TYPEVAR:
+                TypeVariable typeVariable = (TypeVariable) typeMirror;
+                String name = typeVariable.asElement().getSimpleName().toString();
+                return Declaration.typeArgOf(name);
             default:
                 throw new IllegalStateException("unknown type kind: " + kind +
                         " for type mirror: " + typeMirror);

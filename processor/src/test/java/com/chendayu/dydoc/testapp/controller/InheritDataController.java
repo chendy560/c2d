@@ -11,12 +11,12 @@ public class InheritDataController {
         return null;
     }
 
-    public interface TestInterface1 {
+    public interface TestInterface1<T> {
 
         /**
          * @return 电子邮件
          */
-        String getEmail();
+        T getEmail();
     }
 
     public interface TestInterface2 {
@@ -42,7 +42,7 @@ public class InheritDataController {
     /**
      * 子类
      */
-    public static class Child extends Parent implements TestInterface1, TestInterface2 {
+    public static class Child extends Parent implements TestInterface1<String>, TestInterface2 {
 
         /**
          * id
