@@ -3,7 +3,6 @@ package com.chendayu.dydoc.processor;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
 import java.util.*;
 
 public class ObjectDeclaration implements Declaration {
@@ -12,17 +11,15 @@ public class ObjectDeclaration implements Declaration {
 
     private final String qualifiedName;
 
-    private final DeclaredType declarationType;
-
     private final List<ObjectProperty> properties = new ArrayList<>();
 
     private final Map<String, ObjectProperty> propertyMap = new HashMap<>();
 
     private List<String> description;
 
-    private List<Property> typeParameters;
+    private Property[] typeArgs;
 
-    private List<Parent> parents;
+    private Property[] typeParameters;
 
     private Map<String, VariableElement> fieldMap = new HashMap<>();
 
@@ -31,7 +28,6 @@ public class ObjectDeclaration implements Declaration {
     public ObjectDeclaration(TypeElement typeElement) {
         this.typeElement = typeElement;
         this.qualifiedName = typeElement.getQualifiedName().toString();
-        this.declarationType = ((DeclaredType) typeElement.asType());
     }
 
     public Collection<VariableElement> getFields() {
@@ -63,12 +59,17 @@ public class ObjectDeclaration implements Declaration {
         return qualifiedName;
     }
 
-    public void setParents(List<Parent> parents) {
-        this.parents = parents;
+    public void setTypeParameters(Property[] typeParameters) {
+        this.typeParameters = typeParameters;
     }
 
-    public void setTypeParameters(List<Property> typeParameters) {
-        this.typeParameters = typeParameters;
+    public int indexOfTypeParameters(String name) {
+        for (int i = 0; i < typeParameters.length; i++) {
+            if (typeParameters[i].getName().equals(name)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public void addProperty(ObjectProperty property) {
@@ -78,6 +79,19 @@ public class ObjectDeclaration implements Declaration {
         }
         this.properties.add(property);
         this.propertyMap.put(name, property);
+    }
+
+    public void addPropertyDescriptionIfNotExists(Property property) {
+        String name = property.getName();
+        ObjectProperty oldProperty = this.propertyMap.get(name);
+        if (oldProperty == null) {
+            throw new IllegalArgumentException("property '" + name + "' not exists in declaration '"
+                    + qualifiedName + '\'');
+        }
+
+        if (oldProperty.descriptionIsEmpty()) {
+            oldProperty.setDescription(property.getDescription());
+        }
     }
 
     public List<Property> getProperties() {
@@ -90,17 +104,5 @@ public class ObjectDeclaration implements Declaration {
 
     public void setGetters(List<ExecutableElement> getters) {
         this.getters = getters;
-    }
-
-    public static class Parent {
-
-        private final Declaration[] typeArgs;
-
-        private final Declaration declaration;
-
-        public Parent(Declaration[] typeArgs, Declaration declaration) {
-            this.typeArgs = typeArgs;
-            this.declaration = declaration;
-        }
     }
 }

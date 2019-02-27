@@ -55,5 +55,10 @@ public enum DeclarationType {
     /**
      * 对象
      */
-    OBJECT
+    OBJECT,
+
+    /**
+     * 带泛型的对象
+     */
+    GENERIC_OBJECT
 }

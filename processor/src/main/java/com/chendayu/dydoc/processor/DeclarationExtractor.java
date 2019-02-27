@@ -19,6 +19,10 @@ public class DeclarationExtractor extends InfoExtractor {
 
     private static final String BOOLEAN_GETTER_PREFIX = "is";
 
+    private static final Property[] EMPTY_TYPE_PARAMETERS = new Property[]{};
+
+    private static final Declaration[] EMPTY_TYPE_ARGS = new Declaration[]{};
+
     private final Set<Element> objectMethods;
 
     private final TypeMirror voidType;
@@ -238,9 +242,10 @@ public class DeclarationExtractor extends InfoExtractor {
         DocComment docComment = DocComment.create(elementUtils.getDocComment(typeElement));
         result.setDescription(docComment.getDescription());
 
+        processFieldAndGetters(typeElement, result);
+
         processParents(typeElement, result);
         processTypeParameters(typeElement, docComment, result);
-        processFieldAndGetters(typeElement, result);
         postProcess(result);
 
         return result;
@@ -255,7 +260,6 @@ public class DeclarationExtractor extends InfoExtractor {
     private void processParents(TypeElement typeElement, ObjectDeclaration result) {
 
         List<? extends TypeMirror> parentTypes = typeUtils.directSupertypes(typeElement.asType());
-        ArrayList<ObjectDeclaration.Parent> parents = new ArrayList<>(parentTypes.size());
 
         for (TypeMirror parentType : parentTypes) {
             DeclaredType declaredType = (DeclaredType) parentType;
@@ -266,22 +270,49 @@ public class DeclarationExtractor extends InfoExtractor {
                 break;
             }
 
-            List<Declaration> typeArgs = findTypeArgs(declaredType);
-            Declaration declaration = extractAndSave(parentElement);
+            Declaration[] typeArgs = findTypeArgs(declaredType);
 
-            Declaration[] ts = typeArgs.toArray(new Declaration[]{});
-            ObjectDeclaration.Parent parent = new ObjectDeclaration.Parent(ts, declaration);
-            parents.add(parent);
+            // 能走到这一步的都是对象了
+            ObjectDeclaration declaration = (ObjectDeclaration) extractAndSave(parentElement);
+
+            List<Property> properties = declaration.getProperties();
+            for (Property property : properties) {
+
+                String propertyName = property.getName();
+                if (result.containsProperty(propertyName)) {
+                    result.addPropertyDescriptionIfNotExists(property);
+                    continue;
+                }
+
+                Declaration propertyDeclaration = property.getDeclaration();
+                List<String> propertyDescription = property.getDescription();
+                DeclarationType type = propertyDeclaration.getType();
+                if (type == DeclarationType.TYPE_PARAMETER) {
+                    String name = ((Declaration.TypeArgDeclaration) propertyDeclaration).getName();
+                    int index = declaration.indexOfTypeParameters(name);
+                    if (index == -1) {
+                        throw new IllegalStateException("type arg for type parameter "
+                                + declaration.getQualifiedName() +
+                                " " + name + " not found for " + result.getQualifiedName());
+                    }
+                    Declaration typeArg = typeArgs[index];
+                    ObjectProperty typeArgProperty = new ObjectProperty(
+                            propertyName, propertyDescription, typeArg, null, null);
+                    result.addProperty(typeArgProperty);
+                } else {
+                    ObjectProperty newProperty = new ObjectProperty(
+                            propertyName, propertyDescription, propertyDeclaration, null, null);
+                    result.addProperty(newProperty);
+                }
+            }
         }
-
-        result.setParents(parents);
     }
 
     private void processTypeParameters(TypeElement typeElement, DocComment docComment,
                                        ObjectDeclaration result) {
         List<? extends TypeParameterElement> typeParameters = typeElement.getTypeParameters();
         if (typeParameters.isEmpty()) {
-            result.setTypeParameters(Collections.emptyList());
+            result.setTypeParameters(EMPTY_TYPE_PARAMETERS);
             return;
         }
 
@@ -293,13 +324,13 @@ public class DeclarationExtractor extends InfoExtractor {
             typeProperties.add(property);
         }
 
-        result.setTypeParameters(typeProperties);
+        result.setTypeParameters(typeProperties.toArray(EMPTY_TYPE_PARAMETERS));
     }
 
-    private List<Declaration> findTypeArgs(DeclaredType declaredType) {
+    private Declaration[] findTypeArgs(DeclaredType declaredType) {
         List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
         if (typeArguments.isEmpty()) {
-            return Collections.emptyList();
+            return EMPTY_TYPE_ARGS;
         }
 
         ArrayList<Declaration> declarations = new ArrayList<>();
@@ -321,7 +352,7 @@ public class DeclarationExtractor extends InfoExtractor {
                     throw new IllegalArgumentException("unknown type kind for type argument: " + kind.name());
             }
         }
-        return declarations;
+        return declarations.toArray(EMPTY_TYPE_ARGS);
     }
 
     public void processFieldAndGetters(TypeElement typeElement, ObjectDeclaration result) {

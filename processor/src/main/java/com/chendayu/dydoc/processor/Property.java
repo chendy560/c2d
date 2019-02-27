@@ -43,4 +43,8 @@ public class Property {
     public void setDeclaration(Declaration declaration) {
         this.declaration = declaration;
     }
+
+    public boolean descriptionIsEmpty() {
+        return description == null || description.isEmpty();
+    }
 }

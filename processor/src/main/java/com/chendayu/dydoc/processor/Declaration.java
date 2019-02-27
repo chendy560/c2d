@@ -21,8 +21,6 @@ public interface Declaration {
 
     Declaration VOID = () -> DeclarationType.VOID;
 
-    Declaration TYPE_PARAMETER = () -> DeclarationType.TYPE_PARAMETER;
-
     static ArrayDeclaration arrayOf(Declaration declaration) {
         return () -> declaration;
     }
@@ -47,7 +45,7 @@ public interface Declaration {
 
         @Override
         default DeclarationType getType() {
-            return DeclarationType.ARRAY;
+            return DeclarationType.TYPE_PARAMETER;
         }
 
         String getName();
