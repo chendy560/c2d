@@ -13,8 +13,10 @@ public class DeclarationExtractor extends InfoExtractor {
     private static final String JAVA_PREFIX = "java.";
 
     private static final String GETTER_PREFIX = "get";
+    private static final int GETTER_LENGTH = GETTER_PREFIX.length();
 
     private static final String BOOLEAN_GETTER_PREFIX = "is";
+    private static final int BOOLEAN_GETTER_LENGTH = BOOLEAN_GETTER_PREFIX.length();
 
     private static final Property[] EMPTY_TYPE_PARAMETERS = new Property[]{};
 
@@ -438,20 +440,24 @@ public class DeclarationExtractor extends InfoExtractor {
         String name = element.getSimpleName().toString();
         TypeMirror returnType = element.getReturnType();
 
-        if (name.startsWith(GETTER_PREFIX) || returnType.getKind() != TypeKind.VOID) {
+        if (name.startsWith(GETTER_PREFIX)
+                && name.length() > GETTER_LENGTH
+                && returnType.getKind() != TypeKind.VOID) {
             return true;
         }
 
-        return name.startsWith(BOOLEAN_GETTER_PREFIX) || returnType.getKind() == TypeKind.BOOLEAN;
+        return name.startsWith(BOOLEAN_GETTER_PREFIX)
+                && name.length() > BOOLEAN_GETTER_LENGTH
+                && returnType.getKind() == TypeKind.BOOLEAN;
     }
 
     private String getterToPropertyName(String methodName) {
         if (methodName.startsWith(GETTER_PREFIX)) {
-            String propertyName = methodName.substring(GETTER_PREFIX.length());
+            String propertyName = methodName.substring(GETTER_LENGTH);
             return Utils.lowerCaseFirst(propertyName);
         }
 
-        String propertyName = methodName.substring(BOOLEAN_GETTER_PREFIX.length());
+        String propertyName = methodName.substring(BOOLEAN_GETTER_LENGTH);
         return Utils.lowerCaseFirst(propertyName);
     }
 
