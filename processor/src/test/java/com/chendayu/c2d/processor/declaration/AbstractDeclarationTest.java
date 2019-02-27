@@ -9,15 +9,12 @@ import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class AbstractDeclarationTest {
-
-    private static final Pattern REPLACE_PATTERN = Pattern.compile("\\$");
-    private static final String REPLACEMENT = ".";
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -27,6 +24,10 @@ public abstract class AbstractDeclarationTest {
     @Before
     public void createCompiler() throws IOException {
         this.compiler = new TestCompiler(this.temporaryFolder);
+    }
+
+    void checkProperty(Property property, String name, DeclarationType type, String... description) {
+        checkProperty(property, name, type, Arrays.asList(description));
     }
 
     void checkProperty(Property property, String name, DeclarationType type, List<String> description) {
@@ -40,9 +41,5 @@ public abstract class AbstractDeclarationTest {
         DeclarationTestProcessor processor = new DeclarationTestProcessor();
         this.compiler.getTask(types).call(processor);
         return processor.getResult();
-    }
-
-    String getQualifiedName(Class clazz) {
-        return REPLACE_PATTERN.matcher(clazz.getName()).replaceAll(REPLACEMENT);
     }
 }

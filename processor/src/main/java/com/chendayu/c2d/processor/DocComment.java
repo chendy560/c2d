@@ -121,6 +121,16 @@ public class DocComment {
         return Collections.emptyList();
     }
 
+    public List<String> getTypeParam(String name) {
+
+        String typeParamName = "<" + name + '>';
+        List<String> comment = comments.get(typeParamName);
+        if (comment != null) {
+            return comment;
+        }
+        return Collections.emptyList();
+    }
+
     public List<String> getParam(Element element) {
         return getParam(element.getSimpleName().toString());
     }

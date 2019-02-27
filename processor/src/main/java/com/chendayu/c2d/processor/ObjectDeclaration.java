@@ -52,6 +52,10 @@ public class ObjectDeclaration implements Declaration {
         return typeArgs;
     }
 
+    public List<Property> getTypeParameters() {
+        return typeParameters;
+    }
+
     public boolean containsProperty(String name) {
         return propertyMap.containsKey(name);
     }
@@ -62,15 +66,6 @@ public class ObjectDeclaration implements Declaration {
 
     public void setTypeParameters(List<Property> typeParameters) {
         this.typeParameters = typeParameters;
-    }
-
-    public int indexOfTypeParameters(String name) {
-        for (int i = 0; i < typeParameters.size(); i++) {
-            if (typeParameters.get(i).getName().equals(name)) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     public void addProperty(ObjectProperty property) {

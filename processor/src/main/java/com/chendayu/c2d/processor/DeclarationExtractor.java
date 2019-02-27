@@ -329,7 +329,7 @@ public class DeclarationExtractor extends InfoExtractor {
         ArrayList<Property> typeProperties = new ArrayList<>(typeParameters.size());
         for (TypeParameterElement typeParameter : typeParameters) {
             String name = typeParameter.getSimpleName().toString();
-            List<String> description = docComment.getParam(name);
+            List<String> description = docComment.getTypeParam(name);
             Property property = new Property(name, description, Declarations.typeArgOf(name));
             typeProperties.add(property);
         }

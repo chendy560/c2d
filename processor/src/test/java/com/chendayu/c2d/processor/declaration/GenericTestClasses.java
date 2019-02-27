@@ -7,6 +7,9 @@ public class GenericTestClasses {
     public void test(SomeData<String> sd1) {
     }
 
+    /**
+     * @param <T> 数据类型
+     */
     public static class SomeData<T> {
 
         private T data;

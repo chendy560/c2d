@@ -3,6 +3,7 @@ package com.chendayu.c2d.processor.declaration;
 import com.chendayu.c2d.processor.Declaration;
 import com.chendayu.c2d.processor.DeclarationType;
 import com.chendayu.c2d.processor.ObjectDeclaration;
+import com.chendayu.c2d.processor.Property;
 import org.junit.Test;
 
 import java.util.List;
@@ -17,6 +18,12 @@ public class GenericTest extends AbstractDeclarationTest {
 
         assertThat(declarations).hasSize(1);
         ObjectDeclaration objectDeclaration = (ObjectDeclaration) declarations.get(0);
+
+        List<Property> typeParameters = objectDeclaration.getTypeParameters();
+        assertThat(typeParameters).hasSize(1);
+
+        Property typeParameter = typeParameters.get(0);
+        checkProperty(typeParameter, "T", DeclarationType.TYPE_PARAMETER, "数据类型");
 
         List<Declaration> typeArgs = objectDeclaration.getTypeArgs();
 
