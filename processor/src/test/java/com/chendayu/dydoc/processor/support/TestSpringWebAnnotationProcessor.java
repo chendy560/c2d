@@ -1,4 +1,4 @@
-package com.chendayu.dydoc;
+package com.chendayu.dydoc.processor.support;
 
 import com.chendayu.dydoc.processor.SpringWebAnnotationProcessor;
 import com.chendayu.dydoc.processor.Warehouse;

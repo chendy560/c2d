@@ -1,6 +1,7 @@
-package com.chendayu.dydoc;
+package com.chendayu.dydoc.processor;
 
-import com.chendayu.dydoc.processor.Warehouse;
+import com.chendayu.dydoc.processor.support.TestCompiler;
+import com.chendayu.dydoc.processor.support.TestSpringWebAnnotationProcessor;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;

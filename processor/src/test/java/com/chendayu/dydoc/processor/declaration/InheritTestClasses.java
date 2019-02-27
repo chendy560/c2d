@@ -1,22 +1,20 @@
-package com.chendayu.dydoc.testapp.controller;
+package com.chendayu.dydoc.processor.declaration;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+@DeclarationTest
+public class InheritTestClasses {
 
-@RestController
-public class InheritDataController {
-
-    @GetMapping("/test")
-    public Child test() {
+    @DeclarationTest
+    public Child test(SimpleChild sc) {
         return null;
     }
+
 
     public interface TestInterface1<T> {
 
         /**
-         * @return 电子邮件
+         * @return 测试数据
          */
-        T getEmail();
+        T getData();
     }
 
     public interface TestInterface2 {
@@ -44,9 +42,6 @@ public class InheritDataController {
      */
     public static class Child extends Parent implements TestInterface1<String>, TestInterface2 {
 
-        /**
-         * id
-         */
         private String id;
 
         /**
@@ -59,6 +54,7 @@ public class InheritDataController {
          */
         private String email;
 
+        @Override
         public String getId() {
             return id;
         }
@@ -67,8 +63,21 @@ public class InheritDataController {
             return age;
         }
 
-        public String getEmail() {
+        @Override
+        public String getData() {
             return email;
+        }
+    }
+
+    public static class SimpleChild extends Parent {
+
+        /**
+         * id
+         */
+        private String id;
+
+        public String getId() {
+            return id;
         }
     }
 }

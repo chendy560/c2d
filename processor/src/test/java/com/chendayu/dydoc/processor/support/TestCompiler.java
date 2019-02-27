@@ -1,4 +1,4 @@
-package com.chendayu.dydoc;
+package com.chendayu.dydoc.processor.support;
 
 import org.junit.rules.TemporaryFolder;
 
