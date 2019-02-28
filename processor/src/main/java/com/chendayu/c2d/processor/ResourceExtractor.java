@@ -4,6 +4,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import java.util.List;
 
@@ -27,7 +29,9 @@ public class ResourceExtractor extends InfoExtractor {
         }
 
         Resource resource = new Resource(resourceName);
-        resource.setPath(getControllerPath(typeElement));
+        StringBuilder requestMappingBuilder = new StringBuilder();
+        getControllerPath(typeElement, requestMappingBuilder);
+        resource.setPath(requestMappingBuilder.toString());
 
         List<? extends Element> members = elementUtils.getAllMembers(typeElement);
         for (Element e : members) {
@@ -52,11 +56,15 @@ public class ResourceExtractor extends InfoExtractor {
         return simpleName.subSequence(0, simpleName.length() - 10).toString();
     }
 
-    private String getControllerPath(TypeElement element) {
+    private void getControllerPath(TypeElement element, StringBuilder builder) {
+        TypeMirror superclass = element.getSuperclass();
+        if (superclass.getKind() != TypeKind.NONE) {
+            getControllerPath((TypeElement) typeUtils.asElement(superclass), builder);
+        }
+
         RequestMapping requestMapping = element.getAnnotation(RequestMapping.class);
         if (requestMapping != null) {
-            return findRequestMapping(requestMapping.value(), requestMapping.path());
+            builder.append(findRequestMapping(requestMapping.value(), requestMapping.path()));
         }
-        return "";
     }
 }

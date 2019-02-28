@@ -1,5 +1,6 @@
-package com.chendayu.c2d.processor;
+package com.chendayu.c2d.processor.resource;
 
+import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.support.TestCompiler;
 import com.chendayu.c2d.processor.support.TestSpringWebAnnotationProcessor;
 import org.junit.Before;
@@ -11,7 +12,7 @@ import java.io.IOException;
 /**
  * 本项目的 ut 整体逻辑都差不多，所以就把公用的部分抽离出来了
  */
-public class AbstractTest {
+public class AbstractResourceTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
