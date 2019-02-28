@@ -54,7 +54,7 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
             for (final TypeElement annotation : annotations) {
                 for (final Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
                     // 因为 Controller 和 RestController 都只能放在类上，所以这里可以无伤强转
-                    resourceExtractor.getAndSave((TypeElement) element);
+                    resourceExtractor.extract((TypeElement) element);
                 }
             }
 

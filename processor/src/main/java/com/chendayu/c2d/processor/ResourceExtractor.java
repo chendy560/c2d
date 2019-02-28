@@ -15,12 +15,12 @@ public class ResourceExtractor extends InfoExtractor {
 
     private final ActionExtractor actionExtractor;
 
-    public ResourceExtractor(ProcessingEnvironment toolbox, Warehouse warehouse) {
-        super(toolbox, warehouse);
-        this.actionExtractor = new ActionExtractor(toolbox, warehouse);
+    public ResourceExtractor(ProcessingEnvironment processingEnv, Warehouse warehouse) {
+        super(processingEnv, warehouse);
+        this.actionExtractor = new ActionExtractor(processingEnv, warehouse);
     }
 
-    public void getAndSave(TypeElement typeElement) {
+    public void extract(TypeElement typeElement) {
         String resourceName = findResourceName(typeElement);
         if (warehouse.containsResource(resourceName)) {
             messager.printMessage(Diagnostic.Kind.WARNING,
@@ -31,13 +31,15 @@ public class ResourceExtractor extends InfoExtractor {
         Resource resource = new Resource(resourceName);
         StringBuilder requestMappingBuilder = new StringBuilder();
         getControllerPath(typeElement, requestMappingBuilder);
-        resource.setPath(requestMappingBuilder.toString());
+        String path = requestMappingBuilder.toString();
+        resource.setPath(path);
 
         List<? extends Element> members = elementUtils.getAllMembers(typeElement);
         for (Element e : members) {
             if (e.getKind() == ElementKind.METHOD) {
                 Action action = actionExtractor.findAction((ExecutableElement) e);
                 if (action != null) {
+                    action.setPathPrefix(path);
                     resource.addAction(action);
                 }
             }
@@ -50,6 +52,7 @@ public class ResourceExtractor extends InfoExtractor {
 
     /**
      * 其实就是把 XxController 的 Controller 剪掉了
+     * 换句话说如果不按约定命名的话，这里不知道能拿到什么玩意…
      */
     private String findResourceName(TypeElement typeElement) {
         Name simpleName = typeElement.getSimpleName();

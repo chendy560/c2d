@@ -4,6 +4,8 @@ import java.util.List;
 
 public class Property {
 
+    private final String innerName;
+
     private String name;
 
     private List<String> description;
@@ -15,9 +17,14 @@ public class Property {
     }
 
     public Property(String name, List<String> description, Declaration declaration) {
+        this.innerName = name;
         this.name = name;
         this.description = description;
         this.declaration = declaration;
+    }
+
+    public String getInnerName() {
+        return innerName;
     }
 
     public String getName() {

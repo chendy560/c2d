@@ -1,6 +1,5 @@
 package com.chendayu.c2d.processor;
 
-import javax.lang.model.element.Element;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,6 +87,8 @@ public class DocComment {
 
             Matcher paramMatcher = PARAM_PATTERN.matcher(line);
             if (paramMatcher.matches()) {
+                trim(commentsMap.get(currentParameterName));
+
                 currentParameterName = paramMatcher.group(1);
                 ArrayList<String> paramLines = new ArrayList<>();
                 if (paramMatcher.groupCount() == 2) {
@@ -100,6 +101,8 @@ public class DocComment {
 
             Matcher returnMatcher = RETURN_PATTERN.matcher(line);
             if (returnMatcher.matches()) {
+                trim(commentsMap.get(currentParameterName));
+
                 currentParameterName = RETURN_KEY;
                 ArrayList<String> returnLines = new ArrayList<>();
                 if (returnMatcher.groupCount() == 1) {
@@ -110,11 +113,32 @@ public class DocComment {
                 continue;
             }
 
+            if (line.startsWith("@")) {
+                continue; // todo 这里要考虑改一下以适应所有的情况
+            }
             commentsMap.get(currentParameterName).add(line);
         }
 
         docComment.comments = commentsMap;
         return docComment;
+    }
+
+    private static void trim(List<String> s) {
+        for (int i = s.size() - 1; i >= 0; i--) {
+            if (s.get(i).isEmpty()) {
+                s.remove(i);
+            } else {
+                break;
+            }
+        }
+
+        for (int i = 0; i < s.size(); i++) {
+            if (s.get(i).isEmpty()) {
+                s.remove(i);
+            } else {
+                break;
+            }
+        }
     }
 
     public List<String> getParam(String name) {
@@ -134,10 +158,6 @@ public class DocComment {
             return comment;
         }
         return Collections.emptyList();
-    }
-
-    public List<String> getParam(Element element) {
-        return getParam(element.getSimpleName().toString());
     }
 
     public List<String> getDescription() {

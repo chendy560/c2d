@@ -106,4 +106,8 @@ public class Action {
     public void setResponseBody(Property responseBody) {
         this.responseBody = responseBody;
     }
+
+    public void setPathPrefix(String s) {
+        this.path = s + path;
+    }
 }

@@ -10,19 +10,22 @@ public class ObjectDeclaration implements Declaration {
 
     private final String qualifiedName;
 
+    private final String name;
+
     private final LinkedHashMap<String, ObjectProperty> propertyMap = new LinkedHashMap<>();
 
     private List<String> description;
 
-    private List<Declaration> typeArgs;
+    private List<Declaration> typeArgs = Collections.emptyList();
 
-    private List<Property> typeParameters;
+    private List<Property> typeParameters = Collections.emptyList();
 
     private Map<String, VariableElement> fieldMap = new HashMap<>();
 
     public ObjectDeclaration(TypeElement typeElement) {
         this.typeElement = typeElement;
         this.qualifiedName = typeElement.getQualifiedName().toString();
+        this.name = typeElement.getSimpleName().toString();
     }
 
     public Collection<VariableElement> getFields() {
@@ -32,6 +35,10 @@ public class ObjectDeclaration implements Declaration {
     @Override
     public DeclarationType getType() {
         return DeclarationType.OBJECT;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public List<String> getDescription() {
@@ -67,18 +74,18 @@ public class ObjectDeclaration implements Declaration {
     }
 
     public void addProperty(ObjectProperty property) {
-        String name = property.getName();
-        if (this.containsProperty(name)) {
-            throw new IllegalArgumentException("property '" + name + "' already exists in '" + name + "'");
+        String innerName = property.getInnerName();
+        if (this.containsProperty(innerName)) {
+            throw new IllegalArgumentException("property '" + innerName + "' already exists in '" + innerName + "'");
         }
-        this.propertyMap.put(name, property);
+        this.propertyMap.put(innerName, property);
     }
 
     public void addPropertyDescriptionIfNotExists(Property property) {
-        String name = property.getName();
-        ObjectProperty oldProperty = this.propertyMap.get(name);
+        String innerName = property.getInnerName();
+        ObjectProperty oldProperty = this.propertyMap.get(innerName);
         if (oldProperty == null) {
-            throw new IllegalArgumentException("property '" + name + "' not exists in declaration '"
+            throw new IllegalArgumentException("property '" + innerName + "' not exists in declaration '"
                     + qualifiedName + '\'');
         }
 
@@ -113,9 +120,7 @@ public class ObjectDeclaration implements Declaration {
             throw new IllegalArgumentException("failed rename property '" + from + "' to '"
                     + to + "' in declaration '" + qualifiedName + "' : property not exists");
         }
-        propertyMap.remove(from);
         objectProperty.setName(to);
-        addProperty(objectProperty);
     }
 
     public ObjectDeclaration withTypeArgs(List<Declaration> typeArgs) {
