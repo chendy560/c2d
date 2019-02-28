@@ -48,6 +48,11 @@ public class DocComment {
         public List<String> getReturn() {
             return Collections.emptyList();
         }
+
+        @Override
+        public List<String> getTypeParam(String name) {
+            return Collections.emptyList();
+        }
     };
 
     private Map<String, List<String>> comments;

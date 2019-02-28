@@ -56,7 +56,7 @@ public class DeclarationTestProcessor extends AbstractProcessor {
                             member.getAnnotation(DeclarationTest.class) != null) {
                         ExecutableElement method = (ExecutableElement) member;
                         for (VariableElement parameter : method.getParameters()) {
-                            Declaration declaration = declarationExtractor.extractFromVariableElement(parameter);
+                            Declaration declaration = declarationExtractor.extract(parameter);
                             declarations.add(declaration);
                         }
                     }

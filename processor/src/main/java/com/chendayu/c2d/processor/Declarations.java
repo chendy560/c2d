@@ -10,6 +10,7 @@ public class Declarations {
     public static final Declaration DYNAMIC = () -> DeclarationType.DYNAMIC;
     public static final Declaration ENUM = () -> DeclarationType.ENUM;
     public static final Declaration VOID = () -> DeclarationType.VOID;
+    public static final Declaration UNKNOWN = () -> DeclarationType.UNKNOWN;
 
     private Declarations() {
 

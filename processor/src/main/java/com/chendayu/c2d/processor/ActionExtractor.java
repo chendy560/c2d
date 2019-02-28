@@ -55,7 +55,7 @@ public class ActionExtractor extends InfoExtractor {
 
         TypeMirror returnType = element.getReturnType();
         List<String> returnComment = docComment.getReturn();
-        Declaration declaration = declarationExtractor.extractFromTypeMirror(returnType);
+        Declaration declaration = declarationExtractor.extract(returnType);
         Property responseBody = new Property(returnComment, declaration);
         action.setResponseBody(responseBody);
 
@@ -69,7 +69,7 @@ public class ActionExtractor extends InfoExtractor {
             String parameterName = findName(parameterElement.getSimpleName().toString(),
                     requestParam.value(), requestParam.name());
             List<String> description = docComment.getParam(parameterElement);
-            Declaration declaration = declarationExtractor.extractFromVariableElement(parameterElement);
+            Declaration declaration = declarationExtractor.extract(parameterElement);
             action.addUrlParameter(new Property(parameterName, description, declaration));
             return;
         }
@@ -79,7 +79,7 @@ public class ActionExtractor extends InfoExtractor {
             String name = findName(parameterElement.getSimpleName().toString(),
                     pathVariable.value(), pathVariable.name());
             List<String> description = docComment.getParam(parameterElement);
-            Declaration declaration = declarationExtractor.extractFromVariableElement(parameterElement);
+            Declaration declaration = declarationExtractor.extract(parameterElement);
             action.addPathVariable(new Property(name, description, declaration));
             return;
         }
@@ -87,7 +87,7 @@ public class ActionExtractor extends InfoExtractor {
         RequestBody requestBody = parameterElement.getAnnotation(RequestBody.class);
         if (requestBody != null) {
             List<String> description = docComment.getParam(parameterElement);
-            Declaration declaration = declarationExtractor.extractFromVariableElement(parameterElement);
+            Declaration declaration = declarationExtractor.extract(parameterElement);
             Property property = new Property(description, declaration);
             action.setRequestBody(property);
         }

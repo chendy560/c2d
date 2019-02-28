@@ -58,7 +58,7 @@ public enum DeclarationType {
     OBJECT,
 
     /**
-     * 带泛型的对象
+     * 解析不出来的东西
      */
-    GENERIC_OBJECT
+    UNKNOWN
 }

@@ -6,6 +6,9 @@ import javax.lang.model.type.*;
 import java.time.Instant;
 import java.util.*;
 
+import static com.chendayu.c2d.processor.Declarations.UNKNOWN;
+import static com.chendayu.c2d.processor.Declarations.arrayOf;
+
 public class DeclarationExtractor extends InfoExtractor {
 
     private static final String LOMBOK_DATA = "lombok.Data";
@@ -18,6 +21,8 @@ public class DeclarationExtractor extends InfoExtractor {
 
     private static final String BOOLEAN_GETTER_PREFIX = "is";
     private static final int BOOLEAN_GETTER_LENGTH = BOOLEAN_GETTER_PREFIX.length();
+
+    private static final Declaration UNKNOWN_ARRAY = arrayOf(UNKNOWN);
 
     private final Set<Element> objectMethods;
 
@@ -32,7 +37,11 @@ public class DeclarationExtractor extends InfoExtractor {
     private final TypeMirror dateType;
     private final TypeMirror instantType;
 
+    private final TypeMirror iterableType;
     private final TypeMirror collectionType;
+    private final TypeMirror listType;
+    private final TypeMirror setType;
+
     private final TypeMirror mapType;
     private final TypeMirror enumType;
 
@@ -51,7 +60,11 @@ public class DeclarationExtractor extends InfoExtractor {
 
         this.dateType = elementUtils.getTypeElement(Date.class.getName()).asType();
         this.instantType = elementUtils.getTypeElement(Instant.class.getName()).asType();
+        this.iterableType = typeUtils.erasure(elementUtils.getTypeElement(Iterable.class.getName()).asType());
         this.collectionType = typeUtils.erasure(elementUtils.getTypeElement(Collection.class.getName()).asType());
+        this.listType = typeUtils.erasure(elementUtils.getTypeElement(List.class.getName()).asType());
+        this.setType = typeUtils.erasure(elementUtils.getTypeElement(Set.class.getName()).asType());
+
         this.mapType = typeUtils.erasure(elementUtils.getTypeElement(Map.class.getName()).asType());
 
         this.enumType = typeUtils.erasure(elementUtils.getTypeElement(Enum.class.getName()).asType());
@@ -75,7 +88,8 @@ public class DeclarationExtractor extends InfoExtractor {
     }
 
     private SortedSet<ObjectDeclarationPostProcessor> initPostProcessors(ProcessingEnvironment environment) {
-        TreeSet<ObjectDeclarationPostProcessor> processors = new TreeSet<>(Comparator.comparing(ObjectDeclarationPostProcessor::getOrder));
+        TreeSet<ObjectDeclarationPostProcessor> processors =
+                new TreeSet<>(Comparator.comparing(ObjectDeclarationPostProcessor::getOrder));
 
         TypeElement lombokData = elementUtils.getTypeElement(LOMBOK_DATA);
         if (lombokData != null) {
@@ -90,14 +104,14 @@ public class DeclarationExtractor extends InfoExtractor {
     /**
      * 两个真正的入口之一，需要解析成 Declaration 的东西只有方法参数和方法返回值，这里是方法参数
      */
-    public Declaration extractFromVariableElement(VariableElement variableElement) {
-        return extractFromTypeMirror(variableElement.asType());
+    public Declaration extract(VariableElement variableElement) {
+        return extract(variableElement.asType());
     }
 
     /**
      * 两个真正的入口之一，需要解析成 Declaration 的东西只有方法参数和方法返回值，这里是返回值
      */
-    public Declaration extractFromTypeMirror(TypeMirror typeMirror) {
+    public Declaration extract(TypeMirror typeMirror) {
         TypeKind kind = typeMirror.getKind();
         switch (kind) {
             case INT:
@@ -113,6 +127,8 @@ public class DeclarationExtractor extends InfoExtractor {
                 return Declarations.STRING; // 真的有人会用吗？
             case VOID:
                 return Declarations.VOID; // void 和 Void 不是一个东西，这里的是 void
+            case ARRAY:
+                return extractFromArrayType((ArrayType) typeMirror);
             case DECLARED:
                 DeclaredType declaredType = (DeclaredType) typeMirror;
                 return extractFromDeclaredType(declaredType);
@@ -130,29 +146,8 @@ public class DeclarationExtractor extends InfoExtractor {
      * 解析对象的入口，只有这里才能解析出指定的泛型
      */
     private Declaration extractFromDeclaredType(DeclaredType declaredType) {
-        Declaration declaration = extractFromTypeElement(((TypeElement) declaredType.asElement()));
 
-        if (declaration instanceof ObjectDeclaration) {
-            ObjectDeclaration objectDeclaration = (ObjectDeclaration) declaration;
-            List<Declaration> typeArgs = findTypeArgs(declaredType);
-            if (!typeArgs.isEmpty()) {
-                return objectDeclaration.withTypeArgs(typeArgs);
-            }
-        }
-
-        return declaration;
-    }
-
-    /**
-     * 解析对象，有可能是基本类型封装类之类的东西
-     * 这里实际上无法处理指定的泛型，因为这里拿到的东西类似一个 class 对应的 java 文件，
-     * 也就无从得知使用的地方制定了什么泛型
-     */
-    private Declaration extractFromTypeElement(TypeElement typeElement) {
-
-        TypeMirror elementType = typeElement.asType();
-        TypeMirror erasedType = typeUtils.erasure(elementType);
-        TypeKind kind = erasedType.getKind();
+        TypeMirror erasedType = typeUtils.erasure(declaredType);
 
         if (isVoid(erasedType)) {
             return Declarations.VOID;
@@ -174,14 +169,8 @@ public class DeclarationExtractor extends InfoExtractor {
             return Declarations.BOOLEAN;
         }
 
-        if (isArray(kind)) {
-            ObjectDeclaration componentDeclaration = extractAndSaveFromArray((ArrayType) elementType);
-            return Declarations.arrayOf(componentDeclaration);
-        }
-
-        if (isCollection(erasedType)) {
-            ObjectDeclaration componentDeclaration = extractAndSaveFromCollection((DeclaredType) elementType);
-            return Declarations.arrayOf(componentDeclaration);
+        if (isIterable(erasedType)) {
+            return extractFromIterable(declaredType);
         }
 
         if (isDynamic(erasedType)) {
@@ -189,11 +178,19 @@ public class DeclarationExtractor extends InfoExtractor {
         }
 
         if (isEnum(erasedType)) {
-            extractAndSaveFromEnum((DeclaredType) elementType);
+            // todo
             return Declarations.ENUM;
         }
 
-        return extractObjectDeclarationFromTypeElement(typeElement);
+        TypeElement typeElement = (TypeElement) declaredType.asElement();
+        ObjectDeclaration objectDeclaration = extractObjectDeclarationFromTypeElement(typeElement);
+
+        List<Declaration> typeArgs = findTypeArgs(declaredType);
+        if (!typeArgs.isEmpty()) {
+            return objectDeclaration.withTypeArgs(typeArgs);
+        }
+
+        return objectDeclaration;
     }
 
     private boolean isEnum(TypeMirror erasedType) {
@@ -204,12 +201,8 @@ public class DeclarationExtractor extends InfoExtractor {
         return typeUtils.isSubtype(erasedType, mapType);
     }
 
-    private boolean isCollection(TypeMirror erasedType) {
-        return typeUtils.isSubtype(erasedType, collectionType);
-    }
-
-    private boolean isArray(TypeKind kind) {
-        return kind == TypeKind.ARRAY;
+    private boolean isIterable(TypeMirror erasedType) {
+        return typeUtils.isSubtype(erasedType, iterableType);
     }
 
     private boolean isBoolean(TypeMirror erasedType) {
@@ -232,18 +225,35 @@ public class DeclarationExtractor extends InfoExtractor {
         return typeUtils.isSameType(typeMirror, voidType);
     }
 
-    private ObjectDeclaration extractAndSaveFromArray(ArrayType type) {
-        //todo
-        return null;
+    private Declaration extractFromArrayType(ArrayType type) {
+        TypeMirror componentType = type.getComponentType();
+        if (componentType.getKind() == TypeKind.CHAR) {
+            return Declarations.STRING;
+        }
+        Declaration declaration = extract(componentType);
+        return arrayOf(declaration);
     }
 
-    private ObjectDeclaration extractAndSaveFromCollection(DeclaredType type) {
-        //todo
-        return null;
+    private Declaration extractFromIterable(DeclaredType type) {
+
+        TypeMirror erased = typeUtils.erasure(type);
+        if (isSimpleIterable(erased)) {
+            List<? extends TypeMirror> typeArguments = type.getTypeArguments();
+            if (!typeArguments.isEmpty()) {
+                TypeMirror typeMirror = typeArguments.get(0);
+                Declaration declaration = extract(typeMirror);
+                return arrayOf(declaration);
+            }
+        }
+
+        return UNKNOWN_ARRAY;
     }
 
-    private void extractAndSaveFromEnum(DeclaredType type) {
-        //todo
+    private boolean isSimpleIterable(TypeMirror erasedType) {
+        return typeUtils.isSameType(erasedType, listType)
+                || typeUtils.isSameType(erasedType, setType)
+                || typeUtils.isSameType(erasedType, collectionType)
+                || typeUtils.isSameType(erasedType, iterableType);
     }
 
     private ObjectDeclaration extractObjectDeclarationFromTypeElement(TypeElement typeElement) {
@@ -297,7 +307,7 @@ public class DeclarationExtractor extends InfoExtractor {
             }
 
             // 能走到这一步的都是对象了
-            ObjectDeclaration declaration = (ObjectDeclaration) extractFromTypeElement(parentElement);
+            ObjectDeclaration declaration = (ObjectDeclaration) extractFromDeclaredType(declaredType);
 
             List<Property> properties = declaration.getProperties();
             for (Property property : properties) {
@@ -345,7 +355,7 @@ public class DeclarationExtractor extends InfoExtractor {
 
         ArrayList<Declaration> typeArgs = new ArrayList<>();
         for (TypeMirror typeArgument : typeArguments) {
-            Declaration declaration = extractFromTypeMirror(typeArgument);
+            Declaration declaration = extract(typeArgument);
             typeArgs.add(declaration);
         }
         return typeArgs;
@@ -399,7 +409,7 @@ public class DeclarationExtractor extends InfoExtractor {
         List<String> description = findDescription(getter, field);
 
         TypeMirror returnType = getter.getReturnType();
-        Declaration declaration = extractFromTypeMirror(returnType);
+        Declaration declaration = extract(returnType);
 
         return new ObjectProperty(name, description, declaration, field, getter);
     }
