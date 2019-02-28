@@ -1,12 +1,12 @@
 package com.chendayu.c2d.processor;
 
-import java.util.Collection;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Warehouse {
 
-    private final SortedMap<String, ObjectDeclaration> declarationMap = new TreeMap<>();
+    private final Map<String, ObjectDeclaration> declarationMap = new HashMap<>(16, 0.5f);
+
+    private final Map<String, EnumDeclaration> enumMap = new HashMap<>(16, 0.5f);
 
     private final SortedMap<String, Resource> resourceMap = new TreeMap<>();
 
@@ -28,5 +28,13 @@ public class Warehouse {
 
     public Collection<Resource> getResources() {
         return resourceMap.values();
+    }
+
+    public EnumDeclaration getEnumDeclaration(String qualifiedName) {
+        return enumMap.get(qualifiedName);
+    }
+
+    public void addEnumDeclaration(EnumDeclaration enumDeclaration) {
+        enumMap.put(enumDeclaration.getQualifiedName(), enumDeclaration);
     }
 }

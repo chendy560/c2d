@@ -5,9 +5,15 @@ import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static com.chendayu.c2d.processor.Declarations.ENUM_CONST;
 import static com.chendayu.c2d.processor.Declarations.UNKNOWN;
 import static com.chendayu.c2d.processor.Declarations.arrayOf;
+import static javax.lang.model.element.Modifier.FINAL;
+import static javax.lang.model.element.Modifier.PUBLIC;
+import static javax.lang.model.element.Modifier.STATIC;
 
 public class DeclarationExtractor extends InfoExtractor {
 
@@ -23,6 +29,9 @@ public class DeclarationExtractor extends InfoExtractor {
     private static final int BOOLEAN_GETTER_LENGTH = BOOLEAN_GETTER_PREFIX.length();
 
     private static final Declaration UNKNOWN_ARRAY = arrayOf(UNKNOWN);
+
+    private static final Collection<Modifier> PUBLIC_STATIC_FINAL = Stream.of(PUBLIC, STATIC, FINAL)
+            .collect(Collectors.toSet());
 
     private final Set<Element> objectMethods;
 
@@ -178,8 +187,7 @@ public class DeclarationExtractor extends InfoExtractor {
         }
 
         if (isEnum(erasedType)) {
-            // todo
-            return Declarations.ENUM;
+            return extractFromEnum(declaredType);
         }
 
         TypeElement typeElement = (TypeElement) declaredType.asElement();
@@ -191,6 +199,45 @@ public class DeclarationExtractor extends InfoExtractor {
         }
 
         return objectDeclaration;
+    }
+
+    private EnumDeclaration extractFromEnum(DeclaredType declaredType) {
+        TypeElement typeElement = (TypeElement) declaredType.asElement();
+        String qualifiedName = typeElement.getQualifiedName().toString();
+        EnumDeclaration existEnum = warehouse.getEnumDeclaration(qualifiedName);
+        if (existEnum != null) {
+            return existEnum;
+        }
+
+        List<? extends Element> members = elementUtils.getAllMembers(typeElement);
+        ArrayList<Property> properties = new ArrayList<>();
+        for (Element member : members) {
+            Property property = asEnumConstant(member);
+            if (property != null) {
+                properties.add(property);
+            }
+        }
+
+        String name = typeElement.getSimpleName().toString();
+        List<String> description = DocComment.create(elementUtils.getDocComment(typeElement))
+                .getDescription();
+        EnumDeclaration enumDeclaration = new EnumDeclaration(name, qualifiedName, properties, description);
+        warehouse.addEnumDeclaration(enumDeclaration);
+
+        return enumDeclaration;
+    }
+
+    private Property asEnumConstant(Element element) {
+        ElementKind elementKind = element.getKind();
+        if (elementKind != ElementKind.ENUM_CONSTANT) {
+            return null;
+        }
+
+        VariableElement variableElement = (VariableElement) element;
+        String name = variableElement.getSimpleName().toString();
+        List<String> description = DocComment.create(elementUtils.getDocComment(variableElement))
+                .getDescription();
+        return new Property(name, description, ENUM_CONST);
     }
 
     private boolean isEnum(TypeMirror erasedType) {
@@ -431,7 +478,7 @@ public class DeclarationExtractor extends InfoExtractor {
 
     private boolean isGetter(ExecutableElement element) {
         Set<Modifier> modifiers = element.getModifiers();
-        if (modifiers.contains(Modifier.STATIC)) {
+        if (modifiers.contains(STATIC)) {
             return false;
         }
 
