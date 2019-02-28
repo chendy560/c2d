@@ -14,7 +14,7 @@ import java.util.List;
 public class LombokObjectDeclarationPostProcessor extends AbstractObjectDeclarationPostProcessor {
 
     private static final String DATA_ANNOTATION = "lombok.Data";
-
+    private static final String VALUE_ANNOTATION = "lombok.Value";
     private static final String GETTER_ANNOTATION = "lombok.Getter";
 
     private final DeclarationExtractor declarationExtractor;
@@ -27,7 +27,7 @@ public class LombokObjectDeclarationPostProcessor extends AbstractObjectDeclarat
     @Override
     public void process(ObjectDeclaration objectDeclaration) {
         TypeElement typeElement = objectDeclaration.getTypeElement();
-        if (!hasDataOrGetter(typeElement)) {
+        if (!hasDataOrGetterOrValue(typeElement)) {
             return;
         }
 
@@ -45,12 +45,13 @@ public class LombokObjectDeclarationPostProcessor extends AbstractObjectDeclarat
         }
     }
 
-    private boolean hasDataOrGetter(TypeElement typeElement) {
+    private boolean hasDataOrGetterOrValue(TypeElement typeElement) {
         List<? extends AnnotationMirror> annotationMirrors = typeElement.getAnnotationMirrors();
         for (AnnotationMirror annotationMirror : annotationMirrors) {
             TypeElement annotationElement = (TypeElement) annotationMirror.getAnnotationType().asElement();
             String name = annotationElement.getQualifiedName().toString();
-            if (name.equals(DATA_ANNOTATION) || name.equals(GETTER_ANNOTATION)) {
+            if (name.equals(DATA_ANNOTATION) || name.equals(GETTER_ANNOTATION)
+                    || name.equals(VALUE_ANNOTATION)) {
                 return true;
             }
         }
