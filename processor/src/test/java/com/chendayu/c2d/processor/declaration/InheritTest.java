@@ -3,10 +3,12 @@ package com.chendayu.c2d.processor.declaration;
 import com.chendayu.c2d.processor.Declaration;
 import com.chendayu.c2d.processor.DeclarationType;
 import com.chendayu.c2d.processor.ObjectDeclaration;
-import com.chendayu.c2d.processor.Property;
+import com.chendayu.c2d.processor.ObjectProperty;
 import org.junit.Test;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
@@ -24,21 +26,23 @@ public class InheritTest extends AbstractDeclarationTest {
 
     private void checkChild(ObjectDeclaration child) {
         assertThat(child.getDescription()).isEqualTo(Collections.singletonList("子类"));
-        List<Property> properties = child.getProperties();
+        Collection<ObjectProperty> properties = child.getProperties();
         assertThat(properties).hasSize(4);
 
-        checkProperty(properties.get(0), "name", DeclarationType.STRING, Collections.singletonList("姓名"));
-        checkProperty(properties.get(1), "id", DeclarationType.STRING, Collections.singletonList("用户id"));
-        checkProperty(properties.get(2), "age", DeclarationType.NUMBER, Collections.singletonList("年龄"));
-        checkProperty(properties.get(3), "data", DeclarationType.STRING, Collections.singletonList("测试数据"));
+        Iterator<ObjectProperty> iterator = properties.iterator();
+        checkProperty(iterator.next(), "name", DeclarationType.STRING, Collections.singletonList("姓名"));
+        checkProperty(iterator.next(), "id", DeclarationType.STRING, Collections.singletonList("用户id"));
+        checkProperty(iterator.next(), "age", DeclarationType.NUMBER, Collections.singletonList("年龄"));
+        checkProperty(iterator.next(), "data", DeclarationType.STRING, Collections.singletonList("测试数据"));
     }
 
     private void checkSimpleChild(ObjectDeclaration simpleChild) {
         assertThat(simpleChild.getDescription()).isEqualTo(emptyList());
-        List<Property> properties = simpleChild.getProperties();
+        Collection<ObjectProperty> properties = simpleChild.getProperties();
         assertThat(properties).hasSize(2);
 
-        checkProperty(properties.get(0), "name", DeclarationType.STRING, Collections.singletonList("姓名"));
-        checkProperty(properties.get(1), "id", DeclarationType.STRING, Collections.singletonList("id"));
+        Iterator<ObjectProperty> iterator = properties.iterator();
+        checkProperty(iterator.next(), "name", DeclarationType.STRING, Collections.singletonList("姓名"));
+        checkProperty(iterator.next(), "id", DeclarationType.STRING, Collections.singletonList("id"));
     }
 }

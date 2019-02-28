@@ -10,9 +10,7 @@ public class ObjectDeclaration implements Declaration {
 
     private final String qualifiedName;
 
-    private final List<ObjectProperty> properties = new ArrayList<>();
-
-    private final Map<String, ObjectProperty> propertyMap = new HashMap<>();
+    private final LinkedHashMap<String, ObjectProperty> propertyMap = new LinkedHashMap<>();
 
     private List<String> description;
 
@@ -56,6 +54,10 @@ public class ObjectDeclaration implements Declaration {
         return typeParameters;
     }
 
+    public void setTypeParameters(List<Property> typeParameters) {
+        this.typeParameters = typeParameters;
+    }
+
     public boolean containsProperty(String name) {
         return propertyMap.containsKey(name);
     }
@@ -64,16 +66,11 @@ public class ObjectDeclaration implements Declaration {
         return qualifiedName;
     }
 
-    public void setTypeParameters(List<Property> typeParameters) {
-        this.typeParameters = typeParameters;
-    }
-
     public void addProperty(ObjectProperty property) {
         String name = property.getName();
         if (this.containsProperty(name)) {
             throw new IllegalArgumentException("property '" + name + "' already exists in '" + name + "'");
         }
-        this.properties.add(property);
         this.propertyMap.put(name, property);
     }
 
@@ -90,18 +87,39 @@ public class ObjectDeclaration implements Declaration {
         }
     }
 
-    public List<Property> getProperties() {
-        return Collections.unmodifiableList(properties);
+    public Collection<ObjectProperty> getProperties() {
+        return propertyMap.values();
+    }
+
+    public List<ObjectProperty> copyProperties() {
+        return new ArrayList<>(propertyMap.values());
     }
 
     public void setFieldMap(Map<String, VariableElement> fieldMap) {
         this.fieldMap = fieldMap;
     }
 
-    // todo 不深不浅的拷贝，应该根据实际情况调整
+    public void removeProperty(String name) {
+        propertyMap.remove(name);
+    }
+
+    public void renameProperty(String from, String to) {
+        if (propertyMap.containsKey(to)) {
+            throw new IllegalArgumentException("failed rename property '" + from + "' to '"
+                    + to + "' in declaration '" + qualifiedName + "' : property already exists");
+        }
+        ObjectProperty objectProperty = propertyMap.get(from);
+        if (objectProperty == null) {
+            throw new IllegalArgumentException("failed rename property '" + from + "' to '"
+                    + to + "' in declaration '" + qualifiedName + "' : property not exists");
+        }
+        propertyMap.remove(from);
+        objectProperty.setName(to);
+        addProperty(objectProperty);
+    }
+
     public ObjectDeclaration withTypeArgs(List<Declaration> typeArgs) {
         ObjectDeclaration copy = new ObjectDeclaration(typeElement);
-        copy.properties.addAll(properties);
         copy.propertyMap.putAll(propertyMap);
         copy.setDescription(new ArrayList<>(description));
         copy.typeArgs = typeArgs;

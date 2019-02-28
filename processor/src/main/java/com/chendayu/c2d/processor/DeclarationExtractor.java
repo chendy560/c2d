@@ -5,19 +5,16 @@ import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.chendayu.c2d.processor.Declarations.ENUM_CONST;
 import static com.chendayu.c2d.processor.Declarations.UNKNOWN;
 import static com.chendayu.c2d.processor.Declarations.arrayOf;
-import static javax.lang.model.element.Modifier.FINAL;
-import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 
 public class DeclarationExtractor extends InfoExtractor {
 
     private static final String LOMBOK_DATA = "lombok.Data";
+    private static final String JACKSON_JSON_IGNORE = "com.fasterxml.jackson.annotation.JsonIgnore";
 
     private static final String JAVA_PREFIX = "java.";
     private static final String JAVAX_PREFIX = "javax.";
@@ -29,9 +26,6 @@ public class DeclarationExtractor extends InfoExtractor {
     private static final int BOOLEAN_GETTER_LENGTH = BOOLEAN_GETTER_PREFIX.length();
 
     private static final Declaration UNKNOWN_ARRAY = arrayOf(UNKNOWN);
-
-    private static final Collection<Modifier> PUBLIC_STATIC_FINAL = Stream.of(PUBLIC, STATIC, FINAL)
-            .collect(Collectors.toSet());
 
     private final Set<Element> objectMethods;
 
@@ -107,6 +101,12 @@ public class DeclarationExtractor extends InfoExtractor {
             processors.add(lombokProcessor);
         }
 
+        TypeElement jsonIgnore = elementUtils.getTypeElement(JACKSON_JSON_IGNORE);
+        if (jsonIgnore != null) {
+            JacksonObjectDeclarationPostProcessor jacksonProcessor =
+                    new JacksonObjectDeclarationPostProcessor(environment);
+            processors.add(jacksonProcessor);
+        }
         return Collections.unmodifiableSortedSet(processors);
     }
 
@@ -356,7 +356,7 @@ public class DeclarationExtractor extends InfoExtractor {
             // 能走到这一步的都是对象了
             ObjectDeclaration declaration = (ObjectDeclaration) extractFromDeclaredType(declaredType);
 
-            List<Property> properties = declaration.getProperties();
+            Collection<ObjectProperty> properties = declaration.getProperties();
             for (Property property : properties) {
 
                 String propertyName = property.getName();

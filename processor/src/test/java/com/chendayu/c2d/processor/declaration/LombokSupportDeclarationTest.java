@@ -4,10 +4,12 @@ package com.chendayu.c2d.processor.declaration;
 import com.chendayu.c2d.processor.Declaration;
 import com.chendayu.c2d.processor.DeclarationType;
 import com.chendayu.c2d.processor.ObjectDeclaration;
-import com.chendayu.c2d.processor.Property;
+import com.chendayu.c2d.processor.ObjectProperty;
 import org.junit.Test;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,18 +22,21 @@ public class LombokSupportDeclarationTest extends AbstractDeclarationTest {
 
         ObjectDeclaration dataTest = (ObjectDeclaration) result.get(0);
         assertThat(dataTest.getDescription()).isEqualTo(Collections.singletonList("Data注解测试数据"));
-        List<Property> dataProperties = dataTest.getProperties();
+
+        Collection<ObjectProperty> dataProperties = dataTest.getProperties();
         assertThat(dataProperties).hasSize(2);
 
-        checkProperty(dataProperties.get(0), "name", DeclarationType.STRING, Collections.singletonList("名字"));
-        checkProperty(dataProperties.get(1), "age", DeclarationType.NUMBER, Collections.singletonList("年龄"));
+        Iterator<ObjectProperty> iterator = dataProperties.iterator();
+        checkProperty(iterator.next(), "name", DeclarationType.STRING, Collections.singletonList("名字"));
+        checkProperty(iterator.next(), "age", DeclarationType.NUMBER, Collections.singletonList("年龄"));
 
         ObjectDeclaration getterData = (ObjectDeclaration) result.get(1);
         assertThat(getterData.getDescription()).isEqualTo(Collections.singletonList("Getter注解测试数据"));
-        List<Property> getterProperties = getterData.getProperties();
+        Collection<ObjectProperty> getterProperties = getterData.getProperties();
         assertThat(getterProperties).hasSize(2);
 
-        checkProperty(getterProperties.get(0), "score", DeclarationType.NUMBER, Collections.singletonList("分数"));
-        checkProperty(getterProperties.get(1), "passed", DeclarationType.BOOLEAN, Collections.singletonList("是否通过"));
+        Iterator<ObjectProperty> getterIterator = getterProperties.iterator();
+        checkProperty(getterIterator.next(), "score", DeclarationType.NUMBER, Collections.singletonList("分数"));
+        checkProperty(getterIterator.next(), "passed", DeclarationType.BOOLEAN, Collections.singletonList("是否通过"));
     }
 }

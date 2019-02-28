@@ -6,7 +6,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 /**
- * 简单实现以下，把常用api弄进来
+ * 简单实现一下，把常用api弄进来
  */
 public abstract class AbstractObjectDeclarationPostProcessor implements ObjectDeclarationPostProcessor {
 
@@ -25,7 +25,21 @@ public abstract class AbstractObjectDeclarationPostProcessor implements ObjectDe
         this.messager = processingEnv.getMessager();
     }
 
-    protected final int highestOrder() {
+    /**
+     * 最高的优先级
+     *
+     * @return 最高的优先级
+     */
+    protected static int highestOrder() {
         return Integer.MIN_VALUE;
+    }
+
+    /**
+     * 最低的优先级
+     *
+     * @return 最低的优先级
+     */
+    protected static int lowestOrder() {
+        return Integer.MAX_VALUE;
     }
 }
