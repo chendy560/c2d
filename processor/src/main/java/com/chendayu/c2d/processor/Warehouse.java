@@ -4,13 +4,17 @@ import java.util.*;
 
 public class Warehouse {
 
+    private static final String PACKAGE_NAME = "c2d";
+
     private final Map<String, ObjectDeclaration> declarationMap = new HashMap<>(16, 0.5f);
 
     private final Map<String, EnumDeclaration> enumMap = new HashMap<>(16, 0.5f);
 
     private final SortedMap<String, Resource> resourceMap = new TreeMap<>();
 
-    private String applicationName;
+    private String applicationName = "Application";
+
+    private String basePackage = "com.chendayu.c2d";
 
     public String getApplicationName() {
         return applicationName;
@@ -18,6 +22,14 @@ public class Warehouse {
 
     public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;
+    }
+
+    public String getBasePackage() {
+        return basePackage;
+    }
+
+    public void setBasePackage(String basePackage) {
+        this.basePackage = basePackage;
     }
 
     public ObjectDeclaration getDeclaration(String qualifiedName) {

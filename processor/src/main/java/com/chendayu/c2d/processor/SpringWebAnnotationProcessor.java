@@ -63,7 +63,7 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
 
                 if (annotation.getQualifiedName().toString().equals(SPRING_BOOT_APPLICATION)) {
                     for (Element element : annotated) {
-                        extractApplicationName(element);
+                        extractApplicationMeta(element);
                     }
                     continue;
                 }
@@ -86,14 +86,19 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
         return false;
     }
 
-    private void extractApplicationName(Element element) {
+    private void extractApplicationMeta(Element element) {
         ElementKind kind = element.getKind();
         if (kind != ElementKind.CLASS) {
             return;
         }
 
         TypeElement typeElement = (TypeElement) element;
+
         String mainClassName = typeElement.getSimpleName().toString();
+        String qualifiedName = typeElement.getQualifiedName().toString();
+        String basePackage = qualifiedName.substring(0, qualifiedName.indexOf(mainClassName) - 1);
+        warehouse.setBasePackage(basePackage);
+
         int lastApplicationIndex = mainClassName.lastIndexOf("Application");
         if (lastApplicationIndex <= 0) {
             return;

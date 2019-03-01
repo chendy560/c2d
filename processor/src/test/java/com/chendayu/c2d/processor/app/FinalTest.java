@@ -46,6 +46,8 @@ public class FinalTest {
 
         String applicationName = warehouse.getApplicationName();
         assertThat(applicationName).isEqualTo("Simple Test");
+        String basePackage = warehouse.getBasePackage();
+        assertThat(basePackage).isEqualTo("com.chendayu.c2d.processor.app");
 
         Collection<Resource> resources = warehouse.getResources();
 
