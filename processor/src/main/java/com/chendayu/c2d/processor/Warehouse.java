@@ -10,6 +10,16 @@ public class Warehouse {
 
     private final SortedMap<String, Resource> resourceMap = new TreeMap<>();
 
+    private String applicationName;
+
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
+
     public ObjectDeclaration getDeclaration(String qualifiedName) {
         return declarationMap.get(qualifiedName);
     }

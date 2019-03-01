@@ -36,11 +36,16 @@ public class FinalTest {
 
     @Test
     public void testAll() {
-        Warehouse warehouse = compile(Page.class, PageRequest.class,
+        Warehouse warehouse = compile(
+                SimpleTestApplication.class,
+                Page.class, PageRequest.class,
                 BaseController.class, UserController.class,
                 IdEntity.class,
                 Pet.class, PetType.class, User.class,
                 UserCreateRequest.class, UserSearchRequest.class, UserUpdateRequest.class);
+
+        String applicationName = warehouse.getApplicationName();
+        assertThat(applicationName).isEqualTo("Simple Test");
 
         Collection<Resource> resources = warehouse.getResources();
 
