@@ -1,5 +1,7 @@
 package com.chendayu.c2d.processor;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 
 public class AdocGenerator {
@@ -21,17 +23,11 @@ public class AdocGenerator {
     private static final char CODE_END = ']';
     private static final String CODE_BOUNDARY = "----";
 
-    private final StringBuilder builder = new StringBuilder(4096);
+    private final Writer writer;
 
-    public AdocGenerator() {
+    public AdocGenerator(Writer writer) {
+        this.writer = writer;
         safeLine();
-    }
-
-    public String getAndReset() {
-        String result = builder.toString();
-        builder.setLength(0);
-        safeLine();
-        return result;
     }
 
     public AdocGenerator tableBoundary() {
@@ -60,18 +56,21 @@ public class AdocGenerator {
                 .append(LINK_END);
     }
 
-    public AdocGenerator shrink(int n) {
-        builder.setLength(builder.length() - n);
-        return this;
-    }
-
     public AdocGenerator append(String s) {
-        builder.append(s);
+        try {
+            writer.append(s);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
         return this;
     }
 
     public AdocGenerator append(char s) {
-        builder.append(s);
+        try {
+            writer.append(s);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
         return this;
     }
 
@@ -79,7 +78,7 @@ public class AdocGenerator {
         newLine().append("// new file begin").newLine();
     }
 
-    public AdocGenerator title(String t, String title) {
+    private AdocGenerator title(String t, String title) {
         return append(t).append(title).dualNewLine();
     }
 
@@ -141,6 +140,6 @@ public class AdocGenerator {
             }
         }
 
-        return shrink(3).dualNewLine();
+        return dualNewLine();
     }
 }

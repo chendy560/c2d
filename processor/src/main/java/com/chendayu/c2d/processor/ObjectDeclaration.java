@@ -2,7 +2,13 @@ package com.chendayu.c2d.processor;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ObjectDeclaration implements Declaration {
 
@@ -11,6 +17,8 @@ public class ObjectDeclaration implements Declaration {
     private final String qualifiedName;
 
     private final String name;
+
+    private final String hash;
 
     private final LinkedHashMap<String, ObjectProperty> propertyMap = new LinkedHashMap<>();
 
@@ -26,6 +34,7 @@ public class ObjectDeclaration implements Declaration {
         this.typeElement = typeElement;
         this.qualifiedName = typeElement.getQualifiedName().toString();
         this.name = typeElement.getSimpleName().toString();
+        this.hash = "d" + Utils.shortHash(qualifiedName);
     }
 
     public Collection<VariableElement> getFields() {
@@ -39,6 +48,10 @@ public class ObjectDeclaration implements Declaration {
 
     public String getName() {
         return name;
+    }
+
+    public String getHash() {
+        return hash;
     }
 
     public List<String> getDescription() {

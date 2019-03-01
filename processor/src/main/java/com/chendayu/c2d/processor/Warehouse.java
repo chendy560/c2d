@@ -1,6 +1,10 @@
 package com.chendayu.c2d.processor;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class Warehouse {
 
@@ -14,7 +18,7 @@ public class Warehouse {
 
     private String applicationName = "Application";
 
-    private String basePackage = "com.chendayu.c2d";
+    private String basePackage = PACKAGE_NAME;
 
     public String getApplicationName() {
         return applicationName;
@@ -29,7 +33,7 @@ public class Warehouse {
     }
 
     public void setBasePackage(String basePackage) {
-        this.basePackage = basePackage;
+        this.basePackage = basePackage + "." + PACKAGE_NAME;
     }
 
     public ObjectDeclaration getDeclaration(String qualifiedName) {

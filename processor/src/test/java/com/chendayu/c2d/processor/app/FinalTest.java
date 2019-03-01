@@ -1,6 +1,15 @@
 package com.chendayu.c2d.processor.app;
 
-import com.chendayu.c2d.processor.*;
+import com.chendayu.c2d.processor.Action;
+import com.chendayu.c2d.processor.Declaration;
+import com.chendayu.c2d.processor.DeclarationType;
+import com.chendayu.c2d.processor.Declarations;
+import com.chendayu.c2d.processor.EnumDeclaration;
+import com.chendayu.c2d.processor.ObjectDeclaration;
+import com.chendayu.c2d.processor.ObjectProperty;
+import com.chendayu.c2d.processor.Property;
+import com.chendayu.c2d.processor.Resource;
+import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.support.TestCompiler;
 import com.chendayu.c2d.processor.support.TestSpringWebAnnotationProcessor;
 import org.junit.Before;
@@ -10,7 +19,12 @@ import org.junit.rules.TemporaryFolder;
 import org.springframework.http.HttpMethod;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,7 +61,7 @@ public class FinalTest {
         String applicationName = warehouse.getApplicationName();
         assertThat(applicationName).isEqualTo("Simple Test");
         String basePackage = warehouse.getBasePackage();
-        assertThat(basePackage).isEqualTo("com.chendayu.c2d.processor.app");
+        assertThat(basePackage).isEqualTo("com.chendayu.c2d.processor.app.c2d");
 
         Collection<Resource> resources = warehouse.getResources();
 

@@ -8,6 +8,8 @@ public class EnumDeclaration implements Declaration {
 
     private final String name;
 
+    private final String hash;
+
     private final List<Property> constants;
 
     private final List<String> description;
@@ -15,6 +17,7 @@ public class EnumDeclaration implements Declaration {
     public EnumDeclaration(String name, String qualifiedName,
                            List<Property> constants, List<String> description) {
         this.name = name;
+        this.hash = "d" + Utils.shortHash(qualifiedName);
         this.qualifiedName = qualifiedName;
         this.constants = constants;
         this.description = description;
@@ -22,6 +25,10 @@ public class EnumDeclaration implements Declaration {
 
     public String getQualifiedName() {
         return qualifiedName;
+    }
+
+    public String getHash() {
+        return hash;
     }
 
     public String getName() {
