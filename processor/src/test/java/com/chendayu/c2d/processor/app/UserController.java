@@ -76,4 +76,15 @@ public class UserController extends BaseController {
     public Page<User> search(UserSearchRequest request) {
         return null;
     }
+
+    /**
+     * 列举用户
+     *
+     * @param request 分页请求
+     * @return 分页数据
+     */
+    @GetMapping
+    public Page<User> list(PageRequest request) {
+        return null;
+    }
 }

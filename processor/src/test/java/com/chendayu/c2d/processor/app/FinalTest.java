@@ -16,6 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class FinalTest {
 
+    private static final String BY_ID_URL = "/sample/v1/users/{id}";
+
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
@@ -47,7 +49,7 @@ public class FinalTest {
         Resource user = resources.iterator().next();
         SortedSet<Action> actions = user.getActions();
 
-        assertThat(actions).hasSize(6);
+        assertThat(actions).hasSize(7);
 
         Iterator<Action> actionIterator = actions.iterator();
 
@@ -57,8 +59,20 @@ public class FinalTest {
         Action deleteAction = actionIterator.next();
         checkDeleteAction(deleteAction);
 
+        Action getAction = actionIterator.next();
+        checkGetAction(getAction);
 
-        System.out.println("Ha!");
+        Action listAction = actionIterator.next();
+        checkListAction(listAction);
+
+        Action overwriteAction = actionIterator.next();
+        checkOverwriteAction(overwriteAction);
+
+        Action searchAction = actionIterator.next();
+        checkSearchAction(searchAction);
+
+        Action updateAction = actionIterator.next();
+        checkUpdateAction(updateAction);
     }
 
     private void checkDeleteAction(Action action) {
@@ -68,7 +82,7 @@ public class FinalTest {
 
         assertThat(action.getMethod()).isEqualTo(HttpMethod.DELETE);
 
-        assertThat(action.getPath()).isEqualTo("/sample/v1/users/{id}");
+        assertThat(action.getPath()).isEqualTo(BY_ID_URL);
 
         List<Property> pathVariables = action.getPathVariables();
         assertThat(pathVariables).hasSize(1);
@@ -105,6 +119,206 @@ public class FinalTest {
         checkUser(((ObjectDeclaration) user.getDeclaration()));
     }
 
+    private void checkGetAction(Action action) {
+        assertThat(action.getName()).isEqualTo("get");
+
+        assertThat(action.getDescription()).isEqualTo(Collections.singletonList("通过id获取用户"));
+
+        assertThat(action.getMethod()).isEqualTo(HttpMethod.GET);
+
+        assertThat(action.getPath()).isEqualTo(BY_ID_URL);
+
+        List<Property> pathVariables = action.getPathVariables();
+        assertThat(pathVariables).hasSize(1);
+
+        Property id = pathVariables.get(0);
+        checkProperty(id, "id", DeclarationType.NUMBER, "用户id");
+
+        List<Property> urlParameters = action.getUrlParameters();
+        assertThat(urlParameters).hasSize(1);
+
+        Property showDeleted = urlParameters.get(0);
+        checkProperty(showDeleted, "showDeleted", DeclarationType.BOOLEAN, "是否展示被删除的数据");
+
+        assertThat(action.getRequestBody()).isNull();
+
+        Property user = action.getResponseBody();
+        checkProperty(user, null, DeclarationType.OBJECT, "指定id的用户数据");
+
+        checkUser((ObjectDeclaration) user.getDeclaration());
+    }
+
+    private void checkListAction(Action action) {
+        assertThat(action.getName()).isEqualTo("list");
+
+        assertThat(action.getDescription()).isEqualTo(Collections.singletonList("列举用户"));
+
+        assertThat(action.getMethod()).isEqualTo(HttpMethod.GET);
+
+        assertThat(action.getPath()).isEqualTo("/sample/v1/users");
+
+        List<Property> pathVariables = action.getPathVariables();
+        assertThat(pathVariables).isEmpty();
+
+        List<Property> urlParameters = action.getUrlParameters();
+        assertThat(urlParameters).hasSize(2);
+
+        Property p = urlParameters.get(0);
+        checkProperty(p, "p", DeclarationType.NUMBER, "第几页");
+        Property n = urlParameters.get(1);
+        checkProperty(n, "n", DeclarationType.NUMBER, "返回多少条");
+
+        assertThat(action.getRequestBody()).isNull();
+
+        Property userPage = action.getResponseBody();
+        checkProperty(userPage, null, DeclarationType.OBJECT, "分页数据");
+
+        checkUserPage((ObjectDeclaration) userPage.getDeclaration());
+    }
+
+    private void checkOverwriteAction(Action action) {
+        assertThat(action.getName()).isEqualTo("overwrite");
+
+        assertThat(action.getDescription()).isEqualTo(Collections.singletonList("更新/覆盖用户数据"));
+
+        assertThat(action.getMethod()).isEqualTo(HttpMethod.PUT);
+
+        assertThat(action.getPath()).isEqualTo(BY_ID_URL);
+
+        List<Property> pathVariables = action.getPathVariables();
+        assertThat(pathVariables).hasSize(1);
+
+        Property id = pathVariables.get(0);
+        checkProperty(id, "id", DeclarationType.NUMBER, "用户id");
+
+        List<Property> urlParameters = action.getUrlParameters();
+        assertThat(urlParameters).isEmpty();
+
+        Property updateRequest = action.getRequestBody();
+        checkProperty(updateRequest, null, DeclarationType.OBJECT, "更新请求");
+
+        checkUserUpdateRequest((ObjectDeclaration) updateRequest.getDeclaration());
+
+
+        Property user = action.getResponseBody();
+        checkProperty(user, null, DeclarationType.VOID);
+    }
+
+    private void checkSearchAction(Action action) {
+        assertThat(action.getName()).isEqualTo("search");
+
+        assertThat(action.getDescription()).isEqualTo(Collections.singletonList("搜索用户"));
+
+        assertThat(action.getMethod()).isEqualTo(HttpMethod.GET);
+
+        assertThat(action.getPath()).isEqualTo("/sample/v1/users/search");
+
+        List<Property> pathVariables = action.getPathVariables();
+        assertThat(pathVariables).isEmpty();
+
+        List<Property> urlParameters = action.getUrlParameters();
+        assertThat(urlParameters).hasSize(5);
+
+        Property p = urlParameters.get(0);
+        checkProperty(p, "p", DeclarationType.NUMBER, "第几页");
+        Property n = urlParameters.get(1);
+        checkProperty(n, "n", DeclarationType.NUMBER, "返回多少条");
+
+        Property name = urlParameters.get(2);
+        checkProperty(name, "name", DeclarationType.ARRAY, "搜索关键字，搜索用户名，可以指定多个");
+        Property maxAge = urlParameters.get(3);
+        checkProperty(maxAge, "maxAge", DeclarationType.NUMBER, "最大年龄");
+        Property minAge = urlParameters.get(4);
+        checkProperty(minAge, "minAge", DeclarationType.NUMBER, "最小年龄");
+
+
+        assertThat(action.getRequestBody()).isNull();
+
+        Property userPage = action.getResponseBody();
+        checkProperty(userPage, null, DeclarationType.OBJECT, "搜索结果的分页");
+
+        checkUserPage((ObjectDeclaration) userPage.getDeclaration());
+    }
+
+    private void checkUserPage(ObjectDeclaration objectDeclaration) {
+        assertThat(objectDeclaration.getName()).isEqualTo("Page");
+        assertThat(objectDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.Page");
+        assertThat(objectDeclaration.getDescription()).isEqualTo(Collections.singletonList("数据分页的一页"));
+
+        List<Property> typeParameters = objectDeclaration.getTypeParameters();
+        assertThat(typeParameters).hasSize(1);
+        Property t = typeParameters.get(0);
+        checkProperty(t, "T", DeclarationType.TYPE_PARAMETER, "分页中的数据的类型");
+
+        List<Declaration> typeArgs = objectDeclaration.getTypeArgs();
+        assertThat(typeArgs).hasSize(1);
+        Declaration user = typeArgs.get(0);
+        checkUser((ObjectDeclaration) user);
+
+        Collection<ObjectProperty> properties = objectDeclaration.getProperties();
+        assertThat(properties).hasSize(3);
+
+        Iterator<ObjectProperty> propertyIterator = properties.iterator();
+        checkProperty(propertyIterator.next(), "count", DeclarationType.NUMBER, "数据总量");
+        checkProperty(propertyIterator.next(), "currentPage", DeclarationType.NUMBER, "当前页");
+        ObjectProperty items = propertyIterator.next();
+        checkProperty(items, "items", DeclarationType.ARRAY, "本页数据");
+
+        Declaration pageItemComponent = ((Declarations.ArrayDeclaration) items.getDeclaration()).getComponentType();
+        Declarations.TypeArgDeclaration td = (Declarations.TypeArgDeclaration) pageItemComponent;
+        assertThat(td.getType()).isEqualTo(DeclarationType.TYPE_PARAMETER);
+        assertThat(td.getName()).isEqualTo("T");
+    }
+
+    private void checkUpdateAction(Action action) {
+        assertThat(action.getName()).isEqualTo("update");
+
+        assertThat(action.getDescription()).isEqualTo(Collections.singletonList("局部更新用户数据"));
+
+        assertThat(action.getMethod()).isEqualTo(HttpMethod.PATCH);
+
+        assertThat(action.getPath()).isEqualTo(BY_ID_URL);
+
+        List<Property> pathVariables = action.getPathVariables();
+        assertThat(pathVariables).hasSize(1);
+
+        Property id = pathVariables.get(0);
+        checkProperty(id, "id", DeclarationType.NUMBER, "用户id");
+
+        List<Property> urlParameters = action.getUrlParameters();
+        assertThat(urlParameters).isEmpty();
+
+        Property userProperty = action.getRequestBody();
+        checkProperty(userProperty, null, DeclarationType.OBJECT, "用户数据");
+
+        checkUser((ObjectDeclaration) userProperty.getDeclaration());
+
+
+        Property user = action.getResponseBody();
+        checkProperty(user, null, DeclarationType.VOID);
+    }
+
+    private void checkUserUpdateRequest(ObjectDeclaration objectDeclaration) {
+
+        assertThat(objectDeclaration.getName()).isEqualTo("UserUpdateRequest");
+        assertThat(objectDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.UserUpdateRequest");
+        assertThat(objectDeclaration.getDescription()).isEqualTo(Collections.singletonList("用户更新请求"));
+
+
+        assertThat(objectDeclaration.getTypeParameters()).isEmpty();
+        assertThat(objectDeclaration.getTypeArgs()).isEmpty();
+
+        Collection<ObjectProperty> properties = objectDeclaration.getProperties();
+        assertThat(properties).hasSize(2);
+
+        Iterator<ObjectProperty> iterator = properties.iterator();
+        ObjectProperty nonsense = iterator.next();
+        checkProperty(nonsense, "nonsense", DeclarationType.TIMESTAMP, "又是一个纯粹测试用字段");
+
+        ObjectProperty user = iterator.next();
+        checkProperty(user, "user", DeclarationType.OBJECT, "用户数据");
+        checkUser((ObjectDeclaration) user.getDeclaration());
+    }
 
     private void checkUserCreateRequest(ObjectDeclaration objectDeclaration) {
 
@@ -210,7 +424,6 @@ public class FinalTest {
         Property dog = constants.get(1);
         checkProperty(dog, "DOG", DeclarationType.ENUM_CONST, "没错，就是🐶");
     }
-
 
     private void checkProperty(Property property, String name, DeclarationType type, String... description) {
         assertThat(property).isNotNull();
