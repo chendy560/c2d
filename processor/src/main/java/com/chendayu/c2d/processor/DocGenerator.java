@@ -43,7 +43,7 @@ public class DocGenerator {
 
                 adoc.sourceCode("http")
                         .codeBoundary()
-                        .append(action.getMethod().name()).space().append(resource.getPath()).append(action.getPath())
+                        .append(action.getMethod().name()).space().append(action.getPath())
                         .newLine()
                         .codeBoundary();
 
