@@ -87,7 +87,7 @@ public class ObjectDeclaration implements Declaration {
     }
 
     public void addProperty(ObjectProperty property) {
-        String innerName = property.getInnerName();
+        String innerName = property.getOriginName();
         if (this.containsProperty(innerName)) {
             throw new IllegalArgumentException("property '" + innerName + "' already exists in '" + innerName + "'");
         }
@@ -95,7 +95,7 @@ public class ObjectDeclaration implements Declaration {
     }
 
     public void addPropertyDescriptionIfNotExists(Property property) {
-        String innerName = property.getInnerName();
+        String innerName = property.getOriginName();
         ObjectProperty oldProperty = this.propertyMap.get(innerName);
         if (oldProperty == null) {
             throw new IllegalArgumentException("property '" + innerName + "' not exists in declaration '"

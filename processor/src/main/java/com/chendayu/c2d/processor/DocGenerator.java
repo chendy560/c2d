@@ -27,7 +27,7 @@ public class DocGenerator {
 
         Collection<Resource> resources = warehouse.getResources();
         String applicationName = warehouse.getApplicationName();
-        AdocGenerator adoc = new AdocGenerator(writer);
+        AdocWriter adoc = new AdocWriter(writer);
 
         adoc.title0(applicationName + " API 文档")
                 .title1("资源");
@@ -41,11 +41,10 @@ public class DocGenerator {
                 adoc.title3(name);
                 adoc.appendLines(action.getDescription());
 
-                adoc.sourceCode("http")
-                        .codeBoundary()
+                adoc.sourceCodeBegin("http")
                         .append(action.getMethod().name()).space().append(action.getPath())
                         .newLine()
-                        .codeBoundary();
+                        .sourceCodeEnd();
 
                 List<Property> pathVariables = action.getPathVariables();
                 if (!pathVariables.isEmpty()) {
@@ -92,8 +91,7 @@ public class DocGenerator {
             switch (type) {
                 case OBJECT:
                     ObjectDeclaration od = (ObjectDeclaration) declaration;
-                    adoc.anchor(od.getHash()).newLine()
-                            .title3(od.getName());
+                    adoc.anchor(od.getHash()).title3(od.getName());
 
                     adoc.appendLines(od.getDescription());
                     List<Property> typeParameters = od.getTypeParameters();
@@ -110,8 +108,7 @@ public class DocGenerator {
                     break;
                 case ENUM:
                     EnumDeclaration ed = (EnumDeclaration) declaration;
-                    adoc.anchor(ed.getHash()).newLine()
-                            .title3(ed.getName());
+                    adoc.anchor(ed.getHash()).title3(ed.getName());
                     List<Property> constants = ed.getConstants();
                     if (!constants.isEmpty()) {
                         adoc.title4("常量列表");
@@ -166,27 +163,27 @@ public class DocGenerator {
         }
     }
 
-    private void parameterTable(Collection<? extends Property> parameters, AdocGenerator adoc) {
+    private void parameterTable(Collection<? extends Property> parameters, AdocWriter adoc) {
 
-        adoc.tableBoundary().newLine()
-                .tableSeparator().append("名称").space()
-                .tableSeparator().append("类型").space()
-                .tableSeparator().append("描述").dualNewLine();
+        adoc.tableBegin()
+                .columnBegin().append("名称").space()
+                .columnBegin().append("类型").space()
+                .columnBegin().append("描述").dualNewLine();
 
         for (Property p : parameters) {
-            adoc.tableSeparator().append(p.getName()).newLine();
-            adoc.tableSeparator();
+            adoc.columnBegin().append(p.getName()).newLine();
+            adoc.columnBegin();
             appendType(p.getDeclaration(), adoc);
             adoc.newLine();
-            adoc.tableSeparator()
+            adoc.columnBegin()
                     .appendLines(p.getDescription());
         }
 
-        adoc.tableBoundary().dualNewLine();
+        adoc.tableBegin();
     }
 
 
-    private void appendType(Declaration d, AdocGenerator adoc) {
+    private void appendType(Declaration d, AdocWriter adoc) {
         DeclarationType type = d.getType();
         switch (type) {
             case STRING:

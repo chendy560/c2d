@@ -1,53 +1,150 @@
 package com.chendayu.c2d.processor;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.*;
-import javax.lang.model.type.*;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.ArrayType;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static com.chendayu.c2d.processor.Declarations.ENUM_CONST;
 import static com.chendayu.c2d.processor.Declarations.UNKNOWN;
 import static com.chendayu.c2d.processor.Declarations.arrayOf;
 import static javax.lang.model.element.Modifier.STATIC;
 
+/**
+ * 数据类型提取器
+ */
 public class DeclarationExtractor extends InfoExtractor {
 
+    /**
+     * lombok 的 Data 注解，用于判断是否引入了 lombok
+     */
     private static final String LOMBOK_DATA = "lombok.Data";
+
+    /**
+     * jackson 的 JsonIgnore 注解，用于判断是否引入了 jackson
+     */
     private static final String JACKSON_JSON_IGNORE = "com.fasterxml.jackson.annotation.JsonIgnore";
 
+    /**
+     * java包，在提取父类和接口时会被忽略
+     */
     private static final String JAVA_PREFIX = "java.";
+
+    /**
+     * javax包，在提取父类和接口时会被忽略
+     */
     private static final String JAVAX_PREFIX = "javax.";
 
+    /**
+     * getter方法的前缀
+     */
     private static final String GETTER_PREFIX = "get";
+
+    /**
+     * getter方法前缀的长度
+     */
     private static final int GETTER_LENGTH = GETTER_PREFIX.length();
 
+    /**
+     * is方法的前缀
+     */
     private static final String BOOLEAN_GETTER_PREFIX = "is";
+
+    /**
+     * is方法的前缀的长度
+     */
     private static final int BOOLEAN_GETTER_LENGTH = BOOLEAN_GETTER_PREFIX.length();
 
+    /**
+     * 当数组内的元素类型无法解析时返回这个类型
+     */
     private static final Declaration UNKNOWN_ARRAY = arrayOf(UNKNOWN);
 
+    /**
+     * Object 自带的方法们，会被忽略
+     */
     private final Set<Element> objectMethods;
 
+    /**
+     * {@link Void} 类型，区别于 void
+     */
     private final TypeMirror voidType;
 
+    /**
+     * {@link CharSequence} 类型，相当于字符串
+     */
     private final TypeMirror charSequenceType;
 
+    /**
+     * {@link Number} 类型，各种数字包装类，大整形，大浮点等等的接口
+     */
     private final TypeMirror numberType;
 
+    /**
+     * {@link Boolean}
+     */
     private final TypeMirror booleanType;
 
+    /**
+     * {@link Date}
+     */
     private final TypeMirror dateType;
+    /**
+     * {@link Instant}
+     */
     private final TypeMirror instantType;
 
+    /**
+     * {@link Iterable} 相当于数组
+     */
     private final TypeMirror iterableType;
+    /**
+     * {@link Collection}
+     */
     private final TypeMirror collectionType;
+    /**
+     * {@link List}
+     */
     private final TypeMirror listType;
+    /**
+     * {@link Set}
+     */
     private final TypeMirror setType;
 
+    /**
+     * {@link Map}
+     */
     private final TypeMirror mapType;
+    /**
+     * {@link Enum} 所有枚举的父类
+     */
     private final TypeMirror enumType;
 
+    /**
+     * 后处理器们
+     */
     private final SortedSet<ObjectDeclarationPostProcessor> postProcessors;
 
     public DeclarationExtractor(ProcessingEnvironment environment, Warehouse warehouse) {
@@ -111,14 +208,14 @@ public class DeclarationExtractor extends InfoExtractor {
     }
 
     /**
-     * 两个真正的入口之一，需要解析成 Declaration 的东西只有方法参数和方法返回值，这里是方法参数
+     * 需要解析成 Declaration 的东西只有方法参数和方法返回值，这里是方法参数
      */
     public Declaration extract(VariableElement variableElement) {
         return extract(variableElement.asType());
     }
 
     /**
-     * 两个真正的入口之一，需要解析成 Declaration 的东西只有方法参数和方法返回值，这里是返回值
+     * 需要解析成 Declaration 的东西只有方法参数和方法返回值，这里方法是返回值
      */
     public Declaration extract(TypeMirror typeMirror) {
         TypeKind kind = typeMirror.getKind();
@@ -518,6 +615,9 @@ public class DeclarationExtractor extends InfoExtractor {
         return Character.isLowerCase(firstChar);
     }
 
+    /**
+     * 还原泛型参数
+     */
     private TypeElement getOriginTypeElement(DeclaredType typeMirror) {
         TypeElement typeElement = (TypeElement) typeMirror.asElement();
         DeclaredType declaredType = (DeclaredType) typeElement.asType();

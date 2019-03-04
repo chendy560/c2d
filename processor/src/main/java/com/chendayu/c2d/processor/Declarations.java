@@ -8,7 +8,6 @@ public class Declarations {
     public static final Declaration BOOLEAN = () -> DeclarationType.BOOLEAN;
     public static final Declaration ENUM_CONST = () -> DeclarationType.ENUM_CONST;
     public static final Declaration DYNAMIC = () -> DeclarationType.DYNAMIC;
-    public static final Declaration ENUM = () -> DeclarationType.ENUM;
     public static final Declaration VOID = () -> DeclarationType.VOID;
     public static final Declaration UNKNOWN = () -> DeclarationType.UNKNOWN;
 

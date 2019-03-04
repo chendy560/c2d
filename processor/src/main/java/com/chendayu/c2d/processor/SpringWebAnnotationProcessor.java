@@ -1,23 +1,35 @@
 package com.chendayu.c2d.processor;
 
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * 入口类
+ * 这里没有用注解的方式定义支持的注解和源代码版本，目的很简单：假装能够挤出一点点性能
+ */
 public class SpringWebAnnotationProcessor extends AbstractProcessor {
 
+    /**
+     * spring 的 Controller 注解（在 spring-context 包里）
+     */
     private static final String CONTROLLER = "org.springframework.stereotype.Controller";
+
+    /**
+     * spring 的 RestController 注解（在 spring-web 包里）
+     */
     private static final String REST_CONTROLLER = "org.springframework.web.bind.annotation.RestController";
+
+    /**
+     * spring-boot 的 SpringBootApplication 注解
+     */
     private static final String SPRING_BOOT_APPLICATION = "org.springframework.boot.autoconfigure.SpringBootApplication";
 
     private static final Set<String> SUPPORTED_ANNOTATIONS =
@@ -27,13 +39,25 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
                     SPRING_BOOT_APPLICATION
             ).collect(Collectors.toSet());
 
+    /**
+     * 数据仓库
+     */
     private Warehouse warehouse;
 
+    /**
+     * 资源数据（api数据）提取器
+     */
     private ResourceExtractor resourceExtractor;
 
-    private DocGenerator docGenerator;
+    /**
+     * 应用信息提取器
+     */
+    private ApplicationMetaExtractor applicationMetaExtractor;
 
-    private Messager messager;
+    /**
+     * 文档生成器
+     */
+    private DocGenerator docGenerator;
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -50,8 +74,9 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
         super.init(processingEnv);
         this.warehouse = new Warehouse();
         this.resourceExtractor = new ResourceExtractor(processingEnv, warehouse);
+        this.applicationMetaExtractor = new ApplicationMetaExtractor(processingEnv, warehouse);
         this.docGenerator = new DocGenerator(processingEnv);
-        this.messager = processingEnv.getMessager();
+
     }
 
     @Override
@@ -63,13 +88,12 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
 
                 if (annotation.getQualifiedName().toString().equals(SPRING_BOOT_APPLICATION)) {
                     for (Element element : annotated) {
-                        extractApplicationMeta(element);
+                        applicationMetaExtractor.extract((TypeElement) element);
                     }
                     continue;
                 }
 
                 for (Element element : annotated) {
-                    // 因为 Controller 和 RestController 都只能放在类上，所以这里可以无伤强转
                     resourceExtractor.extract((TypeElement) element);
                 }
             }
@@ -80,44 +104,13 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
 
         } catch (Exception e) {
             String message = e.getMessage();
-            String trace = Arrays.toString(e.getStackTrace());
-            messager.printMessage(Diagnostic.Kind.ERROR, message + trace);
+            if (message != null) {
+                processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message);
+            } else {
+                processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "no message");
+            }
         }
         return false;
-    }
-
-    private void extractApplicationMeta(Element element) {
-        ElementKind kind = element.getKind();
-        if (kind != ElementKind.CLASS) {
-            return;
-        }
-
-        TypeElement typeElement = (TypeElement) element;
-
-        String mainClassName = typeElement.getSimpleName().toString();
-        String qualifiedName = typeElement.getQualifiedName().toString();
-        String basePackage = qualifiedName.substring(0, qualifiedName.indexOf(mainClassName) - 1);
-        warehouse.setBasePackage(basePackage);
-
-        int lastApplicationIndex = mainClassName.lastIndexOf("Application");
-        if (lastApplicationIndex <= 0) {
-            return;
-        }
-
-        String applicationName = mainClassName.substring(0, lastApplicationIndex);
-
-        StringBuilder builder = new StringBuilder();
-        builder.append(applicationName.charAt(0));
-
-        for (int i = 1; i < applicationName.length(); i++) {
-            char c = applicationName.charAt(i);
-            if (Character.isUpperCase(c)) {
-                builder.append(' ');
-            }
-            builder.append(c);
-        }
-
-        warehouse.setApplicationName(builder.toString());
     }
 
     /**

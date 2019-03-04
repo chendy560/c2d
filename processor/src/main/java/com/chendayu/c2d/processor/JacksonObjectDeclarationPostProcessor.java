@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * 处理 jackson 的一些注解
+ * jackson 的注解很多，功能很强，但是我很菜，所以选择我用到了什么就支持什么
  */
 public class JacksonObjectDeclarationPostProcessor extends AbstractObjectDeclarationPostProcessor {
 
@@ -31,7 +32,8 @@ public class JacksonObjectDeclarationPostProcessor extends AbstractObjectDeclara
     private void processJacksonAnnotations(ObjectProperty property, ObjectDeclaration declaration) {
         String name = property.getName();
         JsonIgnore jsonIgnore = getAnnotation(property, JsonIgnore.class);
-        if (jsonIgnore != null) {
+        // jsonIgnore 是有一个默认为 true 的 value 的，感觉是一个非常迷惑的api
+        if (jsonIgnore != null && jsonIgnore.value()) {
             declaration.removeProperty(name);
             return;
         }

@@ -1,5 +1,8 @@
 package com.chendayu.c2d.processor;
 
+/**
+ * 类型的类型，一定程度上来说这套逻辑可以用 instanceof 实现
+ */
 public enum DeclarationType {
 
     /**
@@ -60,5 +63,5 @@ public enum DeclarationType {
     /**
      * 解析不出来的东西
      */
-    UNKNOWN
+    UNKNOWN;
 }

@@ -10,10 +10,19 @@ import java.util.TreeSet;
  */
 public class Resource {
 
+    /**
+     * 资源名称
+     */
     private final String name;
 
+    /**
+     * 资源的操作，按字母顺序排序
+     */
     private SortedSet<Action> actions = new TreeSet<>(Comparator.comparing(Action::getName));
 
+    /**
+     * 资源的根路径
+     */
     private String path;
 
     public Resource(String name) {

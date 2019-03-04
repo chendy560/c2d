@@ -6,22 +6,43 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * 对资源的一个操作，相当于一个 api 接口
+ */
 public class Action {
 
+    /**
+     * 操作名字
+     */
     private String name;
 
     private List<String> description;
 
+    /**
+     * 请求路径
+     */
     private String path;
 
     private HttpMethod method;
 
+    /**
+     * 路径参数
+     */
     private List<Property> pathVariables = Collections.emptyList();
 
+    /**
+     * url参数
+     */
     private List<Property> urlParameters = Collections.emptyList();
 
+    /**
+     * 请求body，在请求没有body时为null
+     */
     private Property requestBody;
 
+    /**
+     * 响应body，在响应没有body时为null
+     */
     private Property responseBody;
 
     public Action(String name, List<String> description) {
@@ -55,10 +76,6 @@ public class Action {
         return description;
     }
 
-    public void setDescription(List<String> description) {
-        this.description = description;
-    }
-
     public String getPath() {
         return path;
     }
@@ -79,16 +96,8 @@ public class Action {
         return pathVariables;
     }
 
-    public void setPathVariables(List<Property> pathVariables) {
-        this.pathVariables = pathVariables;
-    }
-
     public List<Property> getUrlParameters() {
         return urlParameters;
-    }
-
-    public void setUrlParameters(List<Property> urlParameters) {
-        this.urlParameters = urlParameters;
     }
 
     public Property getRequestBody() {
@@ -107,7 +116,7 @@ public class Action {
         this.responseBody = responseBody;
     }
 
-    public void setPathPrefix(String s) {
+    public void setBasePath(String s) {
         this.path = s + path;
     }
 }

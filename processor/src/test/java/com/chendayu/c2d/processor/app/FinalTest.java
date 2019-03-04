@@ -97,7 +97,7 @@ public class FinalTest {
     }
 
     private void checkDeleteAction(Action action) {
-        assertThat(action.getName()).isEqualTo("delete");
+        assertThat(action.getName()).isEqualTo("Delete");
 
         assertThat(action.getDescription()).isEqualTo(Collections.singletonList("删除用户"));
 
@@ -115,7 +115,7 @@ public class FinalTest {
     }
 
     private void checkCreateAction(Action action) {
-        assertThat(action.getName()).isEqualTo("create");
+        assertThat(action.getName()).isEqualTo("Create");
 
         assertThat(action.getDescription()).isEqualTo(Collections.singletonList("创建用户"));
 
@@ -141,7 +141,7 @@ public class FinalTest {
     }
 
     private void checkGetAction(Action action) {
-        assertThat(action.getName()).isEqualTo("get");
+        assertThat(action.getName()).isEqualTo("Get");
 
         assertThat(action.getDescription()).isEqualTo(Collections.singletonList("通过id获取用户"));
 
@@ -170,7 +170,7 @@ public class FinalTest {
     }
 
     private void checkListAction(Action action) {
-        assertThat(action.getName()).isEqualTo("list");
+        assertThat(action.getName()).isEqualTo("List");
 
         assertThat(action.getDescription()).isEqualTo(Collections.singletonList("列举用户"));
 
@@ -198,7 +198,7 @@ public class FinalTest {
     }
 
     private void checkOverwriteAction(Action action) {
-        assertThat(action.getName()).isEqualTo("overwrite");
+        assertThat(action.getName()).isEqualTo("Overwrite");
 
         assertThat(action.getDescription()).isEqualTo(Collections.singletonList("更新/覆盖用户数据"));
 
@@ -226,7 +226,7 @@ public class FinalTest {
     }
 
     private void checkSearchAction(Action action) {
-        assertThat(action.getName()).isEqualTo("search");
+        assertThat(action.getName()).isEqualTo("Search");
 
         assertThat(action.getDescription()).isEqualTo(Collections.singletonList("搜索用户"));
 
@@ -292,7 +292,7 @@ public class FinalTest {
     }
 
     private void checkUpdateAction(Action action) {
-        assertThat(action.getName()).isEqualTo("update");
+        assertThat(action.getName()).isEqualTo("Update");
 
         assertThat(action.getDescription()).isEqualTo(Collections.singletonList("局部更新用户数据"));
 

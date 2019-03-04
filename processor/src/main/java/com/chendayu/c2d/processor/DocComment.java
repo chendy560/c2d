@@ -1,12 +1,19 @@
 package com.chendayu.c2d.processor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 解析和封装文档注解
+ */
 public class DocComment {
 
-    private static final Pattern SPLIT = Pattern.compile("\n");
+    private static final Pattern SPLIT = Pattern.compile("\n+");
 
     /**
      * 匹配 " @param name desc "

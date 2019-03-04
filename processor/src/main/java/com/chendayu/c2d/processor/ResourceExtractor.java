@@ -3,7 +3,11 @@ package com.chendayu.c2d.processor;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.*;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Name;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
@@ -39,7 +43,7 @@ public class ResourceExtractor extends InfoExtractor {
             if (e.getKind() == ElementKind.METHOD) {
                 Action action = actionExtractor.findAction((ExecutableElement) e);
                 if (action != null) {
-                    action.setPathPrefix(path);
+                    action.setBasePath(path);
                     resource.addAction(action);
                 }
             }

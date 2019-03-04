@@ -1,7 +1,19 @@
 package com.chendayu.c2d.processor;
 
 import org.springframework.http.HttpMethod;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.MatrixVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
@@ -9,9 +21,12 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Annotation;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
 
 import static com.chendayu.c2d.processor.Utils.findName;
 import static com.chendayu.c2d.processor.Utils.findRequestMapping;
@@ -54,13 +69,13 @@ public class ActionExtractor extends InfoExtractor {
             MatrixVariable.class
     );
 
-    private static final Set<DeclarationType> simpleTypes = Stream.of(
+    private static final EnumSet<DeclarationType> simpleTypes = EnumSet.of(
             DeclarationType.STRING,
             DeclarationType.NUMBER,
             DeclarationType.TIMESTAMP,
             DeclarationType.BOOLEAN,
             DeclarationType.ENUM_CONST
-    ).collect(Collectors.toSet());
+    );
 
     private final DeclarationExtractor declarationExtractor;
 
@@ -125,7 +140,8 @@ public class ActionExtractor extends InfoExtractor {
 
     private Action createAction(ExecutableElement element, String path, HttpMethod method) {
 
-        String actionName = element.getSimpleName().toString();
+        String methodName = element.getSimpleName().toString();
+        String actionName = Utils.upperCaseFirst(methodName);
         String docCommentString = elementUtils.getDocComment(element);
         DocComment docComment = DocComment.create(docCommentString);
 
@@ -150,7 +166,7 @@ public class ActionExtractor extends InfoExtractor {
 
     private void handleParameter(VariableElement parameterElement, Action action, List<String> description) {
 
-        if (shouldIgnore(parameterElement)) {
+        if (shouldIgnoreParameter(parameterElement)) {
             return;
         }
 
@@ -202,9 +218,10 @@ public class ActionExtractor extends InfoExtractor {
         }
     }
 
-    private boolean shouldIgnore(VariableElement parameter) {
+    private boolean shouldIgnoreParameter(VariableElement parameter) {
         TypeMirror type = parameter.asType();
         TypeMirror erased = typeUtils.erasure(type);
+
         for (TypeMirror ignoreParameterType : ignoreParameterTypes) {
             if (typeUtils.isSubtype(erased, ignoreParameterType)) {
                 return true;
