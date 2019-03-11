@@ -206,8 +206,9 @@ public class DocWriter {
             case ARRAY:
                 Declarations.ArrayDeclaration ad = (Declarations.ArrayDeclaration) d;
                 Declaration cd = ad.getComponentType();
+                adoc.append("Array<");
                 appendType(cd, adoc);
-                adoc.append(" 数组");
+                adoc.append('>');
                 break;
             case OBJECT:
                 ObjectDeclaration od = (ObjectDeclaration) d;
