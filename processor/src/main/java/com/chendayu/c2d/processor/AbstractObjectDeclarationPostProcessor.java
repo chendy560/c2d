@@ -34,6 +34,10 @@ public abstract class AbstractObjectDeclarationPostProcessor implements ObjectDe
         return Integer.MIN_VALUE;
     }
 
+    protected static int normalOrder() {
+        return 0;
+    }
+
     /**
      * 最低的优先级
      *

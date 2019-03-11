@@ -1,5 +1,6 @@
 package com.chendayu.c2d.processor.app;
 
+import com.chendayu.c2d.processor.DocIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -30,6 +31,9 @@ public class User extends IdEntity {
      */
     @JsonIgnore
     private Object youCannotSeeMe;
+
+    @DocIgnore
+    private String ignoreMe;
 
     /**
      * 是坑爹的弗兰兹呢

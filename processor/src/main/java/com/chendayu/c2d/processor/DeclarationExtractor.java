@@ -1,35 +1,12 @@
 package com.chendayu.c2d.processor;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.ArrayType;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVariable;
+import javax.lang.model.element.*;
+import javax.lang.model.type.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
-import static com.chendayu.c2d.processor.Declarations.ENUM_CONST;
-import static com.chendayu.c2d.processor.Declarations.UNKNOWN;
-import static com.chendayu.c2d.processor.Declarations.arrayOf;
+import static com.chendayu.c2d.processor.Declarations.*;
 import static javax.lang.model.element.Modifier.STATIC;
 
 /**
@@ -191,6 +168,8 @@ public class DeclarationExtractor extends InfoExtractor {
         TreeSet<ObjectDeclarationPostProcessor> processors =
                 new TreeSet<>(Comparator.comparing(ObjectDeclarationPostProcessor::getOrder));
 
+        processors.add(new DocIgnoreObjectDeclarationPostProcessor(environment));
+
         TypeElement lombokData = elementUtils.getTypeElement(LOMBOK_DATA);
         if (lombokData != null) {
             LombokObjectDeclarationPostProcessor lombokProcessor =
@@ -204,6 +183,7 @@ public class DeclarationExtractor extends InfoExtractor {
                     new JacksonObjectDeclarationPostProcessor(environment);
             processors.add(jacksonProcessor);
         }
+
         return Collections.unmodifiableSortedSet(processors);
     }
 
