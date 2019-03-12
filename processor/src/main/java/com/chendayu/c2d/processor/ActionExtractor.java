@@ -74,7 +74,8 @@ public class ActionExtractor extends InfoExtractor {
             DeclarationType.NUMBER,
             DeclarationType.TIMESTAMP,
             DeclarationType.BOOLEAN,
-            DeclarationType.ENUM_CONST
+            DeclarationType.ENUM_CONST,
+            DeclarationType.ENUM
     );
 
     private final DeclarationExtractor declarationExtractor;

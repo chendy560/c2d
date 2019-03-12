@@ -134,7 +134,7 @@ public class DocWriter {
         if (type == DeclarationType.OBJECT) {
             ObjectDeclaration od = (ObjectDeclaration) declaration;
 
-            if (declarationMap.containsKey(od.getName())) {
+            if (declarationMap.containsKey(od.getName()) && od.getTypeArgs().isEmpty()) {
                 return;
             }
             declarationMap.put(od.getName(), od);
