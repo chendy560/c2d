@@ -448,7 +448,7 @@ public class FinalTest {
 
     private void checkProperty(Property property, String name, DeclarationType type, String... description) {
         assertThat(property).isNotNull();
-        assertThat(property.getName()).isEqualTo(name);
+        assertThat(property.getDisplayName()).isEqualTo(name);
         assertThat(property.getDeclaration().getType()).isEqualTo(type);
         assertThat(property.getDescription()).isEqualTo(Arrays.asList(description));
     }

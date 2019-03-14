@@ -30,7 +30,7 @@ public class JacksonObjectDeclarationPostProcessor extends AbstractObjectDeclara
     }
 
     private void processJacksonAnnotations(ObjectProperty property, ObjectDeclaration declaration) {
-        String name = property.getName();
+        String name = property.getDisplayName();
         JsonIgnore jsonIgnore = getAnnotation(property, JsonIgnore.class);
         // jsonIgnore 是有一个默认为 true 的 value 的，感觉是一个非常迷惑的api
         if (jsonIgnore != null && jsonIgnore.value()) {

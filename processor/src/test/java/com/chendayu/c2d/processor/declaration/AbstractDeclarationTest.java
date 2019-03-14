@@ -32,7 +32,7 @@ public abstract class AbstractDeclarationTest {
 
     void checkProperty(Property property, String name, DeclarationType type, List<String> description) {
         assertThat(property).isNotNull();
-        assertThat(property.getName()).isEqualTo(name);
+        assertThat(property.getDisplayName()).isEqualTo(name);
         assertThat(property.getDeclaration().getType()).isEqualTo(type);
         assertThat(property.getDescription()).isEqualTo(description);
     }

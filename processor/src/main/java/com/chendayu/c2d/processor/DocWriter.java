@@ -177,7 +177,7 @@ public class DocWriter {
                 .columnBegin().append("描述").dualNewLine();
 
         for (Property p : parameters) {
-            adoc.columnBegin().append(p.getName()).newLine();
+            adoc.columnBegin().append(p.getDisplayName()).newLine();
             adoc.columnBegin();
             writeType(p.getDeclaration());
             adoc.newLine();

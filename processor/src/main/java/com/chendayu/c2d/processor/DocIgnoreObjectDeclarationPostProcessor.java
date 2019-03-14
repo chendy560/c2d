@@ -14,7 +14,7 @@ public class DocIgnoreObjectDeclarationPostProcessor extends AbstractObjectDecla
     public void process(ObjectDeclaration objectDeclaration) {
         for (ObjectProperty property : objectDeclaration.copyProperties()) {
             if (shouldIgnore(property)) {
-                objectDeclaration.removeProperty(property.getOriginName());
+                objectDeclaration.removeProperty(property.getName());
             }
         }
     }
