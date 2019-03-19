@@ -16,6 +16,9 @@ public class Action {
      */
     private String name;
 
+    /**
+     * 操作描述
+     */
     private List<String> description;
 
     /**
@@ -23,6 +26,9 @@ public class Action {
      */
     private String path;
 
+    /**
+     * 请求方法
+     */
     private HttpMethod method;
 
     /**
