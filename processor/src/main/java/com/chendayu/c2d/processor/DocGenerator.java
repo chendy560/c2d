@@ -20,7 +20,7 @@ public class DocGenerator {
 
     public void printDoc(Warehouse warehouse) {
 
-        try (Writer writer = new BufferedWriter(filer.createResource(StandardLocation.CLASS_OUTPUT, C2D_PACKAGE,
+        try (Writer writer = new BufferedWriter(filer.createResource(StandardLocation.SOURCE_OUTPUT, C2D_PACKAGE,
                 FILE_NAME).openWriter())) {
 
             DocWriter docWriter = new DocWriter(writer);
