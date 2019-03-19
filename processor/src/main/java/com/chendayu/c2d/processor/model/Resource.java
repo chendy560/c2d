@@ -1,4 +1,4 @@
-package com.chendayu.c2d.processor;
+package com.chendayu.c2d.processor.model;
 
 import java.util.Comparator;
 import java.util.SortedSet;

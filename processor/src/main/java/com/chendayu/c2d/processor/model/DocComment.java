@@ -1,4 +1,4 @@
-package com.chendayu.c2d.processor;
+package com.chendayu.c2d.processor.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,7 +66,7 @@ public class DocComment {
     private DocComment() {
     }
 
-    static DocComment create(String comment) {
+    public static DocComment create(String comment) {
         if (comment == null) {
             return EMPTY;
         }

@@ -1,5 +1,8 @@
-package com.chendayu.c2d.processor;
+package com.chendayu.c2d.processor.extract;
 
+import com.chendayu.c2d.processor.Warehouse;
+import com.chendayu.c2d.processor.model.Action;
+import com.chendayu.c2d.processor.model.Resource;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.processing.ProcessingEnvironment;

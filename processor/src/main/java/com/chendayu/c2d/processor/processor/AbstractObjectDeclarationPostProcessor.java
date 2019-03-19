@@ -1,4 +1,4 @@
-package com.chendayu.c2d.processor;
+package com.chendayu.c2d.processor.processor;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;

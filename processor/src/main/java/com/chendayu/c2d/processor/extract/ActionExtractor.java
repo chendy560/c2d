@@ -1,5 +1,16 @@
-package com.chendayu.c2d.processor;
+package com.chendayu.c2d.processor.extract;
 
+import com.chendayu.c2d.processor.Utils;
+import com.chendayu.c2d.processor.Warehouse;
+import com.chendayu.c2d.processor.model.Action;
+import com.chendayu.c2d.processor.model.Declaration;
+import com.chendayu.c2d.processor.model.DeclarationType;
+import com.chendayu.c2d.processor.model.Declarations;
+import com.chendayu.c2d.processor.model.DocComment;
+import com.chendayu.c2d.processor.model.ObjectDeclaration;
+import com.chendayu.c2d.processor.model.ObjectProperty;
+import com.chendayu.c2d.processor.model.Property;
+import com.chendayu.c2d.processor.processor.c2d.DocIgnore;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;

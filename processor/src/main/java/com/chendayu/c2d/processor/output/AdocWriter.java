@@ -1,4 +1,4 @@
-package com.chendayu.c2d.processor;
+package com.chendayu.c2d.processor.output;
 
 import java.io.IOException;
 import java.io.Writer;

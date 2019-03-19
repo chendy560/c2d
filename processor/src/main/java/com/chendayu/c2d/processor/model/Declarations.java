@@ -1,4 +1,4 @@
-package com.chendayu.c2d.processor;
+package com.chendayu.c2d.processor.model;
 
 public class Declarations {
 

@@ -1,5 +1,8 @@
-package com.chendayu.c2d.processor;
+package com.chendayu.c2d.processor.processor.jackson;
 
+import com.chendayu.c2d.processor.model.ObjectDeclaration;
+import com.chendayu.c2d.processor.model.ObjectProperty;
+import com.chendayu.c2d.processor.processor.AbstractObjectDeclarationPostProcessor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

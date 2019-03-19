@@ -1,6 +1,6 @@
 package com.chendayu.c2d.processor.app;
 
-import com.chendayu.c2d.processor.DocIgnore;
+import com.chendayu.c2d.processor.processor.c2d.DocIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

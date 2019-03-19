@@ -1,10 +1,10 @@
 package com.chendayu.c2d.processor.declaration;
 
 
-import com.chendayu.c2d.processor.Declaration;
-import com.chendayu.c2d.processor.DeclarationType;
-import com.chendayu.c2d.processor.ObjectDeclaration;
-import com.chendayu.c2d.processor.ObjectProperty;
+import com.chendayu.c2d.processor.model.Declaration;
+import com.chendayu.c2d.processor.model.DeclarationType;
+import com.chendayu.c2d.processor.model.ObjectDeclaration;
+import com.chendayu.c2d.processor.model.ObjectProperty;
 import org.junit.Test;
 
 import java.util.Collection;

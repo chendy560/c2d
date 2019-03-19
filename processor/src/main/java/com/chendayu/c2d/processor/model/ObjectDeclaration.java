@@ -1,4 +1,6 @@
-package com.chendayu.c2d.processor;
+package com.chendayu.c2d.processor.model;
+
+import com.chendayu.c2d.processor.Utils;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;

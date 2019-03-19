@@ -1,15 +1,15 @@
 package com.chendayu.c2d.processor.app;
 
-import com.chendayu.c2d.processor.Action;
-import com.chendayu.c2d.processor.Declaration;
-import com.chendayu.c2d.processor.DeclarationType;
-import com.chendayu.c2d.processor.Declarations;
-import com.chendayu.c2d.processor.EnumDeclaration;
-import com.chendayu.c2d.processor.ObjectDeclaration;
-import com.chendayu.c2d.processor.ObjectProperty;
-import com.chendayu.c2d.processor.Property;
-import com.chendayu.c2d.processor.Resource;
 import com.chendayu.c2d.processor.Warehouse;
+import com.chendayu.c2d.processor.model.Action;
+import com.chendayu.c2d.processor.model.Declaration;
+import com.chendayu.c2d.processor.model.DeclarationType;
+import com.chendayu.c2d.processor.model.Declarations;
+import com.chendayu.c2d.processor.model.EnumDeclaration;
+import com.chendayu.c2d.processor.model.ObjectDeclaration;
+import com.chendayu.c2d.processor.model.ObjectProperty;
+import com.chendayu.c2d.processor.model.Property;
+import com.chendayu.c2d.processor.model.Resource;
 import com.chendayu.c2d.processor.support.TestCompiler;
 import com.chendayu.c2d.processor.support.TestSpringWebAnnotationProcessor;
 import org.junit.Before;

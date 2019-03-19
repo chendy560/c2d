@@ -1,4 +1,18 @@
-package com.chendayu.c2d.processor;
+package com.chendayu.c2d.processor.extract;
+
+import com.chendayu.c2d.processor.Utils;
+import com.chendayu.c2d.processor.Warehouse;
+import com.chendayu.c2d.processor.model.Declaration;
+import com.chendayu.c2d.processor.model.Declarations;
+import com.chendayu.c2d.processor.model.DocComment;
+import com.chendayu.c2d.processor.model.EnumDeclaration;
+import com.chendayu.c2d.processor.model.ObjectDeclaration;
+import com.chendayu.c2d.processor.model.ObjectProperty;
+import com.chendayu.c2d.processor.model.Property;
+import com.chendayu.c2d.processor.processor.ObjectDeclarationPostProcessor;
+import com.chendayu.c2d.processor.processor.c2d.DocIgnoreObjectDeclarationPostProcessor;
+import com.chendayu.c2d.processor.processor.jackson.JacksonObjectDeclarationPostProcessor;
+import com.chendayu.c2d.processor.processor.lombok.LombokObjectDeclarationPostProcessor;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -27,9 +41,9 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static com.chendayu.c2d.processor.Declarations.ENUM_CONST;
-import static com.chendayu.c2d.processor.Declarations.UNKNOWN;
-import static com.chendayu.c2d.processor.Declarations.arrayOf;
+import static com.chendayu.c2d.processor.model.Declarations.ENUM_CONST;
+import static com.chendayu.c2d.processor.model.Declarations.UNKNOWN;
+import static com.chendayu.c2d.processor.model.Declarations.arrayOf;
 import static javax.lang.model.element.Modifier.STATIC;
 
 /**

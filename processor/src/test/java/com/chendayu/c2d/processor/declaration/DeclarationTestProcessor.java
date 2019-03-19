@@ -1,15 +1,19 @@
 package com.chendayu.c2d.processor.declaration;
 
 
-import com.chendayu.c2d.processor.Declaration;
-import com.chendayu.c2d.processor.DeclarationExtractor;
 import com.chendayu.c2d.processor.Warehouse;
+import com.chendayu.c2d.processor.extract.DeclarationExtractor;
+import com.chendayu.c2d.processor.model.Declaration;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.*;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import java.util.ArrayList;
 import java.util.Collections;

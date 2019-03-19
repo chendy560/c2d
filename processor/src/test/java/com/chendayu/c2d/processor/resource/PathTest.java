@@ -1,7 +1,7 @@
 package com.chendayu.c2d.processor.resource;
 
-import com.chendayu.c2d.processor.Resource;
 import com.chendayu.c2d.processor.Warehouse;
+import com.chendayu.c2d.processor.model.Resource;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
