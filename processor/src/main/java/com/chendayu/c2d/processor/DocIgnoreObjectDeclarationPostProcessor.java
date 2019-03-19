@@ -26,15 +26,6 @@ public class DocIgnoreObjectDeclarationPostProcessor extends AbstractObjectDecla
         }
 
         ExecutableElement getter = property.getGetter();
-        if (getter != null && getter.getAnnotation(DocIgnore.class) != null) {
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public int getOrder() {
-        return normalOrder();
+        return getter != null && getter.getAnnotation(DocIgnore.class) != null;
     }
 }

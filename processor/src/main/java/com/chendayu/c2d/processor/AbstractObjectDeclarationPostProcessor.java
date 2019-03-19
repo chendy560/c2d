@@ -10,6 +10,8 @@ import javax.lang.model.util.Types;
  */
 public abstract class AbstractObjectDeclarationPostProcessor implements ObjectDeclarationPostProcessor {
 
+    public static final int NORMAL_ORDER = 0;
+
     protected final ProcessingEnvironment processingEnv;
 
     protected final Elements elementUtils;
@@ -34,8 +36,13 @@ public abstract class AbstractObjectDeclarationPostProcessor implements ObjectDe
         return Integer.MIN_VALUE;
     }
 
+    /**
+     * 默认的优先级
+     *
+     * @return 默认的优先级
+     */
     protected static int normalOrder() {
-        return 0;
+        return NORMAL_ORDER;
     }
 
     /**
@@ -45,5 +52,15 @@ public abstract class AbstractObjectDeclarationPostProcessor implements ObjectDe
      */
     protected static int lowestOrder() {
         return Integer.MAX_VALUE;
+    }
+
+    /**
+     * 默认使用默认优先级
+     *
+     * @return 默认优先级
+     */
+    @Override
+    public int getOrder() {
+        return normalOrder();
     }
 }
