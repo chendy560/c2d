@@ -1,7 +1,7 @@
 package com.chendayu.c2d.processor.output;
 
 import com.chendayu.c2d.processor.Warehouse;
-import com.chendayu.c2d.processor.model.Action;
+import com.chendayu.c2d.processor.action.Action;
 import com.chendayu.c2d.processor.model.Declaration;
 import com.chendayu.c2d.processor.model.DeclarationType;
 import com.chendayu.c2d.processor.model.Declarations;

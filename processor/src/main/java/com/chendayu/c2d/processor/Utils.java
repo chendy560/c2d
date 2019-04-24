@@ -1,5 +1,6 @@
 package com.chendayu.c2d.processor;
 
+import javax.lang.model.element.VariableElement;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -35,6 +36,10 @@ public class Utils {
             }
         }
         return defaultName;
+    }
+
+    public static String findName(VariableElement element, String... names) {
+        return findName(element.getSimpleName().toString(), names);
     }
 
     public static String upperCaseFirst(String s) {

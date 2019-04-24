@@ -1,5 +1,7 @@
-package com.chendayu.c2d.processor.model;
+package com.chendayu.c2d.processor.action;
 
+import com.chendayu.c2d.processor.model.DocComment;
+import com.chendayu.c2d.processor.model.Property;
 import org.springframework.http.HttpMethod;
 
 import java.util.ArrayList;
@@ -7,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 对资源的一个操作，相当于一个 api 接口
+ * 对资源的一个操作，相当于一个 api 接口，以及一个方法
  */
 public class Action {
 
@@ -20,6 +22,11 @@ public class Action {
      * 操作描述
      */
     private List<String> description;
+
+    /**
+     * 方法上的注释
+     */
+    private DocComment docComment;
 
     /**
      * 请求路径
@@ -51,9 +58,10 @@ public class Action {
      */
     private Property responseBody;
 
-    public Action(String name, List<String> description) {
+    public Action(String name, DocComment docComment) {
         this.name = name;
-        this.description = description;
+        this.docComment = docComment;
+        this.description = docComment.getDescription();
     }
 
     public void addPathVariable(Property property) {
@@ -124,5 +132,15 @@ public class Action {
 
     public void setBasePath(String s) {
         this.path = s + path;
+    }
+
+    /**
+     * 查找参数的注释
+     *
+     * @param name 参数名
+     * @return 参数的注释
+     */
+    public List<String> findParameterDescription(String name) {
+        return docComment.getParam(name);
     }
 }
