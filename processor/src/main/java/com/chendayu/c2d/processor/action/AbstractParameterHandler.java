@@ -20,7 +20,8 @@ public abstract class AbstractParameterHandler extends AbstractComponent impleme
             DeclarationType.TIMESTAMP,
             DeclarationType.BOOLEAN,
             DeclarationType.ENUM_CONST,
-            DeclarationType.ENUM
+            DeclarationType.ENUM,
+            DeclarationType.FILE
     );
 
     protected final DeclarationExtractor declarationExtractor;
