@@ -1,5 +1,6 @@
 package com.chendayu.c2d.processor.processor.c2d;
 
+import com.chendayu.c2d.processor.DocIgnore;
 import com.chendayu.c2d.processor.model.ObjectDeclaration;
 import com.chendayu.c2d.processor.model.ObjectProperty;
 import com.chendayu.c2d.processor.processor.AbstractObjectDeclarationPostProcessor;

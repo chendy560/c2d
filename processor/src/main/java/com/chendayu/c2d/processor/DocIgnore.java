@@ -1,4 +1,4 @@
-package com.chendayu.c2d.processor.processor.c2d;
+package com.chendayu.c2d.processor;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

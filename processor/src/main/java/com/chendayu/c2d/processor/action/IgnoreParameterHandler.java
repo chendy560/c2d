@@ -1,7 +1,7 @@
 package com.chendayu.c2d.processor.action;
 
 import com.chendayu.c2d.processor.AbstractComponent;
-import com.chendayu.c2d.processor.processor.c2d.DocIgnore;
+import com.chendayu.c2d.processor.DocIgnore;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.MatrixVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
