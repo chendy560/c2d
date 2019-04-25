@@ -228,6 +228,9 @@ public class DocWriter {
             case VOID:
                 adoc.append("无");
                 break;
+            case FILE:
+                adoc.append("文件");
+                break;
             case ENUM:
                 EnumDeclaration ed = (EnumDeclaration) d;
                 adoc.link(ed.getHash(), ed.getName());

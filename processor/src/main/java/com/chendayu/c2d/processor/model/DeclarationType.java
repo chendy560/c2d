@@ -61,6 +61,11 @@ public enum DeclarationType {
     OBJECT,
 
     /**
+     * 文件
+     */
+    FILE,
+
+    /**
      * 解析不出来的东西
      */
     UNKNOWN

@@ -10,6 +10,8 @@ public class Declarations {
     public static final Declaration DYNAMIC = () -> DeclarationType.DYNAMIC;
     public static final Declaration VOID = () -> DeclarationType.VOID;
     public static final Declaration UNKNOWN = () -> DeclarationType.UNKNOWN;
+    public static final Declaration FILE = () -> DeclarationType.FILE;
+
 
     private Declarations() {
 

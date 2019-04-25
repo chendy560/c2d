@@ -3,7 +3,6 @@ package com.chendayu.c2d.processor.extract;
 import com.chendayu.c2d.processor.Utils;
 import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.model.Declaration;
-import com.chendayu.c2d.processor.model.Declarations;
 import com.chendayu.c2d.processor.model.DocComment;
 import com.chendayu.c2d.processor.model.EnumDeclaration;
 import com.chendayu.c2d.processor.model.ObjectDeclaration;
@@ -13,6 +12,7 @@ import com.chendayu.c2d.processor.processor.ObjectDeclarationPostProcessor;
 import com.chendayu.c2d.processor.processor.c2d.DocIgnoreObjectDeclarationPostProcessor;
 import com.chendayu.c2d.processor.processor.jackson.JacksonObjectDeclarationPostProcessor;
 import com.chendayu.c2d.processor.processor.lombok.LombokObjectDeclarationPostProcessor;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -41,9 +41,17 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import static com.chendayu.c2d.processor.model.Declarations.BOOLEAN;
+import static com.chendayu.c2d.processor.model.Declarations.DYNAMIC;
 import static com.chendayu.c2d.processor.model.Declarations.ENUM_CONST;
+import static com.chendayu.c2d.processor.model.Declarations.FILE;
+import static com.chendayu.c2d.processor.model.Declarations.NUMBER;
+import static com.chendayu.c2d.processor.model.Declarations.STRING;
+import static com.chendayu.c2d.processor.model.Declarations.TIMESTAMP;
 import static com.chendayu.c2d.processor.model.Declarations.UNKNOWN;
+import static com.chendayu.c2d.processor.model.Declarations.VOID;
 import static com.chendayu.c2d.processor.model.Declarations.arrayOf;
+import static com.chendayu.c2d.processor.model.Declarations.typeArgOf;
 import static javax.lang.model.element.Modifier.STATIC;
 
 /**
@@ -157,6 +165,11 @@ public class DeclarationExtractor extends InfoExtractor {
     private final TypeMirror enumType;
 
     /**
+     *
+     */
+    private final TypeMirror multiPartFileType;
+
+    /**
      * 后处理器们
      */
     private final SortedSet<ObjectDeclarationPostProcessor> postProcessors;
@@ -182,6 +195,7 @@ public class DeclarationExtractor extends InfoExtractor {
         this.mapType = typeUtils.erasure(elementUtils.getTypeElement(Map.class.getName()).asType());
 
         this.enumType = typeUtils.erasure(elementUtils.getTypeElement(Enum.class.getName()).asType());
+        this.multiPartFileType = elementUtils.getTypeElement(MultipartFile.class.getName()).asType();
 
         this.postProcessors = initPostProcessors(environment);
     }
@@ -243,13 +257,13 @@ public class DeclarationExtractor extends InfoExtractor {
             case DOUBLE:
             case SHORT: // 真的有人会用吗？
             case BYTE: // 真的有人会用吗？
-                return Declarations.NUMBER;
+                return NUMBER;
             case BOOLEAN:
-                return Declarations.BOOLEAN;
+                return BOOLEAN;
             case CHAR:
-                return Declarations.STRING; // 真的有人会用吗？
+                return STRING; // 真的有人会用吗？
             case VOID:
-                return Declarations.VOID; // void 和 Void 不是一个东西，这里的是 void
+                return VOID; // void 和 Void 不是一个东西，这里的是 void
             case ARRAY:
                 return extractFromArrayType((ArrayType) typeMirror);
             case DECLARED:
@@ -258,7 +272,7 @@ public class DeclarationExtractor extends InfoExtractor {
             case TYPEVAR:
                 TypeVariable typeVariable = (TypeVariable) typeMirror;
                 String name = typeVariable.asElement().getSimpleName().toString();
-                return Declarations.typeArgOf(name);
+                return typeArgOf(name);
             default:
                 throw new IllegalStateException("unknown type kind: " + kind +
                         " for type mirror: " + typeMirror);
@@ -273,23 +287,23 @@ public class DeclarationExtractor extends InfoExtractor {
         TypeMirror erasedType = typeUtils.erasure(declaredType);
 
         if (isVoid(erasedType)) {
-            return Declarations.VOID;
+            return VOID;
         }
 
         if (isNumber(erasedType)) {
-            return Declarations.NUMBER;
+            return NUMBER;
         }
 
         if (isCharSequence(erasedType)) {
-            return Declarations.STRING;
+            return STRING;
         }
 
         if (isTimestamp(erasedType)) {
-            return Declarations.TIMESTAMP;
+            return TIMESTAMP;
         }
 
         if (isBoolean(erasedType)) {
-            return Declarations.BOOLEAN;
+            return BOOLEAN;
         }
 
         if (isIterable(erasedType)) {
@@ -297,7 +311,11 @@ public class DeclarationExtractor extends InfoExtractor {
         }
 
         if (isDynamic(erasedType)) {
-            return Declarations.DYNAMIC;
+            return DYNAMIC;
+        }
+
+        if (typeUtils.isSameType(erasedType, multiPartFileType)) {
+            return FILE;
         }
 
         if (isEnum(erasedType)) {
@@ -389,7 +407,7 @@ public class DeclarationExtractor extends InfoExtractor {
     private Declaration extractFromArrayType(ArrayType type) {
         TypeMirror componentType = type.getComponentType();
         if (componentType.getKind() == TypeKind.CHAR) {
-            return Declarations.STRING;
+            return STRING;
         }
         Declaration declaration = extract(componentType);
         return arrayOf(declaration);
@@ -501,7 +519,7 @@ public class DeclarationExtractor extends InfoExtractor {
         for (TypeParameterElement typeParameter : typeParameters) {
             String name = typeParameter.getSimpleName().toString();
             List<String> description = docComment.getTypeParam(name);
-            Property property = new Property(name, description, Declarations.typeArgOf(name));
+            Property property = new Property(name, description, typeArgOf(name));
             typeProperties.add(property);
         }
 
