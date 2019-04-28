@@ -12,10 +12,14 @@ public class CollectionTestSupport {
     public void test(Collection<String> cs,
                      List<Integer> li,
                      Set<Boolean> sb,
-                     UnsupportedCollection uc) {
+                     UC uc) {
     }
 
-    public static class UnsupportedCollection extends ArrayList<String> {
+    public static class UnsupportedCollection extends ArrayList {
+
+    }
+
+    public static class UC extends UnsupportedCollection {
 
     }
 }
