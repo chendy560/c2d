@@ -1,12 +1,12 @@
 package com.chendayu.c2d.processor.action;
 
+import com.chendayu.c2d.processor.InfoExtractor;
 import com.chendayu.c2d.processor.Utils;
 import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.declaration.Declaration;
-import com.chendayu.c2d.processor.extract.DeclarationExtractor;
-import com.chendayu.c2d.processor.extract.InfoExtractor;
+import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
 import com.chendayu.c2d.processor.model.DocComment;
-import com.chendayu.c2d.processor.model.Property;
+import com.chendayu.c2d.processor.property.Property;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

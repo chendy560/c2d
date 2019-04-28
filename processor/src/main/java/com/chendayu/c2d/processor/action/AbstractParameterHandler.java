@@ -2,9 +2,9 @@ package com.chendayu.c2d.processor.action;
 
 import com.chendayu.c2d.processor.AbstractComponent;
 import com.chendayu.c2d.processor.declaration.Declaration;
+import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
 import com.chendayu.c2d.processor.declaration.Declarations;
-import com.chendayu.c2d.processor.extract.DeclarationExtractor;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import java.util.EnumSet;

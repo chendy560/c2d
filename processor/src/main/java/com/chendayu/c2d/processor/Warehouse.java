@@ -2,7 +2,7 @@ package com.chendayu.c2d.processor;
 
 import com.chendayu.c2d.processor.declaration.EnumDeclaration;
 import com.chendayu.c2d.processor.declaration.ObjectDeclaration;
-import com.chendayu.c2d.processor.model.Resource;
+import com.chendayu.c2d.processor.resource.Resource;
 
 import java.util.Collection;
 import java.util.HashMap;

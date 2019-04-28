@@ -1,17 +1,15 @@
-package com.chendayu.c2d.processor.extract;
+package com.chendayu.c2d.processor.declaration;
 
+import com.chendayu.c2d.processor.InfoExtractor;
 import com.chendayu.c2d.processor.Utils;
 import com.chendayu.c2d.processor.Warehouse;
-import com.chendayu.c2d.processor.declaration.Declaration;
-import com.chendayu.c2d.processor.declaration.EnumDeclaration;
-import com.chendayu.c2d.processor.declaration.ObjectDeclaration;
 import com.chendayu.c2d.processor.model.DocComment;
-import com.chendayu.c2d.processor.model.ObjectProperty;
-import com.chendayu.c2d.processor.model.Property;
 import com.chendayu.c2d.processor.processor.ObjectDeclarationPostProcessor;
 import com.chendayu.c2d.processor.processor.c2d.DocIgnoreObjectDeclarationPostProcessor;
 import com.chendayu.c2d.processor.processor.jackson.JacksonObjectDeclarationPostProcessor;
 import com.chendayu.c2d.processor.processor.lombok.LombokObjectDeclarationPostProcessor;
+import com.chendayu.c2d.processor.property.ObjectProperty;
+import com.chendayu.c2d.processor.property.Property;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.processing.ProcessingEnvironment;

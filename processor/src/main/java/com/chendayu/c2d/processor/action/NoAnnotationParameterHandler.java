@@ -1,11 +1,11 @@
 package com.chendayu.c2d.processor.action;
 
 import com.chendayu.c2d.processor.declaration.Declaration;
+import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
 import com.chendayu.c2d.processor.declaration.ObjectDeclaration;
-import com.chendayu.c2d.processor.extract.DeclarationExtractor;
-import com.chendayu.c2d.processor.model.ObjectProperty;
-import com.chendayu.c2d.processor.model.Property;
+import com.chendayu.c2d.processor.property.ObjectProperty;
+import com.chendayu.c2d.processor.property.Property;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.VariableElement;

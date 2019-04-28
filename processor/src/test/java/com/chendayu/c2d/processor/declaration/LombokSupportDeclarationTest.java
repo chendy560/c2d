@@ -1,7 +1,7 @@
 package com.chendayu.c2d.processor.declaration;
 
 
-import com.chendayu.c2d.processor.model.ObjectProperty;
+import com.chendayu.c2d.processor.property.ObjectProperty;
 import org.junit.Test;
 
 import java.util.Collection;

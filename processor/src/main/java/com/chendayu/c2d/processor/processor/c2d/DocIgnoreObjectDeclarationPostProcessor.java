@@ -2,8 +2,8 @@ package com.chendayu.c2d.processor.processor.c2d;
 
 import com.chendayu.c2d.processor.DocIgnore;
 import com.chendayu.c2d.processor.declaration.ObjectDeclaration;
-import com.chendayu.c2d.processor.model.ObjectProperty;
 import com.chendayu.c2d.processor.processor.AbstractObjectDeclarationPostProcessor;
+import com.chendayu.c2d.processor.property.ObjectProperty;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;

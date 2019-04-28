@@ -7,9 +7,9 @@ import com.chendayu.c2d.processor.declaration.DeclarationType;
 import com.chendayu.c2d.processor.declaration.Declarations;
 import com.chendayu.c2d.processor.declaration.EnumDeclaration;
 import com.chendayu.c2d.processor.declaration.ObjectDeclaration;
-import com.chendayu.c2d.processor.model.ObjectProperty;
-import com.chendayu.c2d.processor.model.Property;
-import com.chendayu.c2d.processor.model.Resource;
+import com.chendayu.c2d.processor.property.ObjectProperty;
+import com.chendayu.c2d.processor.property.Property;
+import com.chendayu.c2d.processor.resource.Resource;
 
 import java.io.Writer;
 import java.util.Collection;

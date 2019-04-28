@@ -1,7 +1,7 @@
 package com.chendayu.c2d.processor.action;
 
 import com.chendayu.c2d.processor.model.DocComment;
-import com.chendayu.c2d.processor.model.Property;
+import com.chendayu.c2d.processor.property.Property;
 import org.springframework.http.HttpMethod;
 
 import java.util.ArrayList;

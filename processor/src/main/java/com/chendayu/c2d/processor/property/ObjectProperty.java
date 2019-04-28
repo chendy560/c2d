@@ -1,4 +1,4 @@
-package com.chendayu.c2d.processor.model;
+package com.chendayu.c2d.processor.property;
 
 import com.chendayu.c2d.processor.declaration.Declaration;
 

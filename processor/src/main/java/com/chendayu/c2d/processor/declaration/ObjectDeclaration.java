@@ -1,8 +1,8 @@
 package com.chendayu.c2d.processor.declaration;
 
 import com.chendayu.c2d.processor.Utils;
-import com.chendayu.c2d.processor.model.ObjectProperty;
-import com.chendayu.c2d.processor.model.Property;
+import com.chendayu.c2d.processor.property.ObjectProperty;
+import com.chendayu.c2d.processor.property.Property;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;

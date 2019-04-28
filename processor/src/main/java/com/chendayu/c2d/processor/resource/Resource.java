@@ -1,4 +1,4 @@
-package com.chendayu.c2d.processor.model;
+package com.chendayu.c2d.processor.resource;
 
 import com.chendayu.c2d.processor.action.Action;
 
