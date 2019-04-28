@@ -1,15 +1,12 @@
 package com.chendayu.c2d.processor.declaration;
 
-import com.chendayu.c2d.processor.model.Declaration;
-import com.chendayu.c2d.processor.model.DeclarationType;
-import com.chendayu.c2d.processor.model.Declarations;
 import org.junit.Test;
 
 import java.util.List;
 
-import static com.chendayu.c2d.processor.model.DeclarationType.ARRAY;
-import static com.chendayu.c2d.processor.model.DeclarationType.NUMBER;
-import static com.chendayu.c2d.processor.model.DeclarationType.STRING;
+import static com.chendayu.c2d.processor.declaration.DeclarationType.ARRAY;
+import static com.chendayu.c2d.processor.declaration.DeclarationType.NUMBER;
+import static com.chendayu.c2d.processor.declaration.DeclarationType.STRING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ArrayTest extends AbstractDeclarationTest {

@@ -1,9 +1,9 @@
 package com.chendayu.c2d.processor.processor.lombok;
 
+import com.chendayu.c2d.processor.declaration.Declaration;
+import com.chendayu.c2d.processor.declaration.ObjectDeclaration;
 import com.chendayu.c2d.processor.extract.DeclarationExtractor;
-import com.chendayu.c2d.processor.model.Declaration;
 import com.chendayu.c2d.processor.model.DocComment;
-import com.chendayu.c2d.processor.model.ObjectDeclaration;
 import com.chendayu.c2d.processor.model.ObjectProperty;
 import com.chendayu.c2d.processor.processor.AbstractObjectDeclarationPostProcessor;
 

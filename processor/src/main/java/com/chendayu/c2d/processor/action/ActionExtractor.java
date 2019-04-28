@@ -2,9 +2,9 @@ package com.chendayu.c2d.processor.action;
 
 import com.chendayu.c2d.processor.Utils;
 import com.chendayu.c2d.processor.Warehouse;
+import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.extract.DeclarationExtractor;
 import com.chendayu.c2d.processor.extract.InfoExtractor;
-import com.chendayu.c2d.processor.model.Declaration;
 import com.chendayu.c2d.processor.model.DocComment;
 import com.chendayu.c2d.processor.model.Property;
 import org.springframework.http.HttpMethod;

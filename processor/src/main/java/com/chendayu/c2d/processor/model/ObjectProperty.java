@@ -1,5 +1,7 @@
 package com.chendayu.c2d.processor.model;
 
+import com.chendayu.c2d.processor.declaration.Declaration;
+
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.util.List;

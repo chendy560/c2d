@@ -1,7 +1,7 @@
 package com.chendayu.c2d.processor;
 
-import com.chendayu.c2d.processor.model.EnumDeclaration;
-import com.chendayu.c2d.processor.model.ObjectDeclaration;
+import com.chendayu.c2d.processor.declaration.EnumDeclaration;
+import com.chendayu.c2d.processor.declaration.ObjectDeclaration;
 import com.chendayu.c2d.processor.model.Resource;
 
 import java.util.Collection;

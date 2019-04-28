@@ -2,10 +2,10 @@ package com.chendayu.c2d.processor.extract;
 
 import com.chendayu.c2d.processor.Utils;
 import com.chendayu.c2d.processor.Warehouse;
-import com.chendayu.c2d.processor.model.Declaration;
+import com.chendayu.c2d.processor.declaration.Declaration;
+import com.chendayu.c2d.processor.declaration.EnumDeclaration;
+import com.chendayu.c2d.processor.declaration.ObjectDeclaration;
 import com.chendayu.c2d.processor.model.DocComment;
-import com.chendayu.c2d.processor.model.EnumDeclaration;
-import com.chendayu.c2d.processor.model.ObjectDeclaration;
 import com.chendayu.c2d.processor.model.ObjectProperty;
 import com.chendayu.c2d.processor.model.Property;
 import com.chendayu.c2d.processor.processor.ObjectDeclarationPostProcessor;
@@ -41,17 +41,17 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static com.chendayu.c2d.processor.model.Declarations.BOOLEAN;
-import static com.chendayu.c2d.processor.model.Declarations.DYNAMIC;
-import static com.chendayu.c2d.processor.model.Declarations.ENUM_CONST;
-import static com.chendayu.c2d.processor.model.Declarations.FILE;
-import static com.chendayu.c2d.processor.model.Declarations.NUMBER;
-import static com.chendayu.c2d.processor.model.Declarations.STRING;
-import static com.chendayu.c2d.processor.model.Declarations.TIMESTAMP;
-import static com.chendayu.c2d.processor.model.Declarations.UNKNOWN;
-import static com.chendayu.c2d.processor.model.Declarations.VOID;
-import static com.chendayu.c2d.processor.model.Declarations.arrayOf;
-import static com.chendayu.c2d.processor.model.Declarations.typeArgOf;
+import static com.chendayu.c2d.processor.declaration.Declarations.BOOLEAN;
+import static com.chendayu.c2d.processor.declaration.Declarations.DYNAMIC;
+import static com.chendayu.c2d.processor.declaration.Declarations.ENUM_CONST;
+import static com.chendayu.c2d.processor.declaration.Declarations.FILE;
+import static com.chendayu.c2d.processor.declaration.Declarations.NUMBER;
+import static com.chendayu.c2d.processor.declaration.Declarations.STRING;
+import static com.chendayu.c2d.processor.declaration.Declarations.TIMESTAMP;
+import static com.chendayu.c2d.processor.declaration.Declarations.UNKNOWN;
+import static com.chendayu.c2d.processor.declaration.Declarations.VOID;
+import static com.chendayu.c2d.processor.declaration.Declarations.arrayOf;
+import static com.chendayu.c2d.processor.declaration.Declarations.typeArgOf;
 import static javax.lang.model.element.Modifier.STATIC;
 
 /**

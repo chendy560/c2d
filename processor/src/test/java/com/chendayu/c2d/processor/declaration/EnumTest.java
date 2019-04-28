@@ -1,8 +1,5 @@
 package com.chendayu.c2d.processor.declaration;
 
-import com.chendayu.c2d.processor.model.Declaration;
-import com.chendayu.c2d.processor.model.DeclarationType;
-import com.chendayu.c2d.processor.model.EnumDeclaration;
 import com.chendayu.c2d.processor.model.Property;
 import org.junit.Test;
 

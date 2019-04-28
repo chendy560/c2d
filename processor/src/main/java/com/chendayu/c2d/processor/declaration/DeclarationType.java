@@ -1,4 +1,4 @@
-package com.chendayu.c2d.processor.model;
+package com.chendayu.c2d.processor.declaration;
 
 /**
  * 类型的类型，一定程度上来说这套逻辑可以用 instanceof 实现

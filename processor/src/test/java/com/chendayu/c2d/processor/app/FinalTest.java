@@ -2,11 +2,11 @@ package com.chendayu.c2d.processor.app;
 
 import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.action.Action;
-import com.chendayu.c2d.processor.model.Declaration;
-import com.chendayu.c2d.processor.model.DeclarationType;
-import com.chendayu.c2d.processor.model.Declarations;
-import com.chendayu.c2d.processor.model.EnumDeclaration;
-import com.chendayu.c2d.processor.model.ObjectDeclaration;
+import com.chendayu.c2d.processor.declaration.Declaration;
+import com.chendayu.c2d.processor.declaration.DeclarationType;
+import com.chendayu.c2d.processor.declaration.Declarations;
+import com.chendayu.c2d.processor.declaration.EnumDeclaration;
+import com.chendayu.c2d.processor.declaration.ObjectDeclaration;
 import com.chendayu.c2d.processor.model.ObjectProperty;
 import com.chendayu.c2d.processor.model.Property;
 import com.chendayu.c2d.processor.model.Resource;

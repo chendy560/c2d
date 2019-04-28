@@ -3,7 +3,6 @@ package com.chendayu.c2d.processor.declaration;
 
 import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.extract.DeclarationExtractor;
-import com.chendayu.c2d.processor.model.Declaration;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;

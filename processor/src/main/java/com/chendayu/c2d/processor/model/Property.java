@@ -1,5 +1,7 @@
 package com.chendayu.c2d.processor.model;
 
+import com.chendayu.c2d.processor.declaration.Declaration;
+
 import java.util.List;
 
 /**

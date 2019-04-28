@@ -1,6 +1,6 @@
 package com.chendayu.c2d.processor.processor;
 
-import com.chendayu.c2d.processor.model.ObjectDeclaration;
+import com.chendayu.c2d.processor.declaration.ObjectDeclaration;
 
 /**
  * 对象声明后处理器

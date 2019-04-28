@@ -1,7 +1,5 @@
 package com.chendayu.c2d.processor.declaration;
 
-import com.chendayu.c2d.processor.model.Declaration;
-import com.chendayu.c2d.processor.model.DeclarationType;
 import com.chendayu.c2d.processor.model.Property;
 import com.chendayu.c2d.processor.support.TestCompiler;
 import org.junit.Before;

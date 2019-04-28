@@ -1,9 +1,9 @@
 package com.chendayu.c2d.processor.action;
 
+import com.chendayu.c2d.processor.declaration.Declaration;
+import com.chendayu.c2d.processor.declaration.DeclarationType;
+import com.chendayu.c2d.processor.declaration.ObjectDeclaration;
 import com.chendayu.c2d.processor.extract.DeclarationExtractor;
-import com.chendayu.c2d.processor.model.Declaration;
-import com.chendayu.c2d.processor.model.DeclarationType;
-import com.chendayu.c2d.processor.model.ObjectDeclaration;
 import com.chendayu.c2d.processor.model.ObjectProperty;
 import com.chendayu.c2d.processor.model.Property;
 
