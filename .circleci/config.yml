@@ -1,8 +1,13 @@
 version: 2
 jobs:
   build:
-    docker: # use the docker executor type; machine and macos executors are also supported
-      - image: circleci/openjdk:8u212-stretch # the primary container, where your job's commands are run
+    docker:
+      - image: circleci/openjdk:8u212-stretch
     steps:
-      - checkout # check out the code in the project directory
-      - run: mvn clean compile
+      - checkout
+      - run:
+          name: compile
+          command: mvn -q -B clean compile
+      - run:
+          name: test
+          command: mvn -q -B test
