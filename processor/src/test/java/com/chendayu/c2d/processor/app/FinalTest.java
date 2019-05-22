@@ -1,5 +1,13 @@
 package com.chendayu.c2d.processor.app;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+
 import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.action.Action;
 import com.chendayu.c2d.processor.declaration.ArrayDeclaration;
@@ -12,19 +20,12 @@ import com.chendayu.c2d.processor.property.Property;
 import com.chendayu.c2d.processor.resource.Resource;
 import com.chendayu.c2d.processor.support.TestCompiler;
 import com.chendayu.c2d.processor.support.TestSpringWebAnnotationProcessor;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.http.HttpMethod;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.SortedSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -276,7 +277,7 @@ public class FinalTest {
         Declaration user = typeArgs.get(0);
         checkUser((NestedDeclaration) user);
 
-        Collection<Property> properties = nestedDeclaration.allProperties();
+        Collection<Property> properties = nestedDeclaration.gettableProperties();
         assertThat(properties).hasSize(3);
 
         Iterator<Property> propertyIterator = properties.iterator();
@@ -329,7 +330,7 @@ public class FinalTest {
         assertThat(nestedDeclaration.getTypeParameters()).isEmpty();
         assertThat(nestedDeclaration.getTypeArguments()).isEmpty();
 
-        Collection<Property> properties = nestedDeclaration.allProperties();
+        Collection<Property> properties = nestedDeclaration.gettableProperties();
         assertThat(properties).hasSize(2);
 
         Iterator<Property> iterator = properties.iterator();
@@ -373,7 +374,7 @@ public class FinalTest {
         assertThat(nestedDeclaration.getTypeParameters()).isEmpty();
         assertThat(nestedDeclaration.getTypeArguments()).isEmpty();
 
-        Collection<Property> properties = nestedDeclaration.allProperties();
+        Collection<Property> properties = nestedDeclaration.gettableProperties();
         assertThat(properties).hasSize(5);
 
         Iterator<Property> iterator = properties.iterator();
@@ -409,7 +410,7 @@ public class FinalTest {
         assertThat(nestedDeclaration.getTypeParameters()).isEmpty();
         assertThat(nestedDeclaration.getTypeArguments()).isEmpty();
 
-        Collection<Property> properties = nestedDeclaration.allProperties();
+        Collection<Property> properties = nestedDeclaration.gettableProperties();
         assertThat(properties).hasSize(5);
 
         Iterator<Property> iterator = properties.iterator();

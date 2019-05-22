@@ -160,6 +160,11 @@ public class NestedDeclaration implements Declaration {
         }
 
         @Override
+        public Collection<Property> gettableProperties() {
+            return nestedDeclaration.gettableProperties();
+        }
+
+        @Override
         public void applyParent(NestedDeclaration declaration) {
             nestedDeclaration.applyParent(declaration);
         }

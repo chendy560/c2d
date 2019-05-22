@@ -24,8 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import com.chendayu.c2d.processor.InfoExtractor;
 import com.chendayu.c2d.processor.Utils;
@@ -165,7 +163,7 @@ public class DeclarationExtractor extends InfoExtractor {
     /**
      * 后处理器们
      */
-    private final SortedSet<NestedDeclarationPostProcessor> postProcessors;
+    private final List<NestedDeclarationPostProcessor> postProcessors;
 
     public DeclarationExtractor(ProcessingEnvironment environment, Warehouse warehouse) {
         super(environment, warehouse);
@@ -191,9 +189,8 @@ public class DeclarationExtractor extends InfoExtractor {
         this.postProcessors = initPostProcessors(environment);
     }
 
-    private SortedSet<NestedDeclarationPostProcessor> initPostProcessors(ProcessingEnvironment environment) {
-        TreeSet<NestedDeclarationPostProcessor> processors =
-                new TreeSet<>(Comparator.comparing(NestedDeclarationPostProcessor::getOrder));
+    private List<NestedDeclarationPostProcessor> initPostProcessors(ProcessingEnvironment environment) {
+        List<NestedDeclarationPostProcessor> processors = new ArrayList<>();
 
         processors.add(new DocIgnoreProcessor(environment));
         processors.add(new DescriptionProcessor(environment));
@@ -212,7 +209,8 @@ public class DeclarationExtractor extends InfoExtractor {
             processors.add(jacksonProcessor);
         }
 
-        return Collections.unmodifiableSortedSet(processors);
+        processors.sort(Comparator.comparing(NestedDeclarationPostProcessor::getOrder));
+        return Collections.unmodifiableList(processors);
     }
 
     /**
@@ -298,6 +296,11 @@ public class DeclarationExtractor extends InfoExtractor {
         }
 
         TypeElement typeElement = (TypeElement) declaredType.asElement();
+        String qualifiedName = typeElement.getQualifiedName().toString();
+        if (isJavaPackageClass(qualifiedName)) {
+            return UNKNOWN;
+        }
+
         NestedDeclaration nestedDeclaration = extractNestedDeclarationFromTypeElement(typeElement);
 
         List<Declaration> typeArgs = findTypeArgs(declaredType);
@@ -421,8 +424,11 @@ public class DeclarationExtractor extends InfoExtractor {
             }
 
             // 能走到这一步的都是对象了
-            NestedDeclaration declaration = (NestedDeclaration) extractFromDeclaredType(declaredType);
-            result.applyParent(declaration);
+            Declaration parentDeclaration = extractFromDeclaredType(declaredType);
+            if (parentDeclaration.getType() == DeclarationType.OBJECT) {
+                NestedDeclaration declaration = (NestedDeclaration) parentDeclaration;
+                result.applyParent(declaration);
+            }
         }
     }
 
