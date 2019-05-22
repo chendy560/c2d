@@ -1,10 +1,10 @@
 package com.chendayu.c2d.processor.action;
 
 import com.chendayu.c2d.processor.AbstractComponent;
+import com.chendayu.c2d.processor.declaration.ArrayDeclaration;
 import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
-import com.chendayu.c2d.processor.declaration.Declarations;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import java.util.EnumSet;
@@ -44,8 +44,8 @@ public abstract class AbstractParameterHandler extends AbstractComponent impleme
      */
     protected boolean isSimpleArray(Declaration declaration) {
         if (declaration.getType() == DeclarationType.ARRAY) {
-            Declarations.ArrayDeclaration arrayDeclaration = (Declarations.ArrayDeclaration) declaration;
-            Declaration componentType = arrayDeclaration.getComponentType();
+            ArrayDeclaration arrayDeclaration = (ArrayDeclaration) declaration;
+            Declaration componentType = arrayDeclaration.getItemType();
             return isSimpleDeclaration(componentType);
         }
         return false;

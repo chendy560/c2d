@@ -1,5 +1,8 @@
 package com.chendayu.c2d.processor.model;
 
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
+import javax.lang.model.util.Elements;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,9 +64,19 @@ public class DocComment {
         }
     };
 
+    private static Elements elementUtils;
+
     private Map<String, List<String>> comments;
 
     private DocComment() {
+    }
+
+    public static void init(ProcessingEnvironment environment) {
+        elementUtils = environment.getElementUtils();
+    }
+
+    public static DocComment create(Element element) {
+        return create(elementUtils.getDocComment(element));
     }
 
     public static DocComment create(String comment) {

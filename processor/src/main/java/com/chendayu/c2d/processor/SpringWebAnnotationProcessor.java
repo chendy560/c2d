@@ -1,5 +1,6 @@
 package com.chendayu.c2d.processor;
 
+import com.chendayu.c2d.processor.model.DocComment;
 import com.chendayu.c2d.processor.output.DocGenerator;
 import com.chendayu.c2d.processor.resource.ResourceExtractor;
 
@@ -80,6 +81,7 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
         this.applicationMetaExtractor = new ApplicationMetaExtractor(processingEnv, warehouse);
         this.docGenerator = new DocGenerator(processingEnv);
 
+        DocComment.init(processingEnv);
     }
 
     @Override

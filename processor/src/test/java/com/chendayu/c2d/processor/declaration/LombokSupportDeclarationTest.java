@@ -1,7 +1,7 @@
 package com.chendayu.c2d.processor.declaration;
 
 
-import com.chendayu.c2d.processor.property.ObjectProperty;
+import com.chendayu.c2d.processor.property.Property;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -17,22 +17,22 @@ public class LombokSupportDeclarationTest extends AbstractDeclarationTest {
     public void testDataAnnotation() {
         List<Declaration> result = compile(LombokTestClasses.class);
 
-        ObjectDeclaration dataTest = (ObjectDeclaration) result.get(0);
+        NestedDeclaration dataTest = (NestedDeclaration) result.get(0);
         assertThat(dataTest.getDescription()).isEqualTo(Collections.singletonList("Data注解测试数据"));
 
-        Collection<ObjectProperty> dataProperties = dataTest.getProperties();
+        Collection<Property> dataProperties = dataTest.allProperties();
         assertThat(dataProperties).hasSize(2);
 
-        Iterator<ObjectProperty> iterator = dataProperties.iterator();
+        Iterator<Property> iterator = dataProperties.iterator();
         checkProperty(iterator.next(), "name", DeclarationType.STRING, Collections.singletonList("名字"));
         checkProperty(iterator.next(), "age", DeclarationType.NUMBER, Collections.singletonList("年龄"));
 
-        ObjectDeclaration getterData = (ObjectDeclaration) result.get(1);
+        NestedDeclaration getterData = (NestedDeclaration) result.get(1);
         assertThat(getterData.getDescription()).isEqualTo(Collections.singletonList("Getter注解测试数据"));
-        Collection<ObjectProperty> getterProperties = getterData.getProperties();
+        Collection<Property> getterProperties = getterData.allProperties();
         assertThat(getterProperties).hasSize(2);
 
-        Iterator<ObjectProperty> getterIterator = getterProperties.iterator();
+        Iterator<Property> getterIterator = getterProperties.iterator();
         checkProperty(getterIterator.next(), "score", DeclarationType.NUMBER, Collections.singletonList("分数"));
         checkProperty(getterIterator.next(), "passed", DeclarationType.BOOLEAN, Collections.singletonList("是否通过"));
     }

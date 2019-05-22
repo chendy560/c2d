@@ -1,6 +1,6 @@
 package com.chendayu.c2d.processor.declaration;
 
-import com.chendayu.c2d.processor.property.ObjectProperty;
+import com.chendayu.c2d.processor.property.Property;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -16,11 +16,11 @@ public class JacksonTest extends AbstractDeclarationTest {
 
         assertThat(declarations).hasSize(1);
 
-        ObjectDeclaration declaration = (ObjectDeclaration) declarations.get(0);
-        Collection<ObjectProperty> properties = declaration.getProperties();
+        NestedDeclaration declaration = (NestedDeclaration) declarations.get(0);
+        Collection<Property> properties = declaration.allProperties();
         assertThat(properties).hasSize(1);
 
-        ObjectProperty property = properties.iterator().next();
+        Property property = properties.iterator().next();
         checkProperty(property, "username", DeclarationType.STRING, "用户名");
     }
 }

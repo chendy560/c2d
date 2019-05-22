@@ -43,7 +43,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <scope>test</scope>
+            <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
 
         <!-- 用于测试对 SpringBootApplication 注解的支持 -->

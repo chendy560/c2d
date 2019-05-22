@@ -31,15 +31,15 @@ public class ArrayTest extends AbstractDeclarationTest {
         Declaration stringListArray = declarations.get(4);
         checkArrayDeclaration(stringListArray, ARRAY);
 
-        Declarations.ArrayDeclaration stringList = (Declarations.ArrayDeclaration) stringListArray;
-        checkArrayDeclaration(stringList.getComponentType(), STRING);
+        ArrayDeclaration stringList = (ArrayDeclaration) stringListArray;
+        checkArrayDeclaration(stringList.getItemType(), STRING);
 
     }
 
     private void checkArrayDeclaration(Declaration declaration, DeclarationType componentType) {
         assertThat(declaration.getType()).isEqualTo(ARRAY);
-        Declarations.ArrayDeclaration arrayDeclaration = (Declarations.ArrayDeclaration) declaration;
-        Declaration ct = arrayDeclaration.getComponentType();
+        ArrayDeclaration arrayDeclaration = (ArrayDeclaration) declaration;
+        Declaration ct = arrayDeclaration.getItemType();
         assertThat(ct.getType()).isEqualTo(componentType);
     }
 }

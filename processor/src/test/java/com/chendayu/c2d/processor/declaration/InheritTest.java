@@ -1,6 +1,6 @@
 package com.chendayu.c2d.processor.declaration;
 
-import com.chendayu.c2d.processor.property.ObjectProperty;
+import com.chendayu.c2d.processor.property.Property;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -17,28 +17,28 @@ public class InheritTest extends AbstractDeclarationTest {
     public void testInherit() {
         List<Declaration> declarations = compile(InheritTestClasses.class);
 
-        checkChild((ObjectDeclaration) declarations.get(0));
-        checkSimpleChild((ObjectDeclaration) declarations.get(1));
+        checkChild((NestedDeclaration) declarations.get(0));
+        checkSimpleChild((NestedDeclaration) declarations.get(1));
     }
 
-    private void checkChild(ObjectDeclaration child) {
+    private void checkChild(NestedDeclaration child) {
         assertThat(child.getDescription()).isEqualTo(Collections.singletonList("子类"));
-        Collection<ObjectProperty> properties = child.getProperties();
+        Collection<Property> properties = child.allProperties();
         assertThat(properties).hasSize(4);
 
-        Iterator<ObjectProperty> iterator = properties.iterator();
+        Iterator<Property> iterator = properties.iterator();
         checkProperty(iterator.next(), "name", DeclarationType.STRING, Collections.singletonList("姓名"));
         checkProperty(iterator.next(), "id", DeclarationType.STRING, Collections.singletonList("用户id"));
         checkProperty(iterator.next(), "age", DeclarationType.NUMBER, Collections.singletonList("年龄"));
         checkProperty(iterator.next(), "data", DeclarationType.STRING, Collections.singletonList("测试数据"));
     }
 
-    private void checkSimpleChild(ObjectDeclaration simpleChild) {
+    private void checkSimpleChild(NestedDeclaration simpleChild) {
         assertThat(simpleChild.getDescription()).isEqualTo(emptyList());
-        Collection<ObjectProperty> properties = simpleChild.getProperties();
+        Collection<Property> properties = simpleChild.allProperties();
         assertThat(properties).hasSize(2);
 
-        Iterator<ObjectProperty> iterator = properties.iterator();
+        Iterator<Property> iterator = properties.iterator();
         checkProperty(iterator.next(), "name", DeclarationType.STRING, Collections.singletonList("姓名"));
         checkProperty(iterator.next(), "id", DeclarationType.STRING, Collections.singletonList("id"));
     }
