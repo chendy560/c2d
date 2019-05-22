@@ -7,6 +7,7 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.tools.Diagnostic;
 
 /**
  * 单纯为了让代码好写一点的通用父类，包含一些常用的字段和方法
@@ -43,5 +44,13 @@ public abstract class AbstractComponent {
     protected final TypeMirror asErasedType(TypeElement element) {
         TypeMirror type = element.asType();
         return typeUtils.erasure(type);
+    }
+
+    protected final void logWarn(String message) {
+        messager.printMessage(Diagnostic.Kind.WARNING, message);
+    }
+
+    protected final void error(String message) {
+        messager.printMessage(Diagnostic.Kind.ERROR, message);
     }
 }

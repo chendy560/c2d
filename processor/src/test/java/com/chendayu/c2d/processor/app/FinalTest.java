@@ -2,12 +2,12 @@ package com.chendayu.c2d.processor.app;
 
 import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.action.Action;
+import com.chendayu.c2d.processor.declaration.ArrayDeclaration;
 import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
-import com.chendayu.c2d.processor.declaration.Declarations;
 import com.chendayu.c2d.processor.declaration.EnumDeclaration;
-import com.chendayu.c2d.processor.declaration.ObjectDeclaration;
-import com.chendayu.c2d.processor.property.ObjectProperty;
+import com.chendayu.c2d.processor.declaration.NestedDeclaration;
+import com.chendayu.c2d.processor.declaration.TypeVarDeclaration;
 import com.chendayu.c2d.processor.property.Property;
 import com.chendayu.c2d.processor.resource.Resource;
 import com.chendayu.c2d.processor.support.TestCompiler;
@@ -132,12 +132,12 @@ public class FinalTest {
 
         Property userCreateRequest = action.getRequestBody();
         checkProperty(userCreateRequest, null, DeclarationType.OBJECT, "用户创建请求");
-        ObjectDeclaration userCreateRequestDeclaration = (ObjectDeclaration) userCreateRequest.getDeclaration();
+        NestedDeclaration userCreateRequestDeclaration = (NestedDeclaration) userCreateRequest.getDeclaration();
 
         checkUserCreateRequest(userCreateRequestDeclaration);
 
         Property user = action.getResponseBody();
-        checkUser(((ObjectDeclaration) user.getDeclaration()));
+        checkUser(((NestedDeclaration) user.getDeclaration()));
     }
 
     private void checkGetAction(Action action) {
@@ -166,7 +166,7 @@ public class FinalTest {
         Property user = action.getResponseBody();
         checkProperty(user, null, DeclarationType.OBJECT, "指定id的用户数据");
 
-        checkUser((ObjectDeclaration) user.getDeclaration());
+        checkUser((NestedDeclaration) user.getDeclaration());
     }
 
     private void checkListAction(Action action) {
@@ -194,7 +194,7 @@ public class FinalTest {
         Property userPage = action.getResponseBody();
         checkProperty(userPage, null, DeclarationType.OBJECT, "分页数据");
 
-        checkUserPage((ObjectDeclaration) userPage.getDeclaration());
+        checkUserPage((NestedDeclaration) userPage.getDeclaration());
     }
 
     private void checkOverwriteAction(Action action) {
@@ -218,7 +218,7 @@ public class FinalTest {
         Property updateRequest = action.getRequestBody();
         checkProperty(updateRequest, null, DeclarationType.OBJECT, "更新请求");
 
-        checkUserUpdateRequest((ObjectDeclaration) updateRequest.getDeclaration());
+        checkUserUpdateRequest((NestedDeclaration) updateRequest.getDeclaration());
 
 
         Property user = action.getResponseBody();
@@ -258,35 +258,35 @@ public class FinalTest {
         Property userPage = action.getResponseBody();
         checkProperty(userPage, null, DeclarationType.OBJECT, "搜索结果的分页");
 
-        checkUserPage((ObjectDeclaration) userPage.getDeclaration());
+        checkUserPage((NestedDeclaration) userPage.getDeclaration());
     }
 
-    private void checkUserPage(ObjectDeclaration objectDeclaration) {
-        assertThat(objectDeclaration.getName()).isEqualTo("Page");
-        assertThat(objectDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.Page");
-        assertThat(objectDeclaration.getDescription()).isEqualTo(Collections.singletonList("数据分页的一页"));
+    private void checkUserPage(NestedDeclaration nestedDeclaration) {
+        assertThat(nestedDeclaration.getShortName()).isEqualTo("Page");
+        assertThat(nestedDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.Page");
+        assertThat(nestedDeclaration.getDescription()).isEqualTo(Collections.singletonList("数据分页的一页"));
 
-        List<Property> typeParameters = objectDeclaration.getTypeParameters();
+        List<Property> typeParameters = nestedDeclaration.getTypeParameters();
         assertThat(typeParameters).hasSize(1);
         Property t = typeParameters.get(0);
         checkProperty(t, "T", DeclarationType.TYPE_PARAMETER, "分页中的数据的类型");
 
-        List<Declaration> typeArgs = objectDeclaration.getTypeArgs();
+        List<Declaration> typeArgs = nestedDeclaration.getTypeArguments();
         assertThat(typeArgs).hasSize(1);
         Declaration user = typeArgs.get(0);
-        checkUser((ObjectDeclaration) user);
+        checkUser((NestedDeclaration) user);
 
-        Collection<ObjectProperty> properties = objectDeclaration.getProperties();
+        Collection<Property> properties = nestedDeclaration.allProperties();
         assertThat(properties).hasSize(3);
 
-        Iterator<ObjectProperty> propertyIterator = properties.iterator();
+        Iterator<Property> propertyIterator = properties.iterator();
         checkProperty(propertyIterator.next(), "count", DeclarationType.NUMBER, "数据总量");
         checkProperty(propertyIterator.next(), "currentPage", DeclarationType.NUMBER, "当前页");
-        ObjectProperty items = propertyIterator.next();
+        Property items = propertyIterator.next();
         checkProperty(items, "items", DeclarationType.ARRAY, "本页数据");
 
-        Declaration pageItemComponent = ((Declarations.ArrayDeclaration) items.getDeclaration()).getComponentType();
-        Declarations.TypeArgDeclaration td = (Declarations.TypeArgDeclaration) pageItemComponent;
+        Declaration pageItemComponent = ((ArrayDeclaration) items.getDeclaration()).getItemType();
+        TypeVarDeclaration td = (TypeVarDeclaration) pageItemComponent;
         assertThat(td.getType()).isEqualTo(DeclarationType.TYPE_PARAMETER);
         assertThat(td.getName()).isEqualTo("T");
     }
@@ -312,119 +312,119 @@ public class FinalTest {
         Property userProperty = action.getRequestBody();
         checkProperty(userProperty, null, DeclarationType.OBJECT, "用户数据");
 
-        checkUser((ObjectDeclaration) userProperty.getDeclaration());
+        checkUser((NestedDeclaration) userProperty.getDeclaration());
 
 
         Property user = action.getResponseBody();
         checkProperty(user, null, DeclarationType.VOID);
     }
 
-    private void checkUserUpdateRequest(ObjectDeclaration objectDeclaration) {
+    private void checkUserUpdateRequest(NestedDeclaration nestedDeclaration) {
 
-        assertThat(objectDeclaration.getName()).isEqualTo("UserUpdateRequest");
-        assertThat(objectDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.UserUpdateRequest");
-        assertThat(objectDeclaration.getDescription()).isEqualTo(Collections.singletonList("用户更新请求"));
+        assertThat(nestedDeclaration.getShortName()).isEqualTo("UserUpdateRequest");
+        assertThat(nestedDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.UserUpdateRequest");
+        assertThat(nestedDeclaration.getDescription()).isEqualTo(Collections.singletonList("用户更新请求"));
 
 
-        assertThat(objectDeclaration.getTypeParameters()).isEmpty();
-        assertThat(objectDeclaration.getTypeArgs()).isEmpty();
+        assertThat(nestedDeclaration.getTypeParameters()).isEmpty();
+        assertThat(nestedDeclaration.getTypeArguments()).isEmpty();
 
-        Collection<ObjectProperty> properties = objectDeclaration.getProperties();
+        Collection<Property> properties = nestedDeclaration.allProperties();
         assertThat(properties).hasSize(2);
 
-        Iterator<ObjectProperty> iterator = properties.iterator();
-        ObjectProperty nonsense = iterator.next();
+        Iterator<Property> iterator = properties.iterator();
+        Property nonsense = iterator.next();
         checkProperty(nonsense, "nonsense", DeclarationType.TIMESTAMP, "又是一个纯粹测试用字段");
 
-        ObjectProperty user = iterator.next();
+        Property user = iterator.next();
         checkProperty(user, "user", DeclarationType.OBJECT, "用户数据");
-        checkUser((ObjectDeclaration) user.getDeclaration());
+        checkUser((NestedDeclaration) user.getDeclaration());
     }
 
-    private void checkUserCreateRequest(ObjectDeclaration objectDeclaration) {
+    private void checkUserCreateRequest(NestedDeclaration nestedDeclaration) {
 
-        assertThat(objectDeclaration.getName()).isEqualTo("UserCreateRequest");
-        assertThat(objectDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.UserCreateRequest");
-        assertThat(objectDeclaration.getDescription()).isEqualTo(Collections.singletonList("用户创建请求"));
+        assertThat(nestedDeclaration.getShortName()).isEqualTo("UserCreateRequest");
+        assertThat(nestedDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.UserCreateRequest");
+        assertThat(nestedDeclaration.getDescription()).isEqualTo(Collections.singletonList("用户创建请求"));
 
 
-        assertThat(objectDeclaration.getTypeParameters()).isEmpty();
-        assertThat(objectDeclaration.getTypeArgs()).isEmpty();
+        assertThat(nestedDeclaration.getTypeParameters()).isEmpty();
+        assertThat(nestedDeclaration.getTypeArguments()).isEmpty();
 
-        Collection<ObjectProperty> properties = objectDeclaration.getProperties();
+        Collection<Property> properties = nestedDeclaration.allProperties();
         assertThat(properties).hasSize(2);
 
-        Iterator<ObjectProperty> iterator = properties.iterator();
-        ObjectProperty nonsense = iterator.next();
+        Iterator<Property> iterator = properties.iterator();
+        Property nonsense = iterator.next();
         checkProperty(nonsense, "nonsense", DeclarationType.TIMESTAMP, "纯粹测试用字段");
 
-        ObjectProperty user = iterator.next();
+        Property user = iterator.next();
         checkProperty(user, "user", DeclarationType.OBJECT, "用户数据");
-        checkUser((ObjectDeclaration) user.getDeclaration());
+        checkUser((NestedDeclaration) user.getDeclaration());
     }
 
-    private void checkUser(ObjectDeclaration objectDeclaration) {
+    private void checkUser(NestedDeclaration nestedDeclaration) {
 
-        assertThat(objectDeclaration.getName()).isEqualTo("User");
-        assertThat(objectDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.User");
-        assertThat(objectDeclaration.getDescription()).isEqualTo(Collections.singletonList("用户，就是用户"));
+        assertThat(nestedDeclaration.getShortName()).isEqualTo("User");
+        assertThat(nestedDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.User");
+        assertThat(nestedDeclaration.getDescription()).isEqualTo(Collections.singletonList("用户，就是用户"));
 
 
-        assertThat(objectDeclaration.getTypeParameters()).isEmpty();
-        assertThat(objectDeclaration.getTypeArgs()).isEmpty();
+        assertThat(nestedDeclaration.getTypeParameters()).isEmpty();
+        assertThat(nestedDeclaration.getTypeArguments()).isEmpty();
 
-        Collection<ObjectProperty> properties = objectDeclaration.getProperties();
+        Collection<Property> properties = nestedDeclaration.allProperties();
         assertThat(properties).hasSize(5);
 
-        Iterator<ObjectProperty> iterator = properties.iterator();
+        Iterator<Property> iterator = properties.iterator();
         checkId(iterator.next());
 
-        ObjectProperty name = iterator.next();
+        Property name = iterator.next();
         checkProperty(name, "username", DeclarationType.STRING, "用户名");
 
-        ObjectProperty age = iterator.next();
+        Property age = iterator.next();
         checkProperty(age, "age", DeclarationType.NUMBER, "年龄");
 
-        ObjectProperty friends = iterator.next();
+        Property friends = iterator.next();
         checkProperty(friends, "friends", DeclarationType.ARRAY, "是坑爹的弗兰兹呢");
-        Declaration componentType = ((Declarations.ArrayDeclaration) friends.getDeclaration()).getComponentType();
-        assertThat(componentType).isSameAs(objectDeclaration);
+        Declaration componentType = ((ArrayDeclaration) friends.getDeclaration()).getItemType();
+        assertThat(componentType).isSameAs(nestedDeclaration);
 
-        ObjectProperty pets = iterator.next();
+        Property pets = iterator.next();
         checkProperty(pets, "pets", DeclarationType.ARRAY, "宠物们");
-        Declaration petComponentType = ((Declarations.ArrayDeclaration) pets.getDeclaration()).getComponentType();
-        checkPet((ObjectDeclaration) petComponentType);
+        Declaration petComponentType = ((ArrayDeclaration) pets.getDeclaration()).getItemType();
+        checkPet((NestedDeclaration) petComponentType);
     }
 
     private void checkId(Property id) {
         checkProperty(id, "id", DeclarationType.NUMBER, "就是id", "没错就是id");
     }
 
-    private void checkPet(ObjectDeclaration objectDeclaration) {
-        assertThat(objectDeclaration.getName()).isEqualTo("Pet");
-        assertThat(objectDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.Pet");
-        assertThat(objectDeclaration.getDescription()).isEqualTo(Collections.singletonList("宠物，可能是🐈，可能是🐶"));
+    private void checkPet(NestedDeclaration nestedDeclaration) {
+        assertThat(nestedDeclaration.getShortName()).isEqualTo("Pet");
+        assertThat(nestedDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.Pet");
+        assertThat(nestedDeclaration.getDescription()).isEqualTo(Collections.singletonList("宠物，可能是🐈，可能是🐶"));
 
 
-        assertThat(objectDeclaration.getTypeParameters()).isEmpty();
-        assertThat(objectDeclaration.getTypeArgs()).isEmpty();
+        assertThat(nestedDeclaration.getTypeParameters()).isEmpty();
+        assertThat(nestedDeclaration.getTypeArguments()).isEmpty();
 
-        Collection<ObjectProperty> properties = objectDeclaration.getProperties();
+        Collection<Property> properties = nestedDeclaration.allProperties();
         assertThat(properties).hasSize(5);
 
-        Iterator<ObjectProperty> iterator = properties.iterator();
+        Iterator<Property> iterator = properties.iterator();
         checkId(iterator.next());
 
-        ObjectProperty name = iterator.next();
+        Property name = iterator.next();
         checkProperty(name, "name", DeclarationType.STRING, "宠物的名字");
 
-        ObjectProperty birthday = iterator.next();
+        Property birthday = iterator.next();
         checkProperty(birthday, "birthday", DeclarationType.TIMESTAMP, "宠物的生日，啊为什么是时间戳呢，因为现在还没有日期类型啊");
 
-        ObjectProperty age = iterator.next();
+        Property age = iterator.next();
         checkProperty(age, "age", DeclarationType.NUMBER, "年龄");
 
-        ObjectProperty type = iterator.next();
+        Property type = iterator.next();
         checkProperty(type, "type", DeclarationType.ENUM, "类型");
 
         EnumDeclaration types = (EnumDeclaration) type.getDeclaration();

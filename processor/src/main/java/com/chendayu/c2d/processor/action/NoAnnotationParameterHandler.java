@@ -3,8 +3,7 @@ package com.chendayu.c2d.processor.action;
 import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
-import com.chendayu.c2d.processor.declaration.ObjectDeclaration;
-import com.chendayu.c2d.processor.property.ObjectProperty;
+import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 import com.chendayu.c2d.processor.property.Property;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -35,9 +34,9 @@ public class NoAnnotationParameterHandler extends AbstractParameterHandler {
         }
 
         if (declaration.getType() == DeclarationType.OBJECT) {
-            ObjectDeclaration objectDeclaration = (ObjectDeclaration) declaration;
-            Collection<ObjectProperty> properties = objectDeclaration.getProperties();
-            for (ObjectProperty property : properties) {
+            NestedDeclaration nestedDeclaration = (NestedDeclaration) declaration;
+            Collection<Property> properties = nestedDeclaration.allProperties();
+            for (Property property : properties) {
                 Declaration propertyDeclaration = property.getDeclaration();
                 if (isSimpleDeclaration(propertyDeclaration) || isSimpleArray(propertyDeclaration)) {
                     action.addUrlParameter(property);

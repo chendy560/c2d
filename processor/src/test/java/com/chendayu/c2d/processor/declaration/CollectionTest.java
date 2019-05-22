@@ -28,8 +28,8 @@ public class CollectionTest extends AbstractDeclarationTest {
 
     private void checkArrayDeclaration(Declaration declaration, DeclarationType componentType) {
         assertThat(declaration.getType()).isEqualTo(DeclarationType.ARRAY);
-        Declarations.ArrayDeclaration arrayDeclaration = (Declarations.ArrayDeclaration) declaration;
-        Declaration ct = arrayDeclaration.getComponentType();
+        ArrayDeclaration arrayDeclaration = (ArrayDeclaration) declaration;
+        Declaration ct = arrayDeclaration.getItemType();
         assertThat(ct.getType()).isEqualTo(componentType);
     }
 }

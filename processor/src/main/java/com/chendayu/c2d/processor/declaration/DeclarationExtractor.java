@@ -4,11 +4,11 @@ import com.chendayu.c2d.processor.InfoExtractor;
 import com.chendayu.c2d.processor.Utils;
 import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.model.DocComment;
-import com.chendayu.c2d.processor.processor.ObjectDeclarationPostProcessor;
-import com.chendayu.c2d.processor.processor.c2d.DocIgnoreObjectDeclarationPostProcessor;
-import com.chendayu.c2d.processor.processor.jackson.JacksonObjectDeclarationPostProcessor;
-import com.chendayu.c2d.processor.processor.lombok.LombokObjectDeclarationPostProcessor;
-import com.chendayu.c2d.processor.property.ObjectProperty;
+import com.chendayu.c2d.processor.processor.DescriptionProcessor;
+import com.chendayu.c2d.processor.processor.DocIgnoreProcessor;
+import com.chendayu.c2d.processor.processor.JacksonProcessor;
+import com.chendayu.c2d.processor.processor.LombokProcessor;
+import com.chendayu.c2d.processor.processor.NestedDeclarationPostProcessor;
 import com.chendayu.c2d.processor.property.Property;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,11 +27,11 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,17 +39,16 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static com.chendayu.c2d.processor.declaration.Declarations.BOOLEAN;
-import static com.chendayu.c2d.processor.declaration.Declarations.DYNAMIC;
-import static com.chendayu.c2d.processor.declaration.Declarations.ENUM_CONST;
-import static com.chendayu.c2d.processor.declaration.Declarations.FILE;
-import static com.chendayu.c2d.processor.declaration.Declarations.NUMBER;
-import static com.chendayu.c2d.processor.declaration.Declarations.STRING;
-import static com.chendayu.c2d.processor.declaration.Declarations.TIMESTAMP;
-import static com.chendayu.c2d.processor.declaration.Declarations.UNKNOWN;
-import static com.chendayu.c2d.processor.declaration.Declarations.VOID;
-import static com.chendayu.c2d.processor.declaration.Declarations.arrayOf;
-import static com.chendayu.c2d.processor.declaration.Declarations.typeArgOf;
+import static com.chendayu.c2d.processor.declaration.ArrayDeclaration.arrayOf;
+import static com.chendayu.c2d.processor.declaration.SimpleDeclaration.BOOLEAN;
+import static com.chendayu.c2d.processor.declaration.SimpleDeclaration.DYNAMIC;
+import static com.chendayu.c2d.processor.declaration.SimpleDeclaration.ENUM_CONST;
+import static com.chendayu.c2d.processor.declaration.SimpleDeclaration.FILE;
+import static com.chendayu.c2d.processor.declaration.SimpleDeclaration.NUMBER;
+import static com.chendayu.c2d.processor.declaration.SimpleDeclaration.STRING;
+import static com.chendayu.c2d.processor.declaration.SimpleDeclaration.TIMESTAMP;
+import static com.chendayu.c2d.processor.declaration.SimpleDeclaration.UNKNOWN;
+import static com.chendayu.c2d.processor.declaration.SimpleDeclaration.VOID;
 import static javax.lang.model.element.Modifier.STATIC;
 
 /**
@@ -98,14 +97,19 @@ public class DeclarationExtractor extends InfoExtractor {
     private static final int BOOLEAN_GETTER_LENGTH = BOOLEAN_GETTER_PREFIX.length();
 
     /**
+     * setter方法前缀
+     */
+    private static final String SETTER_PREFIX = "set";
+
+    /**
+     * setter方法前缀长度
+     */
+    private static final int SETTER_LENGTH = SETTER_PREFIX.length();
+
+    /**
      * 当数组内的元素类型无法解析时返回这个类型
      */
     private static final Declaration UNKNOWN_ARRAY = arrayOf(UNKNOWN);
-
-    /**
-     * Object 自带的方法们，会被忽略
-     */
-    private final Set<Element> objectMethods;
 
     /**
      * {@link Void} 类型，区别于 void
@@ -131,105 +135,79 @@ public class DeclarationExtractor extends InfoExtractor {
      * {@link Date}
      */
     private final TypeMirror dateType;
+
     /**
      * {@link Instant}
      */
     private final TypeMirror instantType;
 
     /**
-     * {@link Iterable} 相当于数组
-     */
-    private final TypeMirror iterableType;
-    /**
      * {@link Collection}
      */
     private final TypeMirror collectionType;
-    /**
-     * {@link List}
-     */
-    private final TypeMirror listType;
-    /**
-     * {@link Set}
-     */
-    private final TypeMirror setType;
 
     /**
      * {@link Map}
      */
     private final TypeMirror mapType;
+
     /**
      * {@link Enum} 所有枚举的父类
      */
     private final TypeMirror enumType;
 
     /**
-     *
+     * {@link MultipartFile} spring 处理文件上传的类型
      */
     private final TypeMirror multiPartFileType;
 
     /**
      * 后处理器们
      */
-    private final SortedSet<ObjectDeclarationPostProcessor> postProcessors;
+    private final SortedSet<NestedDeclarationPostProcessor> postProcessors;
 
     public DeclarationExtractor(ProcessingEnvironment environment, Warehouse warehouse) {
         super(environment, warehouse);
-        this.objectMethods = initObjectMethods();
 
-        this.voidType = elementUtils.getTypeElement(Void.class.getName()).asType();
-        this.charSequenceType = elementUtils.getTypeElement(CharSequence.class.getName()).asType();
+        this.voidType = getDeclaredType(Void.class);
+        this.charSequenceType = getDeclaredType(CharSequence.class);
 
-        this.booleanType = elementUtils.getTypeElement(Boolean.class.getName()).asType();
+        this.booleanType = getDeclaredType(Boolean.class);
 
-        this.numberType = elementUtils.getTypeElement(Number.class.getName()).asType();
+        this.numberType = getDeclaredType(Number.class);
 
-        this.dateType = elementUtils.getTypeElement(Date.class.getName()).asType();
-        this.instantType = elementUtils.getTypeElement(Instant.class.getName()).asType();
-        this.iterableType = typeUtils.erasure(elementUtils.getTypeElement(Iterable.class.getName()).asType());
-        this.collectionType = typeUtils.erasure(elementUtils.getTypeElement(Collection.class.getName()).asType());
-        this.listType = typeUtils.erasure(elementUtils.getTypeElement(List.class.getName()).asType());
-        this.setType = typeUtils.erasure(elementUtils.getTypeElement(Set.class.getName()).asType());
+        this.dateType = getDeclaredType(Date.class);
+        this.instantType = getDeclaredType(Instant.class);
 
-        this.mapType = typeUtils.erasure(elementUtils.getTypeElement(Map.class.getName()).asType());
+        this.collectionType = getDeclaredType(Collection.class, 1);
 
-        this.enumType = typeUtils.erasure(elementUtils.getTypeElement(Enum.class.getName()).asType());
-        this.multiPartFileType = elementUtils.getTypeElement(MultipartFile.class.getName()).asType();
+        this.mapType = getDeclaredType(Map.class, 2);
+
+        this.enumType = getDeclaredType(Enum.class, 1);
+
+        this.multiPartFileType = getDeclaredType(MultipartFile.class);
 
         this.postProcessors = initPostProcessors(environment);
     }
 
-    private Set<Element> initObjectMethods() {
+    private SortedSet<NestedDeclarationPostProcessor> initPostProcessors(ProcessingEnvironment environment) {
+        TreeSet<NestedDeclarationPostProcessor> processors =
+                new TreeSet<>(Comparator.comparing(NestedDeclarationPostProcessor::getOrder));
 
-        HashSet<Element> objectMethodsSet = new HashSet<>(32, 0.5f);
-
-        TypeElement objectElement = elementUtils.getTypeElement(Object.class.getName());
-        List<? extends Element> objectMembers = elementUtils.getAllMembers(objectElement);
-        for (Element objectMember : objectMembers) {
-            ElementKind kind = objectMember.getKind();
-            if (kind == ElementKind.METHOD) {
-                objectMethodsSet.add(objectMember);
-            }
-        }
-        return Collections.unmodifiableSet(objectMethodsSet);
-    }
-
-    private SortedSet<ObjectDeclarationPostProcessor> initPostProcessors(ProcessingEnvironment environment) {
-        TreeSet<ObjectDeclarationPostProcessor> processors =
-                new TreeSet<>(Comparator.comparing(ObjectDeclarationPostProcessor::getOrder));
-
-        processors.add(new DocIgnoreObjectDeclarationPostProcessor(environment));
+        processors.add(new DocIgnoreProcessor(environment));
+        processors.add(new DescriptionProcessor(environment));
 
         TypeElement lombokData = elementUtils.getTypeElement(LOMBOK_DATA);
         if (lombokData != null) {
-            LombokObjectDeclarationPostProcessor lombokProcessor =
-                    new LombokObjectDeclarationPostProcessor(environment, this);
+            LombokProcessor lombokProcessor =
+                    new LombokProcessor(environment);
             processors.add(lombokProcessor);
         }
 
         TypeElement jsonIgnore = elementUtils.getTypeElement(JACKSON_JSON_IGNORE);
         if (jsonIgnore != null) {
-            JacksonObjectDeclarationPostProcessor jacksonProcessor =
-                    new JacksonObjectDeclarationPostProcessor(environment);
+            JacksonProcessor jacksonProcessor =
+                    new JacksonProcessor(environment);
             processors.add(jacksonProcessor);
         }
 
@@ -270,65 +248,63 @@ public class DeclarationExtractor extends InfoExtractor {
             case TYPEVAR:
                 TypeVariable typeVariable = (TypeVariable) typeMirror;
                 String name = typeVariable.asElement().getSimpleName().toString();
-                return typeArgOf(name);
+                return new TypeVarDeclaration(name);
             default:
-                throw new IllegalStateException("unknown type kind: " + kind +
-                        " for type mirror: " + typeMirror);
+                String message = "unknown type kind: " + kind +
+                        " for type mirror: " + typeMirror;
+                logWarn(message);
+                return UNKNOWN;
         }
     }
 
-    /**
-     * 解析对象的入口，只有这里才能解析出指定的泛型
-     */
     private Declaration extractFromDeclaredType(DeclaredType declaredType) {
 
-        TypeMirror erasedType = typeUtils.erasure(declaredType);
-
-        if (isVoid(erasedType)) {
+        if (typeUtils.isSameType(declaredType, voidType)) {
             return VOID;
         }
 
-        if (isNumber(erasedType)) {
+        if (typeUtils.isAssignable(declaredType, numberType)) {
             return NUMBER;
         }
 
-        if (isCharSequence(erasedType)) {
+        if (typeUtils.isAssignable(declaredType, charSequenceType)) {
             return STRING;
         }
 
-        if (isTimestamp(erasedType)) {
+        if (typeUtils.isAssignable(declaredType, dateType) ||
+                typeUtils.isAssignable(declaredType, instantType)) {
             return TIMESTAMP;
         }
 
-        if (isBoolean(erasedType)) {
+        if (typeUtils.isSameType(declaredType, booleanType)) {
             return BOOLEAN;
         }
 
-        if (isIterable(erasedType)) {
-            return extractFromIterable(declaredType);
+        if (typeUtils.isAssignable(declaredType, collectionType)) {
+            return extractFromCollection(declaredType);
         }
 
-        if (isDynamic(erasedType)) {
+        if (typeUtils.isAssignable(declaredType, mapType)) {
             return DYNAMIC;
         }
 
-        if (typeUtils.isSameType(erasedType, multiPartFileType)) {
+        if (typeUtils.isSameType(declaredType, multiPartFileType)) {
             return FILE;
         }
 
-        if (isEnum(erasedType)) {
+        if (typeUtils.isAssignable(declaredType, enumType)) {
             return extractFromEnum(declaredType);
         }
 
         TypeElement typeElement = (TypeElement) declaredType.asElement();
-        ObjectDeclaration objectDeclaration = extractObjectDeclarationFromTypeElement(typeElement);
+        NestedDeclaration nestedDeclaration = extractNestedDeclarationFromTypeElement(typeElement);
 
         List<Declaration> typeArgs = findTypeArgs(declaredType);
         if (!typeArgs.isEmpty()) {
-            return objectDeclaration.withTypeArgs(typeArgs);
+            return nestedDeclaration.withTypeArguments(typeArgs);
         }
 
-        return objectDeclaration;
+        return nestedDeclaration;
     }
 
     private EnumDeclaration extractFromEnum(DeclaredType declaredType) {
@@ -370,38 +346,6 @@ public class DeclarationExtractor extends InfoExtractor {
         return new Property(name, description, ENUM_CONST);
     }
 
-    private boolean isEnum(TypeMirror erasedType) {
-        return typeUtils.isSubtype(erasedType, enumType);
-    }
-
-    private boolean isDynamic(TypeMirror erasedType) {
-        return typeUtils.isSubtype(erasedType, mapType);
-    }
-
-    private boolean isIterable(TypeMirror erasedType) {
-        return typeUtils.isSubtype(erasedType, iterableType);
-    }
-
-    private boolean isBoolean(TypeMirror erasedType) {
-        return typeUtils.isSameType(erasedType, booleanType);
-    }
-
-    private boolean isTimestamp(TypeMirror erasedType) {
-        return typeUtils.isSameType(erasedType, dateType) || typeUtils.isSameType(erasedType, instantType);
-    }
-
-    private boolean isCharSequence(TypeMirror erasedType) {
-        return typeUtils.isSubtype(erasedType, charSequenceType);
-    }
-
-    private boolean isNumber(TypeMirror typeMirror) {
-        return typeUtils.isSubtype(typeMirror, numberType);
-    }
-
-    private boolean isVoid(TypeMirror typeMirror) {
-        return typeUtils.isSameType(typeMirror, voidType);
-    }
-
     private Declaration extractFromArrayType(ArrayType type) {
         TypeMirror componentType = type.getComponentType();
         if (componentType.getKind() == TypeKind.CHAR) {
@@ -411,47 +355,39 @@ public class DeclarationExtractor extends InfoExtractor {
         return arrayOf(declaration);
     }
 
-    private Declaration extractFromIterable(DeclaredType type) {
+    private Declaration extractFromCollection(DeclaredType type) {
+        List<? extends TypeMirror> typeArguments = type.getTypeArguments();
 
-        TypeMirror erased = typeUtils.erasure(type);
-        if (isSimpleIterable(erased)) {
-            List<? extends TypeMirror> typeArguments = type.getTypeArguments();
-            if (!typeArguments.isEmpty()) {
-                TypeMirror typeMirror = typeArguments.get(0);
-                Declaration declaration = extract(typeMirror);
-                return arrayOf(declaration);
-            }
+        if (typeArguments.isEmpty()) {
+            return UNKNOWN_ARRAY;
         }
 
-        return UNKNOWN_ARRAY;
+        TypeMirror typeMirror = typeArguments.get(0);
+        Declaration declaration = extract(typeMirror);
+        return arrayOf(declaration);
     }
 
-    private boolean isSimpleIterable(TypeMirror erasedType) {
-        return typeUtils.isSameType(erasedType, listType)
-                || typeUtils.isSameType(erasedType, setType)
-                || typeUtils.isSameType(erasedType, collectionType)
-                || typeUtils.isSameType(erasedType, iterableType);
-    }
 
-    private ObjectDeclaration extractObjectDeclarationFromTypeElement(TypeElement typeElement) {
+    private NestedDeclaration extractNestedDeclarationFromTypeElement(TypeElement typeElement) {
         String qualifiedName = typeElement.getQualifiedName().toString();
-        ObjectDeclaration existsDeclaration = warehouse.getDeclaration(qualifiedName);
+        NestedDeclaration existsDeclaration = warehouse.getDeclaration(qualifiedName);
         if (existsDeclaration != null) {
             return existsDeclaration;
         }
 
-        ObjectDeclaration result = new ObjectDeclaration(typeElement);
+        DocComment docComment = DocComment.create(elementUtils.getDocComment(typeElement));
+        NestedDeclaration result = new NestedDeclaration(typeElement);
+
         // 直接塞进仓库，避免无限递归
         warehouse.addDeclaration(result);
 
-        DocComment docComment = DocComment.create(elementUtils.getDocComment(typeElement));
-        result.setDescription(docComment.getDescription());
-
-        // 首先处理自己的字段，父类和接口的 field 和 getter 直接可以在子类中拿到，
-        initFieldsAndProperties(typeElement, result);
-
-        // 获取父类和接口更多是为了在特殊情况下补齐文档
+        // 首先处理父类
         processParents(typeElement, result);
+
+        // 处理自己的字段，父类和接口的 field 和 getter 直接可以在子类中拿到，
+        Map<String, Property> propertyMap = getPropertyMap(typeElement);
+
+        result.applyProperties(propertyMap.values());
 
         // 最后设置好类型参数
         processTypeParameters(typeElement, docComment, result);
@@ -462,51 +398,35 @@ public class DeclarationExtractor extends InfoExtractor {
         return result;
     }
 
-    private void postProcess(ObjectDeclaration result) {
-        for (ObjectDeclarationPostProcessor postProcessor : postProcessors) {
+    private void postProcess(NestedDeclaration result) {
+        for (NestedDeclarationPostProcessor postProcessor : postProcessors) {
             postProcessor.process(result);
         }
     }
 
-    private void processParents(TypeElement typeElement, ObjectDeclaration result) {
+    private void processParents(TypeElement typeElement, NestedDeclaration result) {
 
         List<? extends TypeMirror> parentTypes = typeUtils.directSupertypes(typeElement.asType());
 
         for (TypeMirror parentType : parentTypes) {
             DeclaredType declaredType = (DeclaredType) parentType;
-            TypeElement parentElement = getOriginTypeElement(declaredType);
+            TypeElement parentElement = (TypeElement) declaredType.asElement();
 
             String qualifiedName = parentElement.getQualifiedName().toString();
 
             // 默认情况下，java和javax的东西都不处理，其实这里更多是在优化
             if (isJavaPackageClass(qualifiedName)) {
-                break;
+                continue;
             }
 
             // 能走到这一步的都是对象了
-            ObjectDeclaration declaration = (ObjectDeclaration) extractFromDeclaredType(declaredType);
-
-            Collection<ObjectProperty> properties = declaration.getProperties();
-            for (Property property : properties) {
-
-                String propertyName = property.getDisplayName();
-
-                if (result.containsProperty(propertyName)) {
-                    result.addPropertyDescriptionIfNotExists(property);
-                    continue;
-                }
-
-                Declaration propertyDeclaration = property.getDeclaration();
-                List<String> propertyDescription = property.getDescription();
-                ObjectProperty newProperty = new ObjectProperty(
-                        propertyName, propertyDescription, propertyDeclaration, null, null);
-                result.addProperty(newProperty);
-            }
+            NestedDeclaration declaration = (NestedDeclaration) extractFromDeclaredType(declaredType);
+            result.applyParent(declaration);
         }
     }
 
     private void processTypeParameters(TypeElement typeElement, DocComment docComment,
-                                       ObjectDeclaration result) {
+                                       NestedDeclaration result) {
         List<? extends TypeParameterElement> typeParameters = typeElement.getTypeParameters();
         if (typeParameters.isEmpty()) {
             result.setTypeParameters(Collections.emptyList());
@@ -517,7 +437,7 @@ public class DeclarationExtractor extends InfoExtractor {
         for (TypeParameterElement typeParameter : typeParameters) {
             String name = typeParameter.getSimpleName().toString();
             List<String> description = docComment.getTypeParam(name);
-            Property property = new Property(name, description, typeArgOf(name));
+            Property property = new Property(name, description, new TypeVarDeclaration(name));
             typeProperties.add(property);
         }
 
@@ -538,31 +458,23 @@ public class DeclarationExtractor extends InfoExtractor {
         return typeArgs;
     }
 
-    private void initFieldsAndProperties(TypeElement typeElement, ObjectDeclaration result) {
+    private Map<String, Property> getPropertyMap(TypeElement typeElement) {
 
-        List<? extends Element> members = elementUtils.getAllMembers(typeElement);
+        LinkedHashMap<String, Property> propertyMap = new LinkedHashMap<>();
 
-        LinkedHashMap<String, VariableElement> fieldMap = new LinkedHashMap<>();
-        ArrayList<ExecutableElement> getters = new ArrayList<>();
-
+        List<? extends Element> members = typeElement.getEnclosedElements();
         for (Element member : members) {
-
-            if (objectMethods.contains(member)) {
-                continue;
-            }
-            String name = member.getSimpleName().toString();
 
             switch (member.getKind()) {
                 case FIELD:
-                    VariableElement field = (VariableElement) member;
-                    if (isInstanceField(field)) {
-                        fieldMap.put(name, field);
-                    }
+                    handleField(propertyMap, (VariableElement) member);
                     break;
                 case METHOD:
                     ExecutableElement method = (ExecutableElement) member;
                     if (isGetter(method)) {
-                        getters.add(method);
+                        handleGetter(propertyMap, member, method);
+                    } else if (isSetter(method)) {
+                        handleSetter(propertyMap, member, method);
                     }
                     break;
                 default:
@@ -570,45 +482,66 @@ public class DeclarationExtractor extends InfoExtractor {
             }
         }
 
-        result.setFieldMap(fieldMap);
+        return propertyMap;
+    }
 
-        for (ExecutableElement getter : getters) {
-            ObjectProperty property = createProperty(getter, fieldMap);
-            result.addProperty(property);
+    private void handleSetter(LinkedHashMap<String, Property> propertyMap, Element member, ExecutableElement method) {
+        String methodName = member.getSimpleName().toString();
+        String propertyName = setterToPropertyName(methodName);
+        Property property = propertyMap.get(propertyName);
+        if (property == null) {
+            TypeMirror returnType = method.getReturnType();
+            Declaration declaration = extract(returnType);
+            Property newProperty = new Property(propertyName, declaration);
+            newProperty.setSetter(method);
+            newProperty.setSettable(true);
+            propertyMap.put(propertyName, newProperty);
+        } else {
+            property.setSetter(method);
+            property.setSettable(true);
         }
     }
 
-    private ObjectProperty createProperty(ExecutableElement getter, Map<String, VariableElement> fieldMap) {
-        String getterName = getter.getSimpleName().toString();
-        String name = getterToPropertyName(getterName);
-        VariableElement field = fieldMap.get(name);
-
-        List<String> description = findDescription(getter, field);
-
-        TypeMirror returnType = getter.getReturnType();
-        Declaration declaration = extract(returnType);
-
-        return new ObjectProperty(name, description, declaration, field, getter);
+    private void handleGetter(LinkedHashMap<String, Property> propertyMap, Element member, ExecutableElement method) {
+        String methodName = member.getSimpleName().toString();
+        String propertyName = getterToPropertyName(methodName);
+        Property property = propertyMap.get(propertyName);
+        if (property == null) {
+            TypeMirror returnType = method.getReturnType();
+            Declaration declaration = extract(returnType);
+            Property newProperty = new Property(propertyName, declaration);
+            newProperty.setGetter(method);
+            newProperty.setGettable(true);
+            propertyMap.put(propertyName, newProperty);
+        } else {
+            property.setGetter(method);
+            property.setGettable(true);
+        }
     }
 
-    private List<String> findDescription(ExecutableElement getter, VariableElement field) {
-        List<String> methodReturnComment = DocComment.create(elementUtils.getDocComment(getter)).getReturn();
-        if (!methodReturnComment.isEmpty()) {
-            return methodReturnComment;
+    private void handleField(LinkedHashMap<String, Property> propertyMap, VariableElement member) {
+        if (isInstanceField(member)) {
+            String fieldName = member.getSimpleName().toString();
+            Property property = propertyMap.get(fieldName);
+            if (property == null) {
+                Declaration declaration = this.extract(member);
+                Property newProperty = new Property(fieldName, declaration);
+                newProperty.setSettable(false);
+                newProperty.setGettable(false);
+                propertyMap.put(fieldName, newProperty);
+            } else {
+                property.setField(member);
+            }
         }
-
-        if (field != null) {
-            String docComment = elementUtils.getDocComment(field);
-            DocComment fieldDocComment = DocComment.create(docComment);
-            return fieldDocComment.getDescription();
-        }
-
-        return Collections.emptyList();
     }
 
     private boolean isGetter(ExecutableElement element) {
         Set<Modifier> modifiers = element.getModifiers();
         if (modifiers.contains(STATIC)) {
+            return false;
+        }
+
+        if (!element.getParameters().isEmpty()) {
             return false;
         }
 
@@ -628,6 +561,22 @@ public class DeclarationExtractor extends InfoExtractor {
                 && kind == TypeKind.BOOLEAN;
     }
 
+    private boolean isSetter(ExecutableElement element) {
+        Set<Modifier> modifiers = element.getModifiers();
+
+        if (modifiers.contains(STATIC)) {
+            return false;
+        }
+
+        if (element.getParameters().size() != 1) {
+            return false;
+        }
+
+        String name = element.getSimpleName().toString();
+
+        return name.startsWith(SETTER_PREFIX) && name.length() > SETTER_LENGTH;
+    }
+
     private String getterToPropertyName(String methodName) {
         if (methodName.startsWith(GETTER_PREFIX)) {
             String propertyName = methodName.substring(GETTER_LENGTH);
@@ -638,22 +587,40 @@ public class DeclarationExtractor extends InfoExtractor {
         return Utils.lowerCaseFirst(propertyName);
     }
 
+    private String setterToPropertyName(String methodName) {
+        String propertyName = methodName.substring(SETTER_LENGTH);
+        return Utils.lowerCaseFirst(propertyName);
+    }
+
     private boolean isJavaPackageClass(String qualifiedName) {
         return qualifiedName.startsWith(JAVA_PREFIX)
                 || qualifiedName.startsWith(JAVAX_PREFIX);
     }
 
     private boolean isInstanceField(VariableElement field) {
+        if (field.getModifiers().contains(STATIC)) {
+            return false;
+        }
         char firstChar = field.getSimpleName().toString().charAt(0);
         return Character.isLowerCase(firstChar);
     }
 
+    private TypeMirror getDeclaredType(Class<?> typeClass) {
+        return getDeclaredType(typeClass, 0);
+    }
+
     /**
-     * 还原泛型参数
+     * 从 spring-boot-configuration-processor 抄来的方法，用来获取指定类型的 TypeMirror
      */
-    private TypeElement getOriginTypeElement(DeclaredType typeMirror) {
-        TypeElement typeElement = (TypeElement) typeMirror.asElement();
-        DeclaredType declaredType = (DeclaredType) typeElement.asType();
-        return ((TypeElement) declaredType.asElement());
+    private TypeMirror getDeclaredType(Class<?> typeClass, int numberOfTypeArgs) {
+        TypeMirror[] typeArgs = new TypeMirror[numberOfTypeArgs];
+        Arrays.setAll(typeArgs, i -> typeUtils.getWildcardType(null, null));
+        TypeElement typeElement = elementUtils.getTypeElement(typeClass.getName());
+        try {
+            return typeUtils.getDeclaredType(typeElement, typeArgs);
+        } catch (IllegalArgumentException ex) {
+            // Try again without generics for older Java versions
+            return typeUtils.getDeclaredType(typeElement);
+        }
     }
 }

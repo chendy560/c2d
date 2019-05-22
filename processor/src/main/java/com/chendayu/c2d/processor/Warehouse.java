@@ -1,7 +1,7 @@
 package com.chendayu.c2d.processor;
 
 import com.chendayu.c2d.processor.declaration.EnumDeclaration;
-import com.chendayu.c2d.processor.declaration.ObjectDeclaration;
+import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 import com.chendayu.c2d.processor.resource.Resource;
 
 import java.util.Collection;
@@ -14,7 +14,7 @@ public class Warehouse {
 
     private static final String PACKAGE_NAME = "c2d";
 
-    private final Map<String, ObjectDeclaration> declarationMap = new HashMap<>(16, 0.5f);
+    private final Map<String, NestedDeclaration> declarationMap = new HashMap<>(16, 0.5f);
 
     private final Map<String, EnumDeclaration> enumMap = new HashMap<>(16, 0.5f);
 
@@ -40,11 +40,11 @@ public class Warehouse {
         this.basePackage = basePackage + "." + PACKAGE_NAME;
     }
 
-    public ObjectDeclaration getDeclaration(String qualifiedName) {
+    public NestedDeclaration getDeclaration(String qualifiedName) {
         return declarationMap.get(qualifiedName);
     }
 
-    public void addDeclaration(ObjectDeclaration declaration) {
+    public void addDeclaration(NestedDeclaration declaration) {
         declarationMap.put(declaration.getQualifiedName(), declaration);
     }
 
