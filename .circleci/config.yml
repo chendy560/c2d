@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:8u212-stretch
+    steps:
+      - checkout
+      - run:
+          name: compile
+          command: mvn -q -B clean compile
+      - run:
+          name: test
+          command: mvn -q -B test
