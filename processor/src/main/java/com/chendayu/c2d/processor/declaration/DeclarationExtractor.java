@@ -1,17 +1,5 @@
 package com.chendayu.c2d.processor.declaration;
 
-import com.chendayu.c2d.processor.InfoExtractor;
-import com.chendayu.c2d.processor.Utils;
-import com.chendayu.c2d.processor.Warehouse;
-import com.chendayu.c2d.processor.model.DocComment;
-import com.chendayu.c2d.processor.processor.DescriptionProcessor;
-import com.chendayu.c2d.processor.processor.DocIgnoreProcessor;
-import com.chendayu.c2d.processor.processor.JacksonProcessor;
-import com.chendayu.c2d.processor.processor.LombokProcessor;
-import com.chendayu.c2d.processor.processor.NestedDeclarationPostProcessor;
-import com.chendayu.c2d.processor.property.Property;
-import org.springframework.web.multipart.MultipartFile;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -38,6 +26,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import com.chendayu.c2d.processor.InfoExtractor;
+import com.chendayu.c2d.processor.Utils;
+import com.chendayu.c2d.processor.Warehouse;
+import com.chendayu.c2d.processor.model.DocComment;
+import com.chendayu.c2d.processor.processor.DescriptionProcessor;
+import com.chendayu.c2d.processor.processor.DocIgnoreProcessor;
+import com.chendayu.c2d.processor.processor.JacksonProcessor;
+import com.chendayu.c2d.processor.processor.LombokProcessor;
+import com.chendayu.c2d.processor.processor.NestedDeclarationPostProcessor;
+import com.chendayu.c2d.processor.property.Property;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.chendayu.c2d.processor.declaration.ArrayDeclaration.arrayOf;
 import static com.chendayu.c2d.processor.declaration.SimpleDeclaration.BOOLEAN;
@@ -526,6 +527,7 @@ public class DeclarationExtractor extends InfoExtractor {
             if (property == null) {
                 Declaration declaration = this.extract(member);
                 Property newProperty = new Property(fieldName, declaration);
+                newProperty.setField(member);
                 newProperty.setSettable(false);
                 newProperty.setGettable(false);
                 propertyMap.put(fieldName, newProperty);

@@ -1,14 +1,15 @@
 package com.chendayu.c2d.processor.declaration;
 
-import com.chendayu.c2d.processor.model.DocComment;
-import com.chendayu.c2d.processor.property.Property;
-
 import javax.lang.model.element.TypeElement;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.chendayu.c2d.processor.model.DocComment;
+import com.chendayu.c2d.processor.property.Property;
 
 public class NestedDeclaration implements Declaration {
 
@@ -67,6 +68,11 @@ public class NestedDeclaration implements Declaration {
 
     public Collection<Property> allProperties() {
         return propertyMap.values();
+    }
+
+    public Collection<Property> gettableProperties() {
+        return propertyMap.values().stream().filter(p -> !p.isIgnored() && p.isGettable())
+                .collect(Collectors.toList());
     }
 
     public NestedDeclaration withTypeArguments(List<Declaration> typeArguments) {
