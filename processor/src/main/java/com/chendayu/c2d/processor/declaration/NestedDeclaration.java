@@ -8,16 +8,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.chendayu.c2d.processor.Utils;
 import com.chendayu.c2d.processor.model.DocComment;
 import com.chendayu.c2d.processor.property.Property;
 
 public class NestedDeclaration implements Declaration {
+
+    private static final char HASH_PREFIX = 'd';
 
     private TypeElement typeElement;
 
     private String shortName;
 
     private String qualifiedName;
+
+    private String hash;
 
     private List<String> description = Collections.emptyList();
 
@@ -31,6 +36,7 @@ public class NestedDeclaration implements Declaration {
         this.typeElement = typeElement;
         this.shortName = typeElement.getSimpleName().toString();
         this.qualifiedName = typeElement.getQualifiedName().toString();
+        this.hash = Utils.shortHash(qualifiedName);
         this.description = DocComment.create(typeElement).getDescription();
     }
 
@@ -44,6 +50,10 @@ public class NestedDeclaration implements Declaration {
 
     public String getShortName() {
         return shortName;
+    }
+
+    public String getHash() {
+        return hash;
     }
 
     public String getQualifiedName() {
@@ -127,6 +137,11 @@ public class NestedDeclaration implements Declaration {
         @Override
         public String getQualifiedName() {
             return nestedDeclaration.getQualifiedName();
+        }
+
+        @Override
+        public String getHash() {
+            return nestedDeclaration.getHash();
         }
 
         @Override

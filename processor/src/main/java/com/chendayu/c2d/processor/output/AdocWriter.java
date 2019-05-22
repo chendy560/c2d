@@ -9,6 +9,8 @@ import java.util.List;
  */
 public class AdocWriter {
 
+    private static final char ITALIC = '_';
+
     private static final String INCLUDE_BEGIN = "include::";
     private static final String INCLUDE_END = "[]";
 
@@ -82,6 +84,20 @@ public class AdocWriter {
         return append(LINK_BEGIN)
                 .append(anchor).append(LINK_SEPARATOR).append(name)
                 .append(LINK_END);
+    }
+
+    /**
+     * append 一段斜体
+     */
+    public AdocWriter appendItalic(String s) {
+        return append(ITALIC).append(s).append(ITALIC);
+    }
+
+    /**
+     * append 一段斜体
+     */
+    public AdocWriter appendItalic(char s) {
+        return append(ITALIC).append(s).append(ITALIC);
     }
 
     /**
