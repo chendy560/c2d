@@ -1,14 +1,14 @@
 package com.chendayu.c2d.processor;
 
-import com.chendayu.c2d.processor.declaration.EnumDeclaration;
-import com.chendayu.c2d.processor.declaration.NestedDeclaration;
-import com.chendayu.c2d.processor.resource.Resource;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import com.chendayu.c2d.processor.declaration.EnumDeclaration;
+import com.chendayu.c2d.processor.declaration.NestedDeclaration;
+import com.chendayu.c2d.processor.resource.Resource;
 
 public class Warehouse {
 

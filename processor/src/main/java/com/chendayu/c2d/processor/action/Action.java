@@ -1,12 +1,13 @@
 package com.chendayu.c2d.processor.action;
 
-import com.chendayu.c2d.processor.model.DocComment;
-import com.chendayu.c2d.processor.property.Property;
-import org.springframework.http.HttpMethod;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import com.chendayu.c2d.processor.model.DocComment;
+import com.chendayu.c2d.processor.property.Property;
+
+import org.springframework.http.HttpMethod;
 
 /**
  * 对资源的一个操作，相当于一个 api 接口，以及一个方法

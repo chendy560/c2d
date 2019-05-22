@@ -1,13 +1,14 @@
 package com.chendayu.c2d.processor.action;
 
-import com.chendayu.c2d.processor.declaration.Declaration;
-import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
-import com.chendayu.c2d.processor.property.Property;
-import org.springframework.web.bind.annotation.PathVariable;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.VariableElement;
 import java.util.List;
+
+import com.chendayu.c2d.processor.declaration.Declaration;
+import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
+import com.chendayu.c2d.processor.property.Property;
+
+import org.springframework.web.bind.annotation.PathVariable;
 
 import static com.chendayu.c2d.processor.Utils.findName;
 

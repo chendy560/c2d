@@ -1,13 +1,13 @@
 package com.chendayu.c2d.processor.property;
 
-import com.chendayu.c2d.processor.declaration.Declaration;
-import com.chendayu.c2d.processor.declaration.DeclarationType;
-
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
+
+import com.chendayu.c2d.processor.declaration.Declaration;
+import com.chendayu.c2d.processor.declaration.DeclarationType;
 
 /**
  * 叫 property 的东西一般是 Java Bean 的一个 field

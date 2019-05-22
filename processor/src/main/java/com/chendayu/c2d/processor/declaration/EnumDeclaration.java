@@ -1,9 +1,9 @@
 package com.chendayu.c2d.processor.declaration;
 
+import java.util.List;
+
 import com.chendayu.c2d.processor.Utils;
 import com.chendayu.c2d.processor.property.Property;
-
-import java.util.List;
 
 /**
  * 枚举类型，API返回中枚举可以作为对象，但是这里只考虑了作为字符串之类的返回的情况

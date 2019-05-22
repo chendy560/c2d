@@ -1,13 +1,5 @@
 package com.chendayu.c2d.processor.action;
 
-import com.chendayu.c2d.processor.AbstractComponent;
-import com.chendayu.c2d.processor.DocIgnore;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.MatrixVariable;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.SessionAttribute;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -17,6 +9,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import com.chendayu.c2d.processor.AbstractComponent;
+import com.chendayu.c2d.processor.DocIgnore;
+
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.MatrixVariable;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 /**
  * 忽略掉应该忽略的参数的参数处理器

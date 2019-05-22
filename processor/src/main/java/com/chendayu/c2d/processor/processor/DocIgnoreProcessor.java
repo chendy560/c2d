@@ -1,13 +1,13 @@
 package com.chendayu.c2d.processor.processor;
 
-import com.chendayu.c2d.processor.DocIgnore;
-import com.chendayu.c2d.processor.declaration.NestedDeclaration;
-import com.chendayu.c2d.processor.property.Property;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
+
+import com.chendayu.c2d.processor.DocIgnore;
+import com.chendayu.c2d.processor.declaration.NestedDeclaration;
+import com.chendayu.c2d.processor.property.Property;
 
 public class DocIgnoreProcessor extends AbstractNestedDeclarationPostProcessor {
 

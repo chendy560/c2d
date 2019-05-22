@@ -1,13 +1,13 @@
 package com.chendayu.c2d.processor.action;
 
+import javax.annotation.processing.ProcessingEnvironment;
+import java.util.EnumSet;
+
 import com.chendayu.c2d.processor.AbstractComponent;
 import com.chendayu.c2d.processor.declaration.ArrayDeclaration;
 import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
-
-import javax.annotation.processing.ProcessingEnvironment;
-import java.util.EnumSet;
 
 /**
  * 抽象实现，准备一些需要用到的字段和方法

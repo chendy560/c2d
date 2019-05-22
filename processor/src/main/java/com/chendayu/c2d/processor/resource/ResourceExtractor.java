@@ -1,11 +1,5 @@
 package com.chendayu.c2d.processor.resource;
 
-import com.chendayu.c2d.processor.InfoExtractor;
-import com.chendayu.c2d.processor.Warehouse;
-import com.chendayu.c2d.processor.action.Action;
-import com.chendayu.c2d.processor.action.ActionExtractor;
-import org.springframework.web.bind.annotation.RequestMapping;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -16,6 +10,13 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import java.util.List;
+
+import com.chendayu.c2d.processor.InfoExtractor;
+import com.chendayu.c2d.processor.Warehouse;
+import com.chendayu.c2d.processor.action.Action;
+import com.chendayu.c2d.processor.action.ActionExtractor;
+
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import static com.chendayu.c2d.processor.Utils.findRequestMapping;
 

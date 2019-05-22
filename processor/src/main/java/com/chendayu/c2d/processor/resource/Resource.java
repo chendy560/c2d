@@ -1,10 +1,10 @@
 package com.chendayu.c2d.processor.resource;
 
-import com.chendayu.c2d.processor.action.Action;
-
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import com.chendayu.c2d.processor.action.Action;
 
 /**
  * 类似于 entity 的概念，API中的被操作对象

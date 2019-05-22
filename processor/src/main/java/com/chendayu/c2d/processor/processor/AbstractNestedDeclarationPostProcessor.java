@@ -1,8 +1,8 @@
 package com.chendayu.c2d.processor.processor;
 
-import com.chendayu.c2d.processor.AbstractComponent;
-
 import javax.annotation.processing.ProcessingEnvironment;
+
+import com.chendayu.c2d.processor.AbstractComponent;
 
 /**
  * 简单实现一下，把常用api弄进来

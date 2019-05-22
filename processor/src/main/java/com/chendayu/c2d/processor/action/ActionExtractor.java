@@ -1,19 +1,5 @@
 package com.chendayu.c2d.processor.action;
 
-import com.chendayu.c2d.processor.InfoExtractor;
-import com.chendayu.c2d.processor.Utils;
-import com.chendayu.c2d.processor.Warehouse;
-import com.chendayu.c2d.processor.declaration.Declaration;
-import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
-import com.chendayu.c2d.processor.model.DocComment;
-import com.chendayu.c2d.processor.property.Property;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
@@ -21,6 +7,21 @@ import javax.lang.model.type.TypeMirror;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import com.chendayu.c2d.processor.InfoExtractor;
+import com.chendayu.c2d.processor.Utils;
+import com.chendayu.c2d.processor.Warehouse;
+import com.chendayu.c2d.processor.declaration.Declaration;
+import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
+import com.chendayu.c2d.processor.model.DocComment;
+import com.chendayu.c2d.processor.property.Property;
+
+import org.springframework.http.HttpMethod;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import static com.chendayu.c2d.processor.Utils.findRequestMapping;
 

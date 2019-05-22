@@ -1,12 +1,13 @@
 package com.chendayu.c2d.processor.processor;
 
-import com.chendayu.c2d.processor.declaration.NestedDeclaration;
-import com.chendayu.c2d.processor.property.Property;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import java.util.Collection;
+
+import com.chendayu.c2d.processor.declaration.NestedDeclaration;
+import com.chendayu.c2d.processor.property.Property;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 处理 jackson 的一些注解

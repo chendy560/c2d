@@ -1,13 +1,13 @@
 package com.chendayu.c2d.processor.output;
 
-import com.chendayu.c2d.processor.Warehouse;
-
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.StandardLocation;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
+
+import com.chendayu.c2d.processor.Warehouse;
 
 public class DocGenerator {
 

@@ -1,15 +1,15 @@
 package com.chendayu.c2d.processor.action;
 
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.VariableElement;
+import java.util.Collection;
+import java.util.List;
+
 import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 import com.chendayu.c2d.processor.property.Property;
-
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.VariableElement;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * 处理没有注解的参数

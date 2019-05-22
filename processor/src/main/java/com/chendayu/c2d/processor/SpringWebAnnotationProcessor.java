@@ -1,9 +1,5 @@
 package com.chendayu.c2d.processor;
 
-import com.chendayu.c2d.processor.model.DocComment;
-import com.chendayu.c2d.processor.output.DocGenerator;
-import com.chendayu.c2d.processor.resource.ResourceExtractor;
-
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
@@ -14,6 +10,10 @@ import javax.tools.Diagnostic;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.chendayu.c2d.processor.model.DocComment;
+import com.chendayu.c2d.processor.output.DocGenerator;
+import com.chendayu.c2d.processor.resource.ResourceExtractor;
 
 /**
  * 入口类

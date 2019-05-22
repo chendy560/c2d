@@ -1,15 +1,16 @@
 package com.chendayu.c2d.processor.processor;
 
+import javax.annotation.processing.ProcessingEnvironment;
+import java.util.Collection;
+
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 import com.chendayu.c2d.processor.property.Property;
+
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Value;
-
-import javax.annotation.processing.ProcessingEnvironment;
-import java.util.Collection;
 
 /**
  * 处理 lombok 的 Getter 和 Data 注解
