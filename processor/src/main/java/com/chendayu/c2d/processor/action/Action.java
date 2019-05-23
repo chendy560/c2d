@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.chendayu.c2d.processor.declaration.DeclarationType;
 import com.chendayu.c2d.processor.model.DocComment;
 import com.chendayu.c2d.processor.property.Property;
 
@@ -143,5 +144,23 @@ public class Action {
      */
     public List<String> findParameterDescription(String name) {
         return docComment.getParam(name);
+    }
+
+    public boolean hasRequestBody() {
+        if (requestBody == null) {
+            return false;
+        }
+
+        DeclarationType type = requestBody.getType();
+        return type != DeclarationType.VOID && type != DeclarationType.UNKNOWN;
+    }
+
+    public boolean hasResponseBody() {
+        if (responseBody == null) {
+            return false;
+        }
+
+        DeclarationType type = responseBody.getType();
+        return type != DeclarationType.VOID && type != DeclarationType.UNKNOWN;
     }
 }

@@ -23,8 +23,11 @@ public class DocWriter {
 
     private final AdocWriter adoc;
 
+    private final HttpRequestGenerator httpRequestGenerator;
+
     public DocWriter(Writer writer) {
         this.adoc = new AdocWriter(writer);
+        this.httpRequestGenerator = new HttpRequestGenerator();
     }
 
     public void printDoc(Warehouse warehouse) {
@@ -54,10 +57,11 @@ public class DocWriter {
         adoc.title3(name);
         adoc.appendLines(action.getDescription());
 
-        adoc.sourceCodeBegin("http")
-                .append(action.getMethod().name()).space().append(action.getPath())
-                .newLine()
-                .sourceCodeEnd();
+        adoc.sourceCodeBegin("http");
+
+        String request = httpRequestGenerator.generate(action);
+        adoc.append(request);
+        adoc.sourceCodeEnd();
 
         List<Property> pathVariables = action.getPathVariables();
         if (!pathVariables.isEmpty()) {
