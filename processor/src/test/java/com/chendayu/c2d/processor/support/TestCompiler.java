@@ -1,9 +1,11 @@
 package com.chendayu.c2d.processor.support;
 
-import org.junit.rules.TemporaryFolder;
-
 import javax.annotation.processing.Processor;
-import javax.tools.*;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
+import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -26,15 +28,15 @@ public class TestCompiler {
 
     private final File outputLocation;
 
-    public TestCompiler(TemporaryFolder temporaryFolder) throws IOException {
+    public TestCompiler(File temporaryFolder) throws IOException {
         this(ToolProvider.getSystemJavaCompiler(), temporaryFolder);
     }
 
-    public TestCompiler(JavaCompiler compiler, TemporaryFolder temporaryFolder)
+    public TestCompiler(JavaCompiler compiler, File temporaryFolder)
             throws IOException {
         this.compiler = compiler;
         this.fileManager = compiler.getStandardFileManager(null, null, null);
-        this.outputLocation = temporaryFolder.newFolder();
+        this.outputLocation = temporaryFolder;
         Iterable<? extends File> temp = Collections.singleton(this.outputLocation);
         this.fileManager.setLocation(StandardLocation.CLASS_OUTPUT, temp);
         this.fileManager.setLocation(StandardLocation.SOURCE_OUTPUT, temp);

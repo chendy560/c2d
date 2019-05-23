@@ -1,8 +1,8 @@
 package com.chendayu.c2d.processor.declaration;
 
-import org.junit.Test;
-
 import java.util.List;
+
+import org.junit.jupiter.api.Test;
 
 import static com.chendayu.c2d.processor.declaration.DeclarationType.ARRAY;
 import static com.chendayu.c2d.processor.declaration.DeclarationType.NUMBER;

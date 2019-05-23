@@ -1,7 +1,8 @@
 package com.chendayu.c2d.processor.resource;
 
 import com.chendayu.c2d.processor.Warehouse;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

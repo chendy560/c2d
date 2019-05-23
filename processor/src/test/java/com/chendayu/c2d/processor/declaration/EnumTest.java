@@ -1,10 +1,11 @@
 package com.chendayu.c2d.processor.declaration;
 
-import com.chendayu.c2d.processor.property.Property;
-import org.junit.Test;
-
 import java.util.Collections;
 import java.util.List;
+
+import com.chendayu.c2d.processor.property.Property;
+
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -1,25 +1,26 @@
 package com.chendayu.c2d.processor.declaration;
 
-import com.chendayu.c2d.processor.property.Property;
-import com.chendayu.c2d.processor.support.TestCompiler;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
+import com.chendayu.c2d.processor.property.Property;
+import com.chendayu.c2d.processor.support.TestCompiler;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class AbstractDeclarationTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
     private TestCompiler compiler;
 
-    @Before
+    @BeforeEach
     public void createCompiler() throws IOException {
         this.compiler = new TestCompiler(this.temporaryFolder);
     }

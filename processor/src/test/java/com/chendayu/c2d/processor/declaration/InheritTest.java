@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.chendayu.c2d.processor.property.Property;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -1,25 +1,26 @@
 package com.chendayu.c2d.processor.resource;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.support.TestCompiler;
 import com.chendayu.c2d.processor.support.TestSpringWebAnnotationProcessor;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
 
-import java.io.IOException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * 本项目的 ut 整体逻辑都差不多，所以就把公用的部分抽离出来了
  */
 public class AbstractResourceTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
     private TestCompiler compiler;
 
-    @Before
+    @BeforeEach
     public void createCompiler() throws IOException {
         this.compiler = new TestCompiler(this.temporaryFolder);
     }

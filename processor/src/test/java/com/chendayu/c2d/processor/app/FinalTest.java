@@ -1,5 +1,6 @@
 package com.chendayu.c2d.processor.app;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,10 +22,9 @@ import com.chendayu.c2d.processor.resource.Resource;
 import com.chendayu.c2d.processor.support.TestCompiler;
 import com.chendayu.c2d.processor.support.TestSpringWebAnnotationProcessor;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.http.HttpMethod;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,12 +33,12 @@ public class FinalTest {
 
     private static final String BY_ID_URL = "/sample/v1/users/{id}";
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
     private TestCompiler compiler;
 
-    @Before
+    @BeforeEach
     public void createCompiler() throws IOException {
         this.compiler = new TestCompiler(this.temporaryFolder);
     }
