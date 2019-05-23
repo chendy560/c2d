@@ -267,10 +267,10 @@ public class FinalTest {
         assertThat(nestedDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.Page");
         assertThat(nestedDeclaration.getDescription()).isEqualTo(Collections.singletonList("数据分页的一页"));
 
-        List<Property> typeParameters = nestedDeclaration.getTypeParameters();
+        List<TypeVarDeclaration> typeParameters = nestedDeclaration.getTypeParameters();
         assertThat(typeParameters).hasSize(1);
-        Property t = typeParameters.get(0);
-        checkProperty(t, "T", DeclarationType.TYPE_PARAMETER, "分页中的数据的类型");
+        TypeVarDeclaration t = typeParameters.get(0);
+        checkTypeVarDeclaration(t, "T", "分页中的数据的类型");
 
         List<Declaration> typeArgs = nestedDeclaration.getTypeArguments();
         assertThat(typeArgs).hasSize(1);
@@ -286,10 +286,10 @@ public class FinalTest {
         Property items = propertyIterator.next();
         checkProperty(items, "items", DeclarationType.ARRAY, "本页数据");
 
-        Declaration pageItemComponent = ((ArrayDeclaration) items.getDeclaration()).getItemType();
-        TypeVarDeclaration td = (TypeVarDeclaration) pageItemComponent;
-        assertThat(td.getType()).isEqualTo(DeclarationType.TYPE_PARAMETER);
-        assertThat(td.getName()).isEqualTo("T");
+//        Declaration pageItemComponent = ((ArrayDeclaration) items.getDeclaration()).getItemType();
+//        TypeVarDeclaration td = (TypeVarDeclaration) pageItemComponent;
+//        assertThat(td.getType()).isEqualTo(DeclarationType.TYPE_PARAMETER);
+//        assertThat(td.getName()).isEqualTo("T");
     }
 
     private void checkUpdateAction(Action action) {
@@ -451,6 +451,12 @@ public class FinalTest {
         assertThat(property).isNotNull();
         assertThat(property.getDisplayName()).isEqualTo(name);
         assertThat(property.getDeclaration().getType()).isEqualTo(type);
+        assertThat(property.getDescription()).isEqualTo(Arrays.asList(description));
+    }
+
+    private void checkTypeVarDeclaration(TypeVarDeclaration property, String name, String... description) {
+        assertThat(property).isNotNull();
+        assertThat(property.getName()).isEqualTo(name);
         assertThat(property.getDescription()).isEqualTo(Arrays.asList(description));
     }
 }

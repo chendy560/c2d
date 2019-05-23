@@ -111,7 +111,7 @@ public class DocWriter {
                     adoc.anchor(od.getHash()).title3(od.getShortName());
 
                     adoc.appendLines(od.getDescription());
-                    List<Property> typeParameters = od.getTypeParameters();
+                    List<TypeVarDeclaration> typeParameters = od.getTypeParameters();
                     if (!typeParameters.isEmpty()) {
                         adoc.title4("类型参数");
                         parameterTable(typeParameters);
@@ -182,6 +182,24 @@ public class DocWriter {
 
             declarationMap.put(ed.getName(), ed);
         }
+    }
+
+    private void parameterTable(List<TypeVarDeclaration> parameters) {
+
+        adoc.col("3,7");
+        adoc.tableBegin()
+                .columnBegin().append("Name").space()
+                .columnBegin().append("Description").dualNewLine();
+
+        for (TypeVarDeclaration p : parameters) {
+            adoc.columnBegin().appendBoldMonospace(p.getName()).append("  :  ");
+            writeType(p);
+            adoc.newLine();
+            adoc.columnBegin()
+                    .appendLines(p.getDescription());
+        }
+
+        adoc.tableEnd();
     }
 
     private void parameterTable(Collection<? extends Property> parameters) {

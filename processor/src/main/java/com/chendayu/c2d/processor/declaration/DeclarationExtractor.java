@@ -440,15 +440,15 @@ public class DeclarationExtractor extends InfoExtractor {
             return;
         }
 
-        ArrayList<Property> typeProperties = new ArrayList<>(typeParameters.size());
+        ArrayList<TypeVarDeclaration> declarations = new ArrayList<>(typeParameters.size());
         for (TypeParameterElement typeParameter : typeParameters) {
             String name = typeParameter.getSimpleName().toString();
             List<String> description = docComment.getTypeParam(name);
-            Property property = new Property(name, description, new TypeVarDeclaration(name));
-            typeProperties.add(property);
+            TypeVarDeclaration typeVarDeclaration = new TypeVarDeclaration(name, description);
+            declarations.add(typeVarDeclaration);
         }
 
-        result.setTypeParameters(typeProperties);
+        result.setTypeParameters(declarations);
     }
 
     private List<Declaration> findTypeArgs(DeclaredType declaredType) {

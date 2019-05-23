@@ -19,7 +19,7 @@ public class Property {
     /**
      * 字段名称 / 参数名称，如果是返回值则为null
      */
-    private final String originName;
+    private String originName;
 
     /**
      * 显示名称，默认与 originName 相同，可以被修改
@@ -65,6 +65,10 @@ public class Property {
      * 当作为字段时的setter
      */
     private ExecutableElement setter;
+
+    private Property() {
+        // for copy use
+    }
 
     /**
      * 没有名字的字段，即返回值
@@ -218,5 +222,20 @@ public class Property {
         newProperty.setField(child.getField());
 
         return newProperty;
+    }
+
+    public Property copy() {
+        Property copy = new Property();
+        copy.originName = this.originName;
+        copy.displayName = this.displayName;
+        copy.description = this.description;
+        copy.declaration = this.declaration;
+        copy.ignored = this.ignored;
+        copy.settable = this.settable;
+        copy.gettable = this.gettable;
+        copy.field = this.field;
+        copy.getter = this.getter;
+        copy.setter = this.setter;
+        return copy;
     }
 }

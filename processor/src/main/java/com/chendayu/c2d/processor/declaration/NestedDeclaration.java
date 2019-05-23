@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import com.chendayu.c2d.processor.Utils;
 import com.chendayu.c2d.processor.model.DocComment;
@@ -28,7 +30,7 @@ public class NestedDeclaration implements Declaration {
 
     private LinkedHashMap<String, Property> propertyMap = new LinkedHashMap<>();
 
-    private List<Property> typeParameters = Collections.emptyList();
+    private List<TypeVarDeclaration> typeParameters = Collections.emptyList();
 
     private List<Declaration> typeArguments = Collections.emptyList();
 
@@ -60,15 +62,16 @@ public class NestedDeclaration implements Declaration {
         return qualifiedName;
     }
 
+    @Override
     public List<String> getDescription() {
         return description;
     }
 
-    public List<Property> getTypeParameters() {
+    public List<TypeVarDeclaration> getTypeParameters() {
         return typeParameters;
     }
 
-    public void setTypeParameters(List<Property> typeParameters) {
+    public void setTypeParameters(List<TypeVarDeclaration> typeParameters) {
         this.typeParameters = typeParameters;
     }
 
@@ -91,7 +94,47 @@ public class NestedDeclaration implements Declaration {
     }
 
     public NestedDeclaration withTypeArguments(List<Declaration> typeArguments) {
-        return new NestedDeclarationWithTypeArgs(this, typeArguments);
+        if (typeArguments.size() != typeParameters.size()) {
+            throw new IllegalArgumentException("cannot set type arguments for " + qualifiedName +
+                    " : expect <" + typeParameters.size() + "> type arguments but get <" +
+                    typeArguments.size() + ">");
+        }
+        NestedDeclaration copy = copy();
+        copy.typeArguments = typeArguments;
+        copy.replaceTypeParameter();
+        return copy;
+    }
+
+    private void replaceTypeParameter() {
+        for (int i = 0; i < typeParameters.size(); i++) {
+            TypeVarDeclaration typeParameter = typeParameters.get(i);
+            Declaration typeArgument = typeArguments.get(i);
+
+            for (Map.Entry<String, Property> entry : propertyMap.entrySet()) {
+                Property property = entry.getValue();
+                switch (property.getType()) {
+                    case ARRAY:
+                        ArrayDeclaration arrayDeclaration = (ArrayDeclaration) property.getDeclaration();
+                        Declaration itemType = arrayDeclaration.getItemType();
+                        if (typeParameter.equals(itemType)) {
+                            Property copy = property.copy();
+                            copy.setDeclaration(ArrayDeclaration.arrayOf(typeArgument));
+                            entry.setValue(copy);
+                        }
+                        break;
+                    case TYPE_PARAMETER:
+                        Declaration declaration = property.getDeclaration();
+                        if (typeParameter.equals(declaration)) {
+                            Property copy = property.copy();
+                            copy.setDeclaration(typeArgument);
+                            entry.setValue(copy);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
     }
 
     public void applyParent(NestedDeclaration declaration) {
@@ -118,85 +161,29 @@ public class NestedDeclaration implements Declaration {
         return typeElement.getAnnotation(clazz);
     }
 
-    private static final class NestedDeclarationWithTypeArgs extends NestedDeclaration {
+    private NestedDeclaration copy() {
+        NestedDeclaration copy = new NestedDeclaration();
+        copy.typeElement = this.typeElement;
+        copy.shortName = this.shortName;
+        copy.qualifiedName = this.qualifiedName;
+        copy.hash = this.hash;
+        copy.description = this.description;
+        copy.propertyMap = new LinkedHashMap<>(this.propertyMap);
+        copy.typeParameters = new ArrayList<>(this.typeParameters);
+        copy.typeArguments = new ArrayList<>(this.typeParameters);
+        return copy;
+    }
 
-        private final NestedDeclaration nestedDeclaration;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NestedDeclaration that = (NestedDeclaration) o;
+        return typeElement.equals(that.typeElement);
+    }
 
-        private final List<Declaration> typeArguments;
-
-        private NestedDeclarationWithTypeArgs(NestedDeclaration nestedDeclaration, List<Declaration> typeArguments) {
-            this.nestedDeclaration = nestedDeclaration;
-            this.typeArguments = typeArguments;
-        }
-
-        @Override
-        public DeclarationType getType() {
-            return nestedDeclaration.getType();
-        }
-
-        @Override
-        public String getShortName() {
-            return nestedDeclaration.getShortName();
-        }
-
-        @Override
-        public String getQualifiedName() {
-            return nestedDeclaration.getQualifiedName();
-        }
-
-        @Override
-        public String getHash() {
-            return nestedDeclaration.getHash();
-        }
-
-        @Override
-        public List<String> getDescription() {
-            return nestedDeclaration.getDescription();
-        }
-
-        @Override
-        public List<Property> getTypeParameters() {
-            return nestedDeclaration.getTypeParameters();
-        }
-
-        @Override
-        public void setTypeParameters(List<Property> typeParameters) {
-            nestedDeclaration.setTypeParameters(typeParameters);
-        }
-
-        @Override
-        public List<Declaration> getTypeArguments() {
-            return typeArguments;
-        }
-
-        @Override
-        public Collection<Property> allProperties() {
-            return nestedDeclaration.allProperties();
-        }
-
-        @Override
-        public NestedDeclaration withTypeArguments(List<Declaration> typeArguments) {
-            return nestedDeclaration.withTypeArguments(typeArguments);
-        }
-
-        @Override
-        public Collection<Property> gettableProperties() {
-            return nestedDeclaration.gettableProperties();
-        }
-
-        @Override
-        public void applyParent(NestedDeclaration declaration) {
-            nestedDeclaration.applyParent(declaration);
-        }
-
-        @Override
-        public void applyProperties(Collection<Property> properties) {
-            nestedDeclaration.applyProperties(properties);
-        }
-
-        @Override
-        public <T extends Annotation> T getAnnotation(Class<T> clazz) {
-            return nestedDeclaration.getAnnotation(clazz);
-        }
+    @Override
+    public int hashCode() {
+        return Objects.hash(typeElement);
     }
 }
