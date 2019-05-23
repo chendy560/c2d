@@ -113,7 +113,7 @@ public class DocWriter {
                         parameterTable(typeParameters);
                     }
 
-                    Collection<Property> properties = od.allProperties();
+                    Collection<Property> properties = od.gettableProperties();
                     if (!properties.isEmpty()) {
                         adoc.title4("字段");
                         parameterTable(properties);
@@ -154,7 +154,7 @@ public class DocWriter {
                 saveDeclaration(typeArg);
             }
 
-            for (Property property : od.allProperties()) {
+            for (Property property : od.gettableProperties()) {
                 saveDeclaration(property.getDeclaration());
             }
 
@@ -182,19 +182,20 @@ public class DocWriter {
 
     private void parameterTable(Collection<? extends Property> parameters) {
 
+        adoc.col("3,7");
         adoc.tableBegin()
-                .columnBegin().append("名称").space()
-                .columnBegin().append("描述").dualNewLine();
+                .columnBegin().append("Name").space()
+                .columnBegin().append("Description").dualNewLine();
 
         for (Property p : parameters) {
-            adoc.columnBegin().append(p.getDisplayName()).hardNewLine();
+            adoc.columnBegin().appendBoldMonospace(p.getDisplayName()).append("  :  ");
             writeType(p.getDeclaration());
             adoc.newLine();
             adoc.columnBegin()
                     .appendLines(p.getDescription());
         }
 
-        adoc.tableBegin();
+        adoc.tableEnd();
     }
 
     private void writeType(Declaration d) {
@@ -223,7 +224,7 @@ public class DocWriter {
                 adoc.appendItalic("TypeParameter").appendItalic(tad.getName());
                 break;
             case VOID:
-                adoc.appendItalic("Void");
+                adoc.appendItalic("None");
                 break;
             case FILE:
                 adoc.appendItalic("File");

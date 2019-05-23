@@ -36,7 +36,7 @@ public class InheritTest extends AbstractDeclarationTest {
 
     private void checkSimpleChild(NestedDeclaration simpleChild) {
         assertThat(simpleChild.getDescription()).isEqualTo(emptyList());
-        Collection<Property> properties = simpleChild.allProperties();
+        Collection<Property> properties = simpleChild.gettableProperties();
         assertThat(properties).hasSize(2);
 
         Iterator<Property> iterator = properties.iterator();

@@ -1,5 +1,7 @@
 package com.chendayu.c2d.processor.declaration;
 
+import com.chendayu.c2d.processor.DocIgnore;
+
 @DeclarationTest
 public class InheritTestClasses {
 
@@ -30,8 +32,15 @@ public class InheritTestClasses {
          */
         private String name;
 
+        @DocIgnore
+        private String youCannotSeeMe;
+
         public String getName() {
             return name;
+        }
+
+        public String getYouCannotSeeMe() {
+            return youCannotSeeMe;
         }
     }
 

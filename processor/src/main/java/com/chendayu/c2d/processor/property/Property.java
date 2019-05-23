@@ -194,26 +194,28 @@ public class Property {
         return null;
     }
 
-    public Property apply(Property property) {
-        Property newProperty = new Property(this.getOriginName(), this.getDeclaration());
-        newProperty.setDisplayName(this.getDisplayName());
-        newProperty.setDeclaration(property.getDeclaration());
+    public Property mergeChild(Property child) {
+        Property parent = this; // 更易读一点
 
-        List<String> newDescription = property.getDescription();
+        Property newProperty = new Property(parent.getOriginName(), parent.getDeclaration());
+        newProperty.setDisplayName(parent.getDisplayName());
+        newProperty.setDeclaration(child.getDeclaration());
+
+        List<String> newDescription = child.getDescription();
         if (!newDescription.isEmpty()) {
             newProperty.setDescription(newDescription);
         } else {
-            newProperty.setDescription(this.description);
+            newProperty.setDescription(parent.description);
         }
 
-        newProperty.setIgnored(this.isIgnored());
-        newProperty.setSettable(this.isSettable() || property.isSettable());
-        newProperty.setSetter(property.getSetter());
+        newProperty.setIgnored(parent.isIgnored());
+        newProperty.setSettable(parent.isSettable() || child.isSettable());
+        newProperty.setSetter(child.getSetter());
 
-        newProperty.setGettable(this.isGettable() || property.isGettable());
-        newProperty.setGetter(property.getGetter());
+        newProperty.setGettable(parent.isGettable() || child.isGettable());
+        newProperty.setGetter(child.getGetter());
 
-        newProperty.setField(property.getField());
+        newProperty.setField(child.getField());
 
         return newProperty;
     }

@@ -10,9 +10,14 @@ import java.util.List;
 public class AdocWriter {
 
     private static final char ITALIC = '_';
+    private static final char BOLD = '*';
+    private static final char MONOSPACE = '`';
 
     private static final String INCLUDE_BEGIN = "include::";
     private static final String INCLUDE_END = "[]";
+
+    private static final String COL_BEGIN = "[cols=\"";
+    private static final String COL_END = "\"]";
 
     private static final String HARD_NEW_LINE = " +\n";
 
@@ -36,16 +41,23 @@ public class AdocWriter {
     }
 
     /**
+     * 打印表格的列控制行
+     */
+    public AdocWriter col(String col) {
+        return append(COL_BEGIN).append(col).append(COL_END).newLine();
+    }
+
+    /**
      * 表格开始
      */
     public AdocWriter tableBegin() {
-        return append(TABLE_BOUNDARY).newLine();
+        return append(TABLE_BOUNDARY).dualNewLine();
     }
 
     /**
      * 表格结束
      */
-    public AdocWriter tableENd() {
+    public AdocWriter tableEnd() {
         return append(TABLE_BOUNDARY).dualNewLine();
     }
 
@@ -84,6 +96,22 @@ public class AdocWriter {
         return append(LINK_BEGIN)
                 .append(anchor).append(LINK_SEPARATOR).append(name)
                 .append(LINK_END);
+    }
+
+    /**
+     * append 一段粗体
+     */
+    public AdocWriter appendMonospace(String s) {
+        return append(MONOSPACE).append(s).append(MONOSPACE);
+    }
+
+    /**
+     * append 一段粗体
+     */
+    public AdocWriter appendBoldMonospace(String s) {
+        return append(MONOSPACE).append(BOLD)
+                .append(s)
+                .append(BOLD).append(MONOSPACE);
     }
 
     /**

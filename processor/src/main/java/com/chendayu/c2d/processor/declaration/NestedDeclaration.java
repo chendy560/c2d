@@ -2,11 +2,11 @@ package com.chendayu.c2d.processor.declaration;
 
 import javax.lang.model.element.TypeElement;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.chendayu.c2d.processor.Utils;
 import com.chendayu.c2d.processor.model.DocComment;
@@ -36,7 +36,7 @@ public class NestedDeclaration implements Declaration {
         this.typeElement = typeElement;
         this.shortName = typeElement.getSimpleName().toString();
         this.qualifiedName = typeElement.getQualifiedName().toString();
-        this.hash = Utils.shortHash(qualifiedName);
+        this.hash = HASH_PREFIX + Utils.shortHash(qualifiedName);
         this.description = DocComment.create(typeElement).getDescription();
     }
 
@@ -81,8 +81,13 @@ public class NestedDeclaration implements Declaration {
     }
 
     public Collection<Property> gettableProperties() {
-        return propertyMap.values().stream().filter(p -> !p.isIgnored() && p.isGettable())
-                .collect(Collectors.toList());
+        List<Property> list = new ArrayList<>();
+        for (Property p : propertyMap.values()) {
+            if (!p.isIgnored() && p.isGettable()) {
+                list.add(p);
+            }
+        }
+        return list;
     }
 
     public NestedDeclaration withTypeArguments(List<Declaration> typeArguments) {
@@ -102,7 +107,7 @@ public class NestedDeclaration implements Declaration {
             String originName = property.getOriginName();
             Property oldProperty = propertyMap.get(originName);
             if (oldProperty != null) {
-                propertyMap.put(originName, oldProperty.apply(property));
+                propertyMap.put(originName, oldProperty.mergeChild(property));
             } else {
                 propertyMap.put(originName, property);
             }
