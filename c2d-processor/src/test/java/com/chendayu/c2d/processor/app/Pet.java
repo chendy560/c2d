@@ -1,9 +1,9 @@
 package com.chendayu.c2d.processor.app;
 
+import java.time.Instant;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.time.Instant;
 
 /**
  * 宠物，可能是🐈，可能是🐶

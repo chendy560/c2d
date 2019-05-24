@@ -1,8 +1,8 @@
 package com.chendayu.c2d.processor.app;
 
-import lombok.Data;
-
 import java.util.Date;
+
+import lombok.Data;
 
 /**
  * 用户更新请求

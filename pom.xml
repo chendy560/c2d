@@ -10,7 +10,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
-        <module>processor</module>
+        <module>c2d-processor</module>
     </modules>
 
     <properties>

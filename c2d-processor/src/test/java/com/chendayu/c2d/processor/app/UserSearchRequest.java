@@ -1,9 +1,9 @@
 package com.chendayu.c2d.processor.app;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.List;
 
 /**
  * 用户搜索请求

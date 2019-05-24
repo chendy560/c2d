@@ -1,12 +1,13 @@
 package com.chendayu.c2d.processor.app;
 
+import java.util.List;
+
 import com.chendayu.c2d.processor.DocIgnore;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.List;
 
 /**
  * 用户，就是用户
