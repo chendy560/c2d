@@ -192,9 +192,9 @@ public class DocWriter {
                 .columnBegin().append("Description").dualNewLine();
 
         for (TypeVarDeclaration p : parameters) {
-            adoc.columnBegin().appendBoldMonospace(p.getName()).append("  :  ");
+            adoc.columnBegin().appendBoldMonospace(p.getName()).append(" : [small]#");
             writeType(p);
-            adoc.newLine();
+            adoc.append('#').newLine();
             adoc.columnBegin()
                     .appendLines(p.getDescription());
         }
@@ -210,9 +210,9 @@ public class DocWriter {
                 .columnBegin().append("Description").dualNewLine();
 
         for (Property p : parameters) {
-            adoc.columnBegin().appendBoldMonospace(p.getDisplayName()).append("  :  ");
+            adoc.columnBegin().appendBoldMonospace(p.getDisplayName()).append(" : [small]#");
             writeType(p.getDeclaration());
-            adoc.newLine();
+            adoc.append('#').newLine();
             adoc.columnBegin()
                     .appendLines(p.getDescription());
         }
@@ -224,32 +224,32 @@ public class DocWriter {
         DeclarationType type = d.getType();
         switch (type) {
             case STRING:
-                adoc.appendItalic("String");
+                adoc.append("string");
                 break;
             case NUMBER:
-                adoc.appendItalic("Number");
+                adoc.append("number");
                 break;
             case TIMESTAMP:
-                adoc.appendItalic("Timestamp");
+                adoc.append("timestamp");
                 break;
             case BOOLEAN:
-                adoc.appendItalic("Boolean");
+                adoc.append("boolean");
                 break;
             case ENUM_CONST:
-                adoc.appendItalic("Enum");
+                adoc.append("enum_const");
                 break;
             case DYNAMIC:
-                adoc.appendItalic("Any");
+                adoc.append("any");
                 break;
             case TYPE_PARAMETER:
                 TypeVarDeclaration tad = (TypeVarDeclaration) d;
-                adoc.appendItalic("TypeParameter").appendItalic(tad.getName());
+                adoc.append("type_parameter");
                 break;
             case VOID:
-                adoc.appendItalic("None");
+                adoc.append("none");
                 break;
             case FILE:
-                adoc.appendItalic("File");
+                adoc.append("file");
                 break;
             case ENUM:
                 EnumDeclaration ed = (EnumDeclaration) d;
@@ -258,9 +258,9 @@ public class DocWriter {
             case ARRAY:
                 ArrayDeclaration ad = (ArrayDeclaration) d;
                 Declaration cd = ad.getItemType();
-                adoc.appendItalic("Array<");
+                adoc.append("array<");
                 writeType(cd);
-                adoc.appendItalic('>');
+                adoc.append('>');
                 break;
             case OBJECT:
                 NestedDeclaration od = (NestedDeclaration) d;

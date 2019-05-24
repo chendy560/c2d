@@ -101,13 +101,6 @@ public class AdocWriter {
     /**
      * append 一段粗体
      */
-    public AdocWriter appendMonospace(String s) {
-        return append(MONOSPACE).append(s).append(MONOSPACE);
-    }
-
-    /**
-     * append 一段粗体
-     */
     public AdocWriter appendBoldMonospace(String s) {
         return append(MONOSPACE).append(BOLD)
                 .append(s)
