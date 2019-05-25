@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.chendayu.c2d.processor.SupportedContentType;
 import com.chendayu.c2d.processor.action.Action;
 import com.chendayu.c2d.processor.declaration.ArrayDeclaration;
 import com.chendayu.c2d.processor.declaration.Declaration;
@@ -27,12 +28,7 @@ public class HttpRequestGenerator {
     private static final char PARAMETER_END = '}';
     private static final char EQUAL = '=';
 
-    private static final String ACCEPT = "Accept";
-    private static final String ACCEPT_ALL = "*/*";
-
     private static final String CONTENT_TYPE = "Content-Type";
-
-    private static final String APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8";
 
     private static final String HEADER_SPLIT = ": ";
 
@@ -90,21 +86,11 @@ public class HttpRequestGenerator {
     }
 
     private void writeRequest(Action action) {
-        boolean hasRequestBody = action.hasRequestBody();
-        boolean hasResponseBody = action.hasResponseBody();
-
-        if (hasRequestBody) {
-            writeHeader(CONTENT_TYPE, APPLICATION_JSON_UTF_8);
-        }
-
-        if (hasResponseBody) {
-            writeHeader(ACCEPT, APPLICATION_JSON_UTF_8);
-        } else {
-            writeHeader(ACCEPT, ACCEPT_ALL);
-        }
-
-        if (hasRequestBody) {
+        if (action.hasRequestBody()) {
+            SupportedContentType contentType = action.getRequestContentType();
+            writeHeader(CONTENT_TYPE, contentType.getValue());
             builder.append('\n');
+
             writeBody(action.getRequestBody().getDeclaration());
             builder.append('\n');
         }
@@ -115,7 +101,9 @@ public class HttpRequestGenerator {
     }
 
     private String generateAndCleanup() {
-        return generateAndCleanup(builder);
+        String result = builder.toString();
+        builder.setLength(0);
+        return result;
     }
 
     public void writeBody(Declaration declaration) {
@@ -133,10 +121,10 @@ public class HttpRequestGenerator {
     }
 
     private void writeResponseHeaderAndBody(Action action) {
-        boolean hasResponseBody = action.hasResponseBody();
-        if (hasResponseBody) {
+        if (action.hasResponseBody()) {
 
-            writeHeader(CONTENT_TYPE, APPLICATION_JSON_UTF_8);
+            SupportedContentType contentType = action.getResponseBodyContentType();
+            writeHeader(CONTENT_TYPE, contentType.getValue());
 
             builder.append('\n');
 
@@ -240,12 +228,6 @@ public class HttpRequestGenerator {
         for (int i = 0; i < indent * INDENT_SIZE; i++) {
             builder.append(' ');
         }
-    }
-
-    private String generateAndCleanup(StringBuilder builder) {
-        String result = builder.toString();
-        builder.setLength(0);
-        return result;
     }
 
     private void cut(int length) {
