@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.chendayu.c2d.processor.SupportedContentType;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
 import com.chendayu.c2d.processor.model.DocComment;
 import com.chendayu.c2d.processor.property.Property;
@@ -56,9 +57,19 @@ public class Action {
     private Property requestBody;
 
     /**
+     * 可以处理的请求的内容类型
+     */
+    private SupportedContentType requestContentType;
+
+    /**
      * 响应body，在响应没有body时为null
      */
     private Property responseBody;
+
+    /**
+     * 响应body的内容类型
+     */
+    private SupportedContentType responseBodyContentType;
 
     public Action(String name, DocComment docComment) {
         this.name = name;
@@ -130,6 +141,22 @@ public class Action {
 
     public void setResponseBody(Property responseBody) {
         this.responseBody = responseBody;
+    }
+
+    public SupportedContentType getRequestContentType() {
+        return requestContentType;
+    }
+
+    public void setRequestContentType(SupportedContentType requestContentType) {
+        this.requestContentType = requestContentType;
+    }
+
+    public SupportedContentType getResponseBodyContentType() {
+        return responseBodyContentType;
+    }
+
+    public void setResponseBodyContentType(SupportedContentType responseBodyContentType) {
+        this.responseBodyContentType = responseBodyContentType;
     }
 
     public void setBasePath(String s) {

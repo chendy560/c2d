@@ -5,14 +5,17 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import com.chendayu.c2d.processor.InfoExtractor;
+import com.chendayu.c2d.processor.SupportedContentType;
 import com.chendayu.c2d.processor.Utils;
 import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
+import com.chendayu.c2d.processor.declaration.DeclarationType;
 import com.chendayu.c2d.processor.model.DocComment;
 import com.chendayu.c2d.processor.property.Property;
 
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import static com.chendayu.c2d.processor.SupportedContentType.MULTIPART_FORM_DATA;
 import static com.chendayu.c2d.processor.Utils.findRequestMapping;
 
 public class ActionExtractor extends InfoExtractor {
@@ -56,37 +60,43 @@ public class ActionExtractor extends InfoExtractor {
         GetMapping getMapping = element.getAnnotation(GetMapping.class);
         if (getMapping != null) {
             String path = findRequestMapping(getMapping.value(), getMapping.path());
-            return createAction(element, path, HttpMethod.GET);
+            return createAction(element, path, HttpMethod.GET,
+                    Arrays.asList(getMapping.consumes()), Arrays.asList(getMapping.produces()));
         }
 
         PostMapping postMapping = element.getAnnotation(PostMapping.class);
         if (postMapping != null) {
             String path = findRequestMapping(postMapping.value(), postMapping.params());
-            return createAction(element, path, HttpMethod.POST);
+            return createAction(element, path, HttpMethod.POST,
+                    Arrays.asList(postMapping.consumes()), Arrays.asList(postMapping.produces()));
         }
 
         DeleteMapping deleteMapping = element.getAnnotation(DeleteMapping.class);
         if (deleteMapping != null) {
             String path = findRequestMapping(deleteMapping.value(), deleteMapping.params());
-            return createAction(element, path, HttpMethod.DELETE);
+            return createAction(element, path, HttpMethod.DELETE,
+                    Arrays.asList(deleteMapping.consumes()), Arrays.asList(deleteMapping.produces()));
         }
 
         PutMapping putMapping = element.getAnnotation(PutMapping.class);
         if (putMapping != null) {
             String path = findRequestMapping(putMapping.value(), putMapping.params());
-            return createAction(element, path, HttpMethod.PUT);
+            return createAction(element, path, HttpMethod.PUT,
+                    Arrays.asList(putMapping.consumes()), Arrays.asList(putMapping.produces()));
         }
 
         PatchMapping patchMapping = element.getAnnotation(PatchMapping.class);
         if (patchMapping != null) {
             String path = findRequestMapping(patchMapping.value(), patchMapping.params());
-            return createAction(element, path, HttpMethod.PATCH);
+            return createAction(element, path, HttpMethod.PATCH,
+                    Arrays.asList(patchMapping.consumes()), Arrays.asList(patchMapping.produces()));
         }
 
         return null;
     }
 
-    private Action createAction(ExecutableElement element, String path, HttpMethod method) {
+    private Action createAction(ExecutableElement element, String path, HttpMethod method,
+                                List<String> consume, List<String> produce) {
 
         String methodName = element.getSimpleName().toString();
         String actionName = Utils.upperCaseFirst(methodName);
@@ -108,6 +118,8 @@ public class ActionExtractor extends InfoExtractor {
         Property responseBody = new Property(returnComment, declaration);
         action.setResponseBody(responseBody);
 
+        confirmContentType(action, consume, produce);
+
         return action;
     }
 
@@ -119,5 +131,38 @@ public class ActionExtractor extends InfoExtractor {
                 break;
             }
         }
+    }
+
+    private void confirmContentType(Action action, List<String> consume, List<String> produce) {
+        inferRequestContentType(action, consume);
+        inferResponseContentType(action, produce);
+    }
+
+    private void inferRequestContentType(Action action, List<String> consume) {
+        if (containsFileParam(action)) {
+            action.setRequestContentType(MULTIPART_FORM_DATA);
+            return;
+        }
+
+        if (action.hasRequestBody()) {
+            action.setRequestContentType(SupportedContentType.infer(consume));
+        }
+    }
+
+    private void inferResponseContentType(Action action, List<String> produce) {
+        if (action.hasResponseBody()) {
+            action.setRequestContentType(SupportedContentType.infer(produce));
+        }
+    }
+
+    private boolean containsFileParam(Action action) {
+        List<Property> urlParameters = action.getUrlParameters();
+        for (Property urlParameter : urlParameters) {
+            if (urlParameter.getDeclaration().getType() == DeclarationType.FILE) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
