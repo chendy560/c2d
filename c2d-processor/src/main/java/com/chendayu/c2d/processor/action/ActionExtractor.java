@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.chendayu.c2d.processor.DocIgnore;
 import com.chendayu.c2d.processor.InfoExtractor;
 import com.chendayu.c2d.processor.SupportedContentType;
 import com.chendayu.c2d.processor.Utils;
@@ -56,6 +57,11 @@ public class ActionExtractor extends InfoExtractor {
      * 就是这么任性，谢谢
      */
     public Action findAction(ExecutableElement element) {
+
+        DocIgnore docIgnore = element.getAnnotation(DocIgnore.class);
+        if (docIgnore != null && docIgnore.value()) {
+            return null;
+        }
 
         GetMapping getMapping = element.getAnnotation(GetMapping.class);
         if (getMapping != null) {
@@ -151,7 +157,7 @@ public class ActionExtractor extends InfoExtractor {
 
     private void inferResponseContentType(Action action, List<String> produce) {
         if (action.hasResponseBody()) {
-            action.setRequestContentType(SupportedContentType.infer(produce));
+            action.setResponseBodyContentType(SupportedContentType.infer(produce));
         }
     }
 

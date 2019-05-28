@@ -10,18 +10,39 @@ import com.chendayu.c2d.processor.declaration.EnumDeclaration;
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 import com.chendayu.c2d.processor.resource.Resource;
 
+/**
+ * 保存解析到的各种信息的仓库
+ */
 public class Warehouse {
 
+    /**
+     * 解析得到的文档会存放到这个包下
+     */
     private static final String PACKAGE_NAME = "c2d";
 
-    private final Map<String, NestedDeclaration> declarationMap = new HashMap<>(16, 0.5f);
+    /**
+     * 保存处理过的 {@link NestedDeclaration}
+     */
+    private final Map<String, NestedDeclaration> nameDeclarationMap = new HashMap<>(16, 0.5f);
 
-    private final Map<String, EnumDeclaration> enumMap = new HashMap<>(16, 0.5f);
+    /**
+     * 保存处理过的 {@link EnumDeclaration}
+     */
+    private final Map<String, EnumDeclaration> nameEnumMap = new HashMap<>(16, 0.5f);
 
+    /**
+     * 保存提取到的 {@link Resource}
+     */
     private final SortedMap<String, Resource> resourceMap = new TreeMap<>();
 
+    /**
+     * 默认情况下，spring-boot 的应用主类的 'Application' 结尾
+     */
     private String applicationName = "Application";
 
+    /**
+     * 默认的"默认包"
+     */
     private String basePackage = PACKAGE_NAME;
 
     public String getApplicationName() {
@@ -37,15 +58,15 @@ public class Warehouse {
     }
 
     public void setBasePackage(String basePackage) {
-        this.basePackage = basePackage + "." + PACKAGE_NAME;
+        this.basePackage = basePackage + '.' + PACKAGE_NAME;
     }
 
     public NestedDeclaration getDeclaration(String qualifiedName) {
-        return declarationMap.get(qualifiedName);
+        return nameDeclarationMap.get(qualifiedName);
     }
 
     public void addDeclaration(NestedDeclaration declaration) {
-        declarationMap.put(declaration.getQualifiedName(), declaration);
+        nameDeclarationMap.put(declaration.getQualifiedName(), declaration);
     }
 
     public boolean containsResource(String name) {
@@ -61,10 +82,10 @@ public class Warehouse {
     }
 
     public EnumDeclaration getEnumDeclaration(String qualifiedName) {
-        return enumMap.get(qualifiedName);
+        return nameEnumMap.get(qualifiedName);
     }
 
     public void addEnumDeclaration(EnumDeclaration enumDeclaration) {
-        enumMap.put(enumDeclaration.getQualifiedName(), enumDeclaration);
+        nameEnumMap.put(enumDeclaration.getQualifiedName(), enumDeclaration);
     }
 }

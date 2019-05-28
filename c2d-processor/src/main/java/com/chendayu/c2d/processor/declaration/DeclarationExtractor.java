@@ -15,7 +15,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -615,20 +614,5 @@ public class DeclarationExtractor extends InfoExtractor {
 
     private TypeMirror getDeclaredType(Class<?> typeClass) {
         return getDeclaredType(typeClass, 0);
-    }
-
-    /**
-     * 从 spring-boot-configuration-processor 抄来的方法，用来获取指定类型的 TypeMirror
-     */
-    private TypeMirror getDeclaredType(Class<?> typeClass, int numberOfTypeArgs) {
-        TypeMirror[] typeArgs = new TypeMirror[numberOfTypeArgs];
-        Arrays.setAll(typeArgs, i -> typeUtils.getWildcardType(null, null));
-        TypeElement typeElement = elementUtils.getTypeElement(typeClass.getName());
-        try {
-            return typeUtils.getDeclaredType(typeElement, typeArgs);
-        } catch (IllegalArgumentException ex) {
-            // Try again without generics for older Java versions
-            return typeUtils.getDeclaredType(typeElement);
-        }
     }
 }

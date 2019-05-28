@@ -71,20 +71,17 @@ public class IgnoreParameterHandler extends AbstractComponent implements Paramet
             if (element == null) {
                 continue;
             }
-            types.add(asErasedType(element));
+            types.add(element.asType());
         }
         this.ignoreParameterTypes = Collections.unmodifiableList(types);
     }
 
     @Override
     public boolean handleParameter(Action action, VariableElement element) {
-        TypeMirror erased = asErasedType(element);
+        TypeMirror type = element.asType();
 
         for (TypeMirror ignoreParameterType : ignoreParameterTypes) {
-            if (typeUtils.isSubtype(erased, ignoreParameterType)) {
-                return true;
-            }
-            if (typeUtils.isSameType(erased, ignoreParameterType)) {
+            if (typeUtils.isAssignable(type, ignoreParameterType)) {
                 return true;
             }
         }
