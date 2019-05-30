@@ -3,6 +3,7 @@
 **C**omment **2** **D**ocument  
 将**注释**变成**文档**
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/805486a479324096a1217c4bd8ecdcf5)](https://app.codacy.com/app/chendy560/c2d?utm_source=github.com&utm_medium=referral&utm_content=chendy560/c2d&utm_campaign=Badge_Grade_Dashboard)
 [![CircleCI](https://circleci.com/gh/chendy560/c2d.svg?style=svg)](https://circleci.com/gh/chendy560/c2d)
 
 自用 spring-web 文档生成器，基于 annotation-processor  
