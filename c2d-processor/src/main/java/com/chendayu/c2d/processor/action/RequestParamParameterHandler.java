@@ -10,7 +10,7 @@ import com.chendayu.c2d.processor.property.Property;
 
 import org.springframework.web.bind.annotation.RequestParam;
 
-import static com.chendayu.c2d.processor.Utils.findName;
+import static com.chendayu.c2d.processor.util.RequestParameters.findParameterName;
 
 /**
  * requestParam 参数处理
@@ -29,7 +29,7 @@ public class RequestParamParameterHandler extends AbstractParameterHandler {
         }
 
         String parameterName = element.getSimpleName().toString();
-        String displayName = findName(element, requestParam.value(), requestParam.name());
+        String displayName = findParameterName(parameterName, requestParam.value(), requestParam.name());
 
         Declaration declaration = declarationExtractor.extract(element);
         if (isSimpleDeclaration(declaration) || isSimpleArray(declaration)) {

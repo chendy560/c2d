@@ -3,11 +3,11 @@ package com.chendayu.c2d.processor.output;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
-import java.util.SortedSet;
 import java.util.TreeMap;
 
 import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.action.Action;
+import com.chendayu.c2d.processor.action.Resource;
 import com.chendayu.c2d.processor.declaration.ArrayDeclaration;
 import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
@@ -15,7 +15,6 @@ import com.chendayu.c2d.processor.declaration.EnumDeclaration;
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 import com.chendayu.c2d.processor.declaration.TypeVarDeclaration;
 import com.chendayu.c2d.processor.property.Property;
-import com.chendayu.c2d.processor.resource.Resource;
 
 public class DocWriter {
 
@@ -45,7 +44,7 @@ public class DocWriter {
         for (Resource resource : resources) {
             adoc.title2(resource.getName());
 
-            SortedSet<Action> actions = resource.getActions();
+            Collection<Action> actions = resource.getActions();
             for (Action action : actions) {
                 writeActions(action);
             }
@@ -108,7 +107,7 @@ public class DocWriter {
             switch (type) {
                 case OBJECT:
                     NestedDeclaration od = (NestedDeclaration) declaration;
-                    adoc.anchor(od.getHash()).title3(od.getShortName());
+                    adoc.anchor(od.getLink()).title3(od.getShortName());
 
                     adoc.appendLines(od.getDescription());
                     List<TypeVarDeclaration> typeParameters = od.getTypeParameters();
@@ -125,7 +124,7 @@ public class DocWriter {
                     break;
                 case ENUM:
                     EnumDeclaration ed = (EnumDeclaration) declaration;
-                    adoc.anchor(ed.getHash()).title3(ed.getName());
+                    adoc.anchor(ed.getLink()).title3(ed.getName());
                     List<Property> constants = ed.getConstants();
                     if (!constants.isEmpty()) {
                         adoc.title4("常量列表");
@@ -253,7 +252,7 @@ public class DocWriter {
                 break;
             case ENUM:
                 EnumDeclaration ed = (EnumDeclaration) d;
-                adoc.link(ed.getHash(), ed.getName());
+                adoc.link(ed.getLink(), ed.getName());
                 break;
             case ARRAY:
                 ArrayDeclaration ad = (ArrayDeclaration) d;
@@ -266,9 +265,9 @@ public class DocWriter {
                 NestedDeclaration od = (NestedDeclaration) d;
                 List<Declaration> typeArgs = od.getTypeArguments();
                 if (typeArgs.isEmpty()) {
-                    adoc.link(od.getHash(), od.getShortName());
+                    adoc.link(od.getLink(), od.getShortName());
                 } else {
-                    adoc.link(od.getHash(), od.getShortName()).append('<');
+                    adoc.link(od.getLink(), od.getShortName()).append('<');
                     for (int i = 0; i < typeArgs.size(); i++) {
                         writeType(typeArgs.get(i));
                         if (i != typeArgs.size() - 1) {

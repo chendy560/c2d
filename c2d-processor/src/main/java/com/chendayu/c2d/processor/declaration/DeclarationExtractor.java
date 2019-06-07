@@ -24,8 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.chendayu.c2d.processor.InfoExtractor;
-import com.chendayu.c2d.processor.Utils;
+import com.chendayu.c2d.processor.AbstractExtractor;
 import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.model.DocComment;
 import com.chendayu.c2d.processor.processor.DescriptionProcessor;
@@ -34,6 +33,7 @@ import com.chendayu.c2d.processor.processor.JacksonProcessor;
 import com.chendayu.c2d.processor.processor.LombokProcessor;
 import com.chendayu.c2d.processor.processor.NestedDeclarationPostProcessor;
 import com.chendayu.c2d.processor.property.Property;
+import com.chendayu.c2d.processor.util.NameConversions;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,7 +52,7 @@ import static javax.lang.model.element.Modifier.STATIC;
 /**
  * 数据类型提取器
  */
-public class DeclarationExtractor extends InfoExtractor {
+public class DeclarationExtractor extends AbstractExtractor {
 
     /**
      * lombok 的 Data 注解，用于判断是否引入了 lombok
@@ -587,16 +587,16 @@ public class DeclarationExtractor extends InfoExtractor {
     private String getterToPropertyName(String methodName) {
         if (methodName.startsWith(GETTER_PREFIX)) {
             String propertyName = methodName.substring(GETTER_LENGTH);
-            return Utils.lowerCaseFirst(propertyName);
+            return NameConversions.toPropertyName(propertyName);
         }
 
         String propertyName = methodName.substring(BOOLEAN_GETTER_LENGTH);
-        return Utils.lowerCaseFirst(propertyName);
+        return NameConversions.toPropertyName(propertyName);
     }
 
     private String setterToPropertyName(String methodName) {
         String propertyName = methodName.substring(SETTER_LENGTH);
-        return Utils.lowerCaseFirst(propertyName);
+        return NameConversions.toPropertyName(propertyName);
     }
 
     private boolean isJavaPackageClass(String qualifiedName) {

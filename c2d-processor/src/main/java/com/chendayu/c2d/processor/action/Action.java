@@ -8,6 +8,8 @@ import com.chendayu.c2d.processor.SupportedContentType;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
 import com.chendayu.c2d.processor.model.DocComment;
 import com.chendayu.c2d.processor.property.Property;
+import com.chendayu.c2d.processor.util.NameConversions;
+import com.chendayu.c2d.processor.util.StringBuilderHolder;
 
 import org.springframework.http.HttpMethod;
 
@@ -19,27 +21,37 @@ public class Action {
     /**
      * 操作名字
      */
-    private String name;
+    private final String name;
+
+    /**
+     * 包含 {@link Resource} 名字的全名
+     */
+    private final String fullName;
+
+    /**
+     * 链接，用于生成文档
+     */
+    private final String link;
+
+    /**
+     * 完整路径
+     */
+    private final String path;
+
+    /**
+     * 请求方法
+     */
+    private final HttpMethod method;
+
+    /**
+     * 方法上的注释
+     */
+    private final DocComment docComment;
 
     /**
      * 操作描述
      */
     private List<String> description;
-
-    /**
-     * 方法上的注释
-     */
-    private DocComment docComment;
-
-    /**
-     * 请求路径
-     */
-    private String path;
-
-    /**
-     * 请求方法
-     */
-    private HttpMethod method;
 
     /**
      * 路径参数
@@ -71,8 +83,17 @@ public class Action {
      */
     private SupportedContentType responseBodyContentType;
 
-    public Action(String name, DocComment docComment) {
+    public Action(Resource resource, String name, String path, HttpMethod method, DocComment docComment) {
         this.name = name;
+        String resourceName = resource.getName();
+        this.fullName = NameConversions.actionFullName(resourceName, name);
+
+        String basePath = resource.getPath();
+        this.path = StringBuilderHolder.resetAndGet().append(basePath).append(path).toString();
+
+        this.method = method;
+        this.link = NameConversions.actionLink(resource.getLink(), name);
+
         this.docComment = docComment;
         this.description = docComment.getDescription();
     }
@@ -95,8 +116,12 @@ public class Action {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getFullName() {
+        return fullName;
+    }
+
+    public String getLink() {
+        return link;
     }
 
     public List<String> getDescription() {
@@ -107,16 +132,8 @@ public class Action {
         return path;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public HttpMethod getMethod() {
         return method;
-    }
-
-    public void setMethod(HttpMethod method) {
-        this.method = method;
     }
 
     public List<Property> getPathVariables() {
@@ -159,10 +176,6 @@ public class Action {
         this.responseBodyContentType = responseBodyContentType;
     }
 
-    public void setBasePath(String s) {
-        this.path = s + path;
-    }
-
     /**
      * 查找参数的注释
      *
@@ -183,11 +196,6 @@ public class Action {
     }
 
     public boolean hasResponseBody() {
-        if (responseBody == null) {
-            return false;
-        }
-
-        DeclarationType type = responseBody.getType();
-        return type != DeclarationType.VOID && type != DeclarationType.UNKNOWN;
+        return responseBody != null;
     }
 }

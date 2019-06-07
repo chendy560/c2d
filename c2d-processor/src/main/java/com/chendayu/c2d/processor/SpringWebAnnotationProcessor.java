@@ -11,9 +11,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.chendayu.c2d.processor.action.ResourceAndActionExtractor;
 import com.chendayu.c2d.processor.model.DocComment;
 import com.chendayu.c2d.processor.output.DocGenerator;
-import com.chendayu.c2d.processor.resource.ResourceExtractor;
 
 /**
  * 入口类
@@ -51,7 +51,7 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
     /**
      * 资源数据（api数据）提取器
      */
-    private ResourceExtractor resourceExtractor;
+    private ResourceAndActionExtractor resourceAndActionExtractor;
 
     /**
      * 应用信息提取器
@@ -77,7 +77,7 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         this.warehouse = new Warehouse();
-        this.resourceExtractor = new ResourceExtractor(processingEnv, warehouse);
+        this.resourceAndActionExtractor = new ResourceAndActionExtractor(processingEnv, warehouse);
         this.applicationMetaExtractor = new ApplicationMetaExtractor(processingEnv, warehouse);
         this.docGenerator = new DocGenerator(processingEnv);
 
@@ -99,7 +99,7 @@ public class SpringWebAnnotationProcessor extends AbstractProcessor {
                 }
 
                 for (Element element : annotated) {
-                    resourceExtractor.extract((TypeElement) element);
+                    resourceAndActionExtractor.extract((TypeElement) element);
                 }
             }
 

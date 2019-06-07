@@ -7,10 +7,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.SortedSet;
 
 import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.action.Action;
+import com.chendayu.c2d.processor.action.Resource;
 import com.chendayu.c2d.processor.declaration.ArrayDeclaration;
 import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
@@ -18,7 +18,6 @@ import com.chendayu.c2d.processor.declaration.EnumDeclaration;
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 import com.chendayu.c2d.processor.declaration.TypeVarDeclaration;
 import com.chendayu.c2d.processor.property.Property;
-import com.chendayu.c2d.processor.resource.Resource;
 import com.chendayu.c2d.processor.support.TestCompiler;
 import com.chendayu.c2d.processor.support.TestSpringWebAnnotationProcessor;
 
@@ -69,7 +68,7 @@ public class FinalTest {
         assertThat(resources).hasSize(1);
 
         Resource user = resources.iterator().next();
-        SortedSet<Action> actions = user.getActions();
+        Collection<Action> actions = user.getActions();
 
         assertThat(actions).hasSize(7);
 
@@ -112,7 +111,7 @@ public class FinalTest {
 
         assertThat(action.getRequestBody()).isNull();
 
-        checkProperty(action.getResponseBody(), null, DeclarationType.VOID);
+        assertThat(action.getResponseBody()).isNull();
     }
 
     private void checkCreateAction(Action action) {
@@ -222,8 +221,8 @@ public class FinalTest {
         checkUserUpdateRequest((NestedDeclaration) updateRequest.getDeclaration());
 
 
-        Property user = action.getResponseBody();
-        checkProperty(user, null, DeclarationType.VOID);
+        Property responseBody = action.getResponseBody();
+        assertThat(responseBody).isNull();
     }
 
     private void checkSearchAction(Action action) {
@@ -316,8 +315,8 @@ public class FinalTest {
         checkUser((NestedDeclaration) userProperty.getDeclaration());
 
 
-        Property user = action.getResponseBody();
-        checkProperty(user, null, DeclarationType.VOID);
+        Property responseBody = action.getResponseBody();
+        assertThat(responseBody).isNull();
     }
 
     private void checkUserUpdateRequest(NestedDeclaration nestedDeclaration) {

@@ -10,13 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.chendayu.c2d.processor.Utils;
 import com.chendayu.c2d.processor.model.DocComment;
 import com.chendayu.c2d.processor.property.Property;
+import com.chendayu.c2d.processor.util.NameConversions;
 
 public class NestedDeclaration implements Declaration {
-
-    private static final char HASH_PREFIX = 'd';
 
     private TypeElement typeElement;
 
@@ -24,7 +22,7 @@ public class NestedDeclaration implements Declaration {
 
     private String qualifiedName;
 
-    private String hash;
+    private String link;
 
     private List<String> description = Collections.emptyList();
 
@@ -38,7 +36,7 @@ public class NestedDeclaration implements Declaration {
         this.typeElement = typeElement;
         this.shortName = typeElement.getSimpleName().toString();
         this.qualifiedName = typeElement.getQualifiedName().toString();
-        this.hash = HASH_PREFIX + Utils.shortHash(qualifiedName);
+        this.link = NameConversions.componentObjectLink(qualifiedName);
         this.description = DocComment.create(typeElement).getDescription();
     }
 
@@ -54,8 +52,8 @@ public class NestedDeclaration implements Declaration {
         return shortName;
     }
 
-    public String getHash() {
-        return hash;
+    public String getLink() {
+        return link;
     }
 
     public String getQualifiedName() {
@@ -166,7 +164,7 @@ public class NestedDeclaration implements Declaration {
         copy.typeElement = this.typeElement;
         copy.shortName = this.shortName;
         copy.qualifiedName = this.qualifiedName;
-        copy.hash = this.hash;
+        copy.link = this.link;
         copy.description = this.description;
         copy.propertyMap = new LinkedHashMap<>(this.propertyMap);
         copy.typeParameters = new ArrayList<>(this.typeParameters);

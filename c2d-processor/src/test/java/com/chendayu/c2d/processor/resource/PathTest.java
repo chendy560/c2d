@@ -1,6 +1,7 @@
 package com.chendayu.c2d.processor.resource;
 
 import com.chendayu.c2d.processor.Warehouse;
+import com.chendayu.c2d.processor.action.Resource;
 
 import org.junit.jupiter.api.Test;
 

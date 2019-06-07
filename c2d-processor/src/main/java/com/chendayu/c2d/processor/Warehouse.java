@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import com.chendayu.c2d.processor.action.Resource;
 import com.chendayu.c2d.processor.declaration.EnumDeclaration;
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
-import com.chendayu.c2d.processor.resource.Resource;
 
 /**
  * 保存解析到的各种信息的仓库

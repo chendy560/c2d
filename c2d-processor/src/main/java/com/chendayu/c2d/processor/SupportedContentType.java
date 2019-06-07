@@ -1,7 +1,5 @@
 package com.chendayu.c2d.processor;
 
-import java.util.List;
-
 /**
  * 支持的响应 Content-Type
  */
@@ -17,7 +15,7 @@ public enum SupportedContentType {
         this.value = value;
     }
 
-    public static SupportedContentType infer(List<String> contentTypes) {
+    public static SupportedContentType infer(String[] contentTypes) {
         for (String contentType : contentTypes) {
             if (contentType.contains(APPLICATION_JSON.getValue())) {
                 return APPLICATION_JSON;

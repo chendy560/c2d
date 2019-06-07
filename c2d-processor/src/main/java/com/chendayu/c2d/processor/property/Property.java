@@ -108,20 +108,12 @@ public class Property {
         this.description = description;
     }
 
-    public boolean hasDescription() {
-        return !this.description.isEmpty();
-    }
-
     public Declaration getDeclaration() {
         return declaration;
     }
 
     public void setDeclaration(Declaration declaration) {
         this.declaration = declaration;
-    }
-
-    public boolean descriptionIsEmpty() {
-        return description == null || description.isEmpty();
     }
 
     public boolean isIgnored() {

@@ -3,7 +3,7 @@ package com.chendayu.c2d.processor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 
-public class ApplicationMetaExtractor extends InfoExtractor {
+public class ApplicationMetaExtractor extends AbstractExtractor {
 
     private static final String APPLICATION = "Application";
 

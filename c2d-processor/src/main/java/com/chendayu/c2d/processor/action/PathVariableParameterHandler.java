@@ -10,7 +10,7 @@ import com.chendayu.c2d.processor.property.Property;
 
 import org.springframework.web.bind.annotation.PathVariable;
 
-import static com.chendayu.c2d.processor.Utils.findName;
+import static com.chendayu.c2d.processor.util.RequestParameters.findParameterName;
 
 /**
  * 路径参数处理器
@@ -30,7 +30,7 @@ public class PathVariableParameterHandler extends AbstractParameterHandler {
         }
 
         String parameterName = element.getSimpleName().toString();
-        String displayName = findName(element, requestParam.value(), requestParam.name());
+        String displayName = findParameterName(parameterName, requestParam.value(), requestParam.name());
 
         Declaration declaration = declarationExtractor.extract(element);
         if (isSimpleDeclaration(declaration) || isSimpleArray(declaration)) {
