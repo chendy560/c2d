@@ -39,12 +39,12 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- 用于实际测试 lombok 的支持 -->
+        <!-- 用于测试 lombok 的支持 -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- 用于测试对 SpringBootApplication 注解的支持 -->
