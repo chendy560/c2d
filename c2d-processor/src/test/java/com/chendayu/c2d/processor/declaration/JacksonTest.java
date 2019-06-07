@@ -18,7 +18,7 @@ public class JacksonTest extends AbstractDeclarationTest {
         assertThat(declarations).hasSize(1);
 
         NestedDeclaration declaration = (NestedDeclaration) declarations.get(0);
-        Collection<Property> properties = declaration.gettableProperties();
+        Collection<Property> properties = declaration.accessibleProperties();
         assertThat(properties).hasSize(1);
 
         Property property = properties.iterator().next();

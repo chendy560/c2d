@@ -116,7 +116,7 @@ public class DocWriter {
                 parameterTable(typeParameters);
             }
 
-            Collection<Property> properties = od.gettableProperties();
+            Collection<Property> properties = od.accessibleProperties();
             if (!properties.isEmpty()) {
                 adoc.title4("Fields");
                 parameterTable(properties);
@@ -155,7 +155,7 @@ public class DocWriter {
                 saveDeclaration(typeArg);
             }
 
-            for (Property property : od.gettableProperties()) {
+            for (Property property : od.accessibleProperties()) {
                 saveDeclaration(property.getDeclaration());
             }
 

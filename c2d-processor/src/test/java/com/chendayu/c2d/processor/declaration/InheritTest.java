@@ -24,7 +24,7 @@ public class InheritTest extends AbstractDeclarationTest {
 
     private void checkChild(NestedDeclaration child) {
         assertThat(child.getDescription()).isEqualTo(Collections.singletonList("子类"));
-        Collection<Property> properties = child.gettableProperties();
+        Collection<Property> properties = child.accessibleProperties();
         assertThat(properties).hasSize(4);
 
         Iterator<Property> iterator = properties.iterator();
@@ -36,7 +36,7 @@ public class InheritTest extends AbstractDeclarationTest {
 
     private void checkSimpleChild(NestedDeclaration simpleChild) {
         assertThat(simpleChild.getDescription()).isEqualTo(emptyList());
-        Collection<Property> properties = simpleChild.gettableProperties();
+        Collection<Property> properties = simpleChild.accessibleProperties();
         assertThat(properties).hasSize(2);
 
         Iterator<Property> iterator = properties.iterator();

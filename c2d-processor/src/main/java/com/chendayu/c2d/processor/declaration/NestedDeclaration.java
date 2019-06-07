@@ -81,7 +81,7 @@ public class NestedDeclaration implements Declaration {
         return propertyMap.values();
     }
 
-    public Collection<Property> gettableProperties() {
+    public Collection<Property> accessibleProperties() {
         List<Property> list = new ArrayList<>();
         for (Property p : propertyMap.values()) {
             if (!p.isIgnored() && p.isGettable()) {
@@ -156,6 +156,10 @@ public class NestedDeclaration implements Declaration {
     }
 
     public <T extends Annotation> T getAnnotation(Class<T> clazz) {
+        if (typeElement == null) {
+            return null;
+        }
+
         return typeElement.getAnnotation(clazz);
     }
 

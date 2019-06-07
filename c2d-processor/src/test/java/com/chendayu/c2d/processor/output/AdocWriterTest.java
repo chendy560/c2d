@@ -136,7 +136,7 @@ class AdocWriterTest {
     @Test
     void appendLines() {
         adocWriter.appendLines(Arrays.asList("line1", "line2", "line3"));
-        assertResult("line1 +\nline2 +\nline3 +\n");
+        assertResult("line1 +\nline2 +\nline3 +\n\n");
     }
 
     private void assertResult(String expect) {

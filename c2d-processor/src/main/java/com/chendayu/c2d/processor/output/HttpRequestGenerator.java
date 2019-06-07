@@ -193,7 +193,7 @@ public class HttpRequestGenerator {
                 } else {
 
                     writeDeclaration.put(qualifiedName, times + 1);
-                    for (Property property : nestedDeclaration.gettableProperties()) {
+                    for (Property property : nestedDeclaration.accessibleProperties()) {
                         generateJson(property, indent + 1);
                     }
 

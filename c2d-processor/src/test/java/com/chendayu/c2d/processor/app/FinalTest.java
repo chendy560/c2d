@@ -276,7 +276,7 @@ public class FinalTest {
         Declaration user = typeArgs.get(0);
         checkUser((NestedDeclaration) user);
 
-        Collection<Property> properties = nestedDeclaration.gettableProperties();
+        Collection<Property> properties = nestedDeclaration.accessibleProperties();
         assertThat(properties).hasSize(3);
 
         Iterator<Property> propertyIterator = properties.iterator();
@@ -329,7 +329,7 @@ public class FinalTest {
         assertThat(nestedDeclaration.getTypeParameters()).isEmpty();
         assertThat(nestedDeclaration.getTypeArguments()).isEmpty();
 
-        Collection<Property> properties = nestedDeclaration.gettableProperties();
+        Collection<Property> properties = nestedDeclaration.accessibleProperties();
         assertThat(properties).hasSize(2);
 
         Iterator<Property> iterator = properties.iterator();
@@ -373,7 +373,7 @@ public class FinalTest {
         assertThat(nestedDeclaration.getTypeParameters()).isEmpty();
         assertThat(nestedDeclaration.getTypeArguments()).isEmpty();
 
-        Collection<Property> properties = nestedDeclaration.gettableProperties();
+        Collection<Property> properties = nestedDeclaration.accessibleProperties();
         assertThat(properties).hasSize(5);
 
         Iterator<Property> iterator = properties.iterator();
@@ -409,7 +409,7 @@ public class FinalTest {
         assertThat(nestedDeclaration.getTypeParameters()).isEmpty();
         assertThat(nestedDeclaration.getTypeArguments()).isEmpty();
 
-        Collection<Property> properties = nestedDeclaration.gettableProperties();
+        Collection<Property> properties = nestedDeclaration.accessibleProperties();
         assertThat(properties).hasSize(5);
 
         Iterator<Property> iterator = properties.iterator();
