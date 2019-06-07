@@ -18,7 +18,8 @@ import com.chendayu.c2d.processor.property.Property;
 
 public class DocWriter {
 
-    private final TreeMap<String, Declaration> declarationMap = new TreeMap<>();
+    private final TreeMap<String, NestedDeclaration> nestedDeclarationMap = new TreeMap<>();
+    private final TreeMap<String, EnumDeclaration> enumDeclarationMap = new TreeMap<>();
 
     private final AdocWriter adoc;
 
@@ -39,7 +40,7 @@ public class DocWriter {
     }
 
     private void writeResources(Collection<Resource> resources) {
-        adoc.title1("资源");
+        adoc.title1("Resources");
 
         for (Resource resource : resources) {
             adoc.title2(resource.getName());
@@ -64,7 +65,7 @@ public class DocWriter {
 
         List<Property> pathVariables = action.getPathVariables();
         if (!pathVariables.isEmpty()) {
-            adoc.title4("路径参数");
+            adoc.title4("Path Variables");
             for (Property pathVariable : pathVariables) {
                 saveDeclaration(pathVariable.getDeclaration());
             }
@@ -73,7 +74,7 @@ public class DocWriter {
 
         List<Property> urlParameters = action.getUrlParameters();
         if (!urlParameters.isEmpty()) {
-            adoc.title4("URL参数");
+            adoc.title4("URL Parameters");
             for (Property property : urlParameters) {
                 saveDeclaration(property.getDeclaration());
             }
@@ -82,59 +83,54 @@ public class DocWriter {
 
         Property requestBody = action.getRequestBody();
         if (requestBody != null) {
-            adoc.title4("请求Body");
+            adoc.title4("Request Body");
             writeType(requestBody.getDeclaration());
             saveDeclaration(requestBody.getDeclaration());
-            adoc.dualNewLine();
         }
+
+        adoc.dualNewLine();
 
         Property responseBody = action.getResponseBody();
         if (responseBody != null) {
-            adoc.title4("响应");
+            adoc.title4("Response Body");
             writeType(responseBody.getDeclaration());
             saveDeclaration(responseBody.getDeclaration());
-            adoc.dualNewLine();
         }
 
         adoc.dualNewLine();
     }
 
     private void writeDeclarations() {
-        adoc.title1("对象结构");
+        adoc.title1("Components");
 
-        for (Declaration declaration : declarationMap.values()) {
-            DeclarationType type = declaration.getType();
-            switch (type) {
-                case OBJECT:
-                    NestedDeclaration od = (NestedDeclaration) declaration;
-                    adoc.anchor(od.getLink());
-                    adoc.title3(od.getShortName());
+        adoc.title2("Objects");
 
-                    adoc.appendLines(od.getDescription());
-                    List<TypeVarDeclaration> typeParameters = od.getTypeParameters();
-                    if (!typeParameters.isEmpty()) {
-                        adoc.title4("类型参数");
-                        parameterTable(typeParameters);
-                    }
+        for (NestedDeclaration od : nestedDeclarationMap.values()) {
+            adoc.anchor(od.getLink());
+            adoc.title3(od.getShortName());
 
-                    Collection<Property> properties = od.gettableProperties();
-                    if (!properties.isEmpty()) {
-                        adoc.title4("字段");
-                        parameterTable(properties);
-                    }
-                    break;
-                case ENUM:
-                    EnumDeclaration ed = (EnumDeclaration) declaration;
-                    adoc.anchor(ed.getLink());
-                    adoc.title3(ed.getName());
-                    List<Property> constants = ed.getConstants();
-                    if (!constants.isEmpty()) {
-                        adoc.title4("常量列表");
-                        parameterTable(constants);
-                    }
-                    break;
-                default:
-                    break;
+            adoc.appendLines(od.getDescription());
+            List<TypeVarDeclaration> typeParameters = od.getTypeParameters();
+            if (!typeParameters.isEmpty()) {
+                adoc.title4("Type Parameters");
+                parameterTable(typeParameters);
+            }
+
+            Collection<Property> properties = od.gettableProperties();
+            if (!properties.isEmpty()) {
+                adoc.title4("Fields");
+                parameterTable(properties);
+            }
+        }
+
+        adoc.title2("Enums");
+        for (EnumDeclaration ed : enumDeclarationMap.values()) {
+            adoc.anchor(ed.getLink());
+            adoc.title3(ed.getName());
+            List<Property> constants = ed.getConstants();
+            if (!constants.isEmpty()) {
+                adoc.title4("Const");
+                parameterTable(constants);
             }
         }
     }
@@ -142,7 +138,7 @@ public class DocWriter {
     private void writeTitle(Warehouse warehouse) {
         String applicationName = warehouse.getApplicationName();
 
-        adoc.title0(applicationName + " API 文档");
+        adoc.title0(applicationName + " API Doc");
     }
 
     private void saveDeclaration(Declaration declaration) {
@@ -150,10 +146,10 @@ public class DocWriter {
         if (type == DeclarationType.OBJECT) {
             NestedDeclaration od = (NestedDeclaration) declaration;
 
-            if (declarationMap.containsKey(od.getShortName()) && od.getTypeArguments().isEmpty()) {
+            if (nestedDeclarationMap.containsKey(od.getShortName()) && od.getTypeArguments().isEmpty()) {
                 return;
             }
-            declarationMap.put(od.getShortName(), od);
+            nestedDeclarationMap.put(od.getShortName(), od);
 
             for (Declaration typeArg : od.getTypeArguments()) {
                 saveDeclaration(typeArg);
@@ -177,11 +173,11 @@ public class DocWriter {
         if (type == DeclarationType.ENUM) {
             EnumDeclaration ed = (EnumDeclaration) declaration;
 
-            if (declarationMap.containsKey(ed.getName())) {
+            if (enumDeclarationMap.containsKey(ed.getName())) {
                 return;
             }
 
-            declarationMap.put(ed.getName(), ed);
+            enumDeclarationMap.put(ed.getName(), ed);
         }
     }
 

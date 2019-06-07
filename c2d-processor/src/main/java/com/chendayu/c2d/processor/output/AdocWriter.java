@@ -227,16 +227,13 @@ public class AdocWriter {
      */
     public void appendLines(List<String> ss) {
 
-        if (ss == null || ss.isEmpty()) {
-            newLine();
-            return;
-        }
-
         for (String s : ss) {
             if (!s.isEmpty()) {
                 append(s);
                 hardNewLine();
             }
         }
+
+        newLine();
     }
 }

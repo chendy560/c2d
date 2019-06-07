@@ -2,12 +2,12 @@ package com.chendayu.c2d.processor.util;
 
 public class NameConversions {
 
-    private static final String COMPONENT_PREFIX = "components/";
-    private static final String COMPONENT_OBJECT_PREFIX = COMPONENT_PREFIX + "objects/";
-    private static final String COMPONENT_ENUM_PREFIX = COMPONENT_PREFIX + "enums/";
+    private static final String COMPONENT_PREFIX = "components-";
+    private static final String COMPONENT_OBJECT_PREFIX = COMPONENT_PREFIX + "objects-";
+    private static final String COMPONENT_ENUM_PREFIX = COMPONENT_PREFIX + "enums-";
 
-    private static final String RESOURCE_PREFIX = "resources/";
-    private static final String ACTION_PREFIX = "actions/";
+    private static final String RESOURCE_PREFIX = "resources-";
+    private static final String ACTION_PREFIX = "actions-";
 
     private static final char RESOURCE_ACTION_SEPARATOR = '.';
 
@@ -56,14 +56,16 @@ public class NameConversions {
     }
 
     private static void appendQualifiedName(StringBuilder builder, String qualifiedName) {
+        char pc = ' ';
         for (char c : qualifiedName.toCharArray()) {
             if (c == PACKAGE_SEPARATOR || c == SUB_CLASS_SEPARATOR) {
                 builder.append(LINK_SEPARATOR);
-            } else if (Character.isUpperCase(c)) {
+            } else if (Character.isUpperCase(c) && pc != PACKAGE_SEPARATOR) {
                 builder.append(LINK_SEPARATOR).append(Character.toLowerCase(c));
             } else {
                 builder.append(c);
             }
+            pc = c;
         }
     }
 
