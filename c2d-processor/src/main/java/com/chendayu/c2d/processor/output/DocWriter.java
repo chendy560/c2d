@@ -107,7 +107,8 @@ public class DocWriter {
             switch (type) {
                 case OBJECT:
                     NestedDeclaration od = (NestedDeclaration) declaration;
-                    adoc.anchor(od.getLink()).title3(od.getShortName());
+                    adoc.anchor(od.getLink());
+                    adoc.title3(od.getShortName());
 
                     adoc.appendLines(od.getDescription());
                     List<TypeVarDeclaration> typeParameters = od.getTypeParameters();
@@ -124,7 +125,8 @@ public class DocWriter {
                     break;
                 case ENUM:
                     EnumDeclaration ed = (EnumDeclaration) declaration;
-                    adoc.anchor(ed.getLink()).title3(ed.getName());
+                    adoc.anchor(ed.getLink());
+                    adoc.title3(ed.getName());
                     List<Property> constants = ed.getConstants();
                     if (!constants.isEmpty()) {
                         adoc.title4("常量列表");
@@ -186,37 +188,51 @@ public class DocWriter {
     private void parameterTable(List<TypeVarDeclaration> parameters) {
 
         adoc.col("3,7");
-        adoc.tableBegin()
-                .columnBegin().append("Name").space()
-                .columnBegin().append("Description").dualNewLine();
+        adoc.tableBoundary();
+        adoc.columnBegin();
+        adoc.append("Name");
+        adoc.appendSpace();
+        adoc.columnBegin();
+        adoc.append("Description");
+        adoc.dualNewLine();
 
         for (TypeVarDeclaration p : parameters) {
-            adoc.columnBegin().appendBoldMonospace(p.getName()).append(" : [small]#");
+            adoc.columnBegin();
+            adoc.appendBoldMonospace(p.getName());
+            adoc.append(" : [small]#");
             writeType(p);
-            adoc.append('#').newLine();
-            adoc.columnBegin()
-                    .appendLines(p.getDescription());
+            adoc.append('#');
+            adoc.newLine();
+            adoc.columnBegin();
+            adoc.appendLines(p.getDescription());
         }
 
-        adoc.tableEnd();
+        adoc.tableBoundary();
     }
 
     private void parameterTable(Collection<? extends Property> parameters) {
 
         adoc.col("3,7");
-        adoc.tableBegin()
-                .columnBegin().append("Name").space()
-                .columnBegin().append("Description").dualNewLine();
+        adoc.tableBoundary();
+        adoc.columnBegin();
+        adoc.append("Name");
+        adoc.appendSpace();
+        adoc.columnBegin();
+        adoc.append("Description");
+        adoc.dualNewLine();
 
         for (Property p : parameters) {
-            adoc.columnBegin().appendBoldMonospace(p.getDisplayName()).append(" : [small]#");
+            adoc.columnBegin();
+            adoc.appendBoldMonospace(p.getDisplayName());
+            adoc.append(" : [small]#");
             writeType(p.getDeclaration());
-            adoc.append('#').newLine();
-            adoc.columnBegin()
-                    .appendLines(p.getDescription());
+            adoc.append('#');
+            adoc.newLine();
+            adoc.columnBegin();
+            adoc.appendLines(p.getDescription());
         }
 
-        adoc.tableEnd();
+        adoc.tableBoundary();
     }
 
     private void writeType(Declaration d) {
@@ -266,7 +282,8 @@ public class DocWriter {
                 if (typeArgs.isEmpty()) {
                     adoc.link(od.getLink(), od.getShortName());
                 } else {
-                    adoc.link(od.getLink(), od.getShortName()).append('<');
+                    adoc.link(od.getLink(), od.getShortName());
+                    adoc.append('<');
                     for (int i = 0; i < typeArgs.size(); i++) {
                         writeType(typeArgs.get(i));
                         if (i != typeArgs.size() - 1) {
