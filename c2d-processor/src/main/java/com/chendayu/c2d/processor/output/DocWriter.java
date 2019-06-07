@@ -241,7 +241,6 @@ public class DocWriter {
                 adoc.append("any");
                 break;
             case TYPE_PARAMETER:
-                TypeVarDeclaration tad = (TypeVarDeclaration) d;
                 adoc.append("type_parameter");
                 break;
             case VOID:

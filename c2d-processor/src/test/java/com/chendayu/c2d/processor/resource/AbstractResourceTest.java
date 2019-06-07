@@ -13,7 +13,7 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * 本项目的 ut 整体逻辑都差不多，所以就把公用的部分抽离出来了
  */
-public class AbstractResourceTest {
+public class AbstractResourceTest {  // NOSONAR 这个不是个测试类，只是个抽象类，不跑测试
 
     @TempDir
     public File temporaryFolder;
