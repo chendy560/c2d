@@ -11,6 +11,7 @@
 
     <modules>
         <module>c2d-processor</module>
+        <module>c2d-sample</module>
     </modules>
 
     <properties>
@@ -37,6 +38,13 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>com.chendayu.c2d</groupId>
+                <artifactId>c2d-processor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>

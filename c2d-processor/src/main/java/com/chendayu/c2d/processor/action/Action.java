@@ -3,6 +3,7 @@ package com.chendayu.c2d.processor.action;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import com.chendayu.c2d.processor.SupportedContentType;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
@@ -197,5 +198,18 @@ public class Action {
 
     public boolean hasResponseBody() {
         return responseBody != null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Action action = (Action) o;
+        return Objects.equals(link, action.link);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(link);
     }
 }

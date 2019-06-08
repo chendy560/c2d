@@ -7,7 +7,7 @@ public class NameConversions {
     private static final String COMPONENT_ENUM_PREFIX = COMPONENT_PREFIX + "enums-";
 
     private static final String RESOURCE_PREFIX = "resources-";
-    private static final String ACTION_PREFIX = "actions-";
+    private static final String ACTION_PREFIX = "-actions-";
 
     private static final char RESOURCE_ACTION_SEPARATOR = '.';
 
@@ -35,7 +35,7 @@ public class NameConversions {
     public static String resourceLink(String resourceName) {
         StringBuilder builder = getStringBuilder();
         builder.append(RESOURCE_PREFIX);
-        appendQualifiedName(builder, resourceName);
+        appendLowerCase(builder, resourceName);
         return builder.toString();
     }
 
@@ -43,7 +43,7 @@ public class NameConversions {
         StringBuilder builder = getStringBuilder();
         builder.append(resourceLink);
         builder.append(ACTION_PREFIX);
-        appendQualifiedName(builder, actionName);
+        appendLowerCase(builder, actionName);
         return builder.toString();
     }
 
@@ -55,13 +55,27 @@ public class NameConversions {
                 .toString();
     }
 
+    private static void appendLowerCase(StringBuilder builder, String s) {
+        char[] chars = s.toCharArray();
+        for (char c : chars) {
+            if (Character.isUpperCase(c)) {
+                builder.append(Character.toLowerCase(c));
+            } else {
+                builder.append(c);
+            }
+        }
+    }
+
     private static void appendQualifiedName(StringBuilder builder, String qualifiedName) {
         char pc = ' ';
         for (char c : qualifiedName.toCharArray()) {
             if (c == PACKAGE_SEPARATOR || c == SUB_CLASS_SEPARATOR) {
                 builder.append(LINK_SEPARATOR);
-            } else if (Character.isUpperCase(c) && pc != PACKAGE_SEPARATOR) {
-                builder.append(LINK_SEPARATOR).append(Character.toLowerCase(c));
+            } else if (Character.isUpperCase(c)) {
+                if (pc != PACKAGE_SEPARATOR) {
+                    builder.append(LINK_SEPARATOR);
+                }
+                builder.append(Character.toLowerCase(c));
             } else {
                 builder.append(c);
             }

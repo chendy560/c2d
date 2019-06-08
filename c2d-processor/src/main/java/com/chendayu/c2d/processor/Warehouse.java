@@ -1,7 +1,9 @@
 package com.chendayu.c2d.processor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -87,5 +89,25 @@ public class Warehouse {
 
     public void addEnumDeclaration(EnumDeclaration enumDeclaration) {
         nameEnumMap.put(enumDeclaration.getQualifiedName(), enumDeclaration);
+    }
+
+    public List<NestedDeclaration> getUsedNestedDeclaration() {
+        ArrayList<NestedDeclaration> result = new ArrayList<>(nameDeclarationMap.size());
+        for (NestedDeclaration value : this.nameDeclarationMap.values()) {
+            if (value.isUsed()) {
+                result.add(value);
+            }
+        }
+        return result;
+    }
+
+    public List<EnumDeclaration> getUsedEnumDeclaration() {
+        ArrayList<EnumDeclaration> result = new ArrayList<>(nameEnumMap.size());
+        for (EnumDeclaration value : this.nameEnumMap.values()) {
+            if (value.isUsed()) {
+                result.add(value);
+            }
+        }
+        return result;
     }
 }

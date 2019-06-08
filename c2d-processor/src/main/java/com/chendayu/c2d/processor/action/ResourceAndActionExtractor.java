@@ -16,9 +16,11 @@ import com.chendayu.c2d.processor.AbstractExtractor;
 import com.chendayu.c2d.processor.DocIgnore;
 import com.chendayu.c2d.processor.SupportedContentType;
 import com.chendayu.c2d.processor.Warehouse;
+import com.chendayu.c2d.processor.declaration.ArrayDeclaration;
 import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
+import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 import com.chendayu.c2d.processor.model.DocComment;
 import com.chendayu.c2d.processor.property.Property;
 import com.chendayu.c2d.processor.util.NameConversions;
@@ -270,12 +272,26 @@ public class ResourceAndActionExtractor extends AbstractExtractor {
         TypeMirror returnType = element.getReturnType();
         List<String> returnComment = docComment.getReturn();
         Declaration declaration = declarationExtractor.extract(returnType);
-        if (declaration.getType() == DeclarationType.OBJECT) {
+        if (declaration.getType() == DeclarationType.OBJECT || declaration.getType() == DeclarationType.ARRAY) {
             Property responseBody = new Property(returnComment, declaration);
             action.setResponseBody(responseBody);
         }
 
         confirmContentType(action, consume, produce);
+
+        if (action.getRequestBody() != null) {
+            NestedDeclaration requestBodyDeclaration = findNestedDeclaration(action.getRequestBody().getDeclaration());
+            if (requestBodyDeclaration != null) {
+                requestBodyDeclaration.usedBy(action);
+            }
+        }
+
+        if (action.getResponseBody() != null) {
+            NestedDeclaration responseBodyDeclaration = findNestedDeclaration(action.getResponseBody().getDeclaration());
+            if (responseBodyDeclaration != null) {
+                responseBodyDeclaration.usedBy(action);
+            }
+        }
 
         return action;
     }
@@ -321,5 +337,21 @@ public class ResourceAndActionExtractor extends AbstractExtractor {
         }
 
         return false;
+    }
+
+    private NestedDeclaration findNestedDeclaration(Declaration declaration) {
+        if (declaration.getType() == DeclarationType.OBJECT) {
+            return ((NestedDeclaration) declaration);
+        }
+
+        if (declaration.getType() == DeclarationType.ARRAY) {
+            ArrayDeclaration arrayDeclaration = (ArrayDeclaration) declaration;
+            Declaration finalItemType = arrayDeclaration.getFinalItemType();
+            if (finalItemType.getType() == DeclarationType.OBJECT) {
+                return ((NestedDeclaration) finalItemType);
+            }
+        }
+
+        return null;
     }
 }

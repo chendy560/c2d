@@ -5,11 +5,14 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
+import com.chendayu.c2d.processor.action.Action;
 import com.chendayu.c2d.processor.model.DocComment;
 import com.chendayu.c2d.processor.property.Property;
 import com.chendayu.c2d.processor.util.NameConversions;
@@ -31,6 +34,10 @@ public class NestedDeclaration implements Declaration {
     private List<TypeVarDeclaration> typeParameters = Collections.emptyList();
 
     private List<Declaration> typeArguments = Collections.emptyList();
+
+    private Set<NestedDeclaration> usedInDeclaration = Collections.emptySet();
+
+    private Set<Action> usedInAction = Collections.emptySet();
 
     public NestedDeclaration(TypeElement typeElement) {
         this.typeElement = typeElement;
@@ -89,6 +96,28 @@ public class NestedDeclaration implements Declaration {
             }
         }
         return list;
+    }
+
+    public void usedBy(Action action) {
+        if (usedInAction.isEmpty()) {
+            usedInAction = new HashSet<>();
+        }
+        this.usedInAction.add(action);
+    }
+
+    public Set<NestedDeclaration> getUsedInDeclaration() {
+        return usedInDeclaration;
+    }
+
+    public Set<Action> getUsedInAction() {
+        return usedInAction;
+    }
+
+    public void usedBy(NestedDeclaration nestedDeclaration) {
+        if (usedInDeclaration.isEmpty()) {
+            usedInDeclaration = new HashSet<>();
+        }
+        this.usedInDeclaration.add(nestedDeclaration);
     }
 
     public NestedDeclaration withTypeArguments(List<Declaration> typeArguments) {
@@ -163,6 +192,10 @@ public class NestedDeclaration implements Declaration {
         return typeElement.getAnnotation(clazz);
     }
 
+    public boolean isUsed() {
+        return !this.usedInAction.isEmpty() || !this.usedInDeclaration.isEmpty();
+    }
+
     private NestedDeclaration copy() {
         NestedDeclaration copy = new NestedDeclaration();
         copy.typeElement = this.typeElement;
@@ -181,11 +214,11 @@ public class NestedDeclaration implements Declaration {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NestedDeclaration that = (NestedDeclaration) o;
-        return typeElement.equals(that.typeElement);
+        return Objects.equals(link, that.link);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(typeElement);
+        return Objects.hash(link);
     }
 }

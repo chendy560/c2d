@@ -31,6 +31,7 @@ import com.chendayu.c2d.processor.processor.DescriptionProcessor;
 import com.chendayu.c2d.processor.processor.DocIgnoreProcessor;
 import com.chendayu.c2d.processor.processor.JacksonProcessor;
 import com.chendayu.c2d.processor.processor.LombokProcessor;
+import com.chendayu.c2d.processor.processor.MarkUsageProcessor;
 import com.chendayu.c2d.processor.processor.NestedDeclarationPostProcessor;
 import com.chendayu.c2d.processor.property.Property;
 import com.chendayu.c2d.processor.util.NameConversions;
@@ -193,6 +194,7 @@ public class DeclarationExtractor extends AbstractExtractor {
 
         processors.add(new DocIgnoreProcessor(environment));
         processors.add(new DescriptionProcessor(environment));
+        processors.add(new MarkUsageProcessor(environment));
 
         TypeElement lombokData = elementUtils.getTypeElement(LOMBOK_DATA);
         if (lombokData != null) {

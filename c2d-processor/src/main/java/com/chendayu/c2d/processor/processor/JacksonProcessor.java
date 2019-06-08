@@ -45,9 +45,4 @@ public class JacksonProcessor extends AbstractNestedDeclarationPostProcessor {
             }
         }
     }
-
-    @Override
-    public int getOrder() {
-        return lowestOrder();
-    }
 }

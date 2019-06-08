@@ -1,6 +1,9 @@
 package com.chendayu.c2d.processor.declaration;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.chendayu.c2d.processor.property.Property;
 import com.chendayu.c2d.processor.util.NameConversions;
@@ -21,6 +24,8 @@ public class EnumDeclaration implements Declaration {
 
     private final List<String> description;
 
+    private Set<NestedDeclaration> usedInDeclaration;
+
     public EnumDeclaration(String name, String qualifiedName,
                            List<Property> constants, List<String> description) {
         this.name = name;
@@ -28,6 +33,22 @@ public class EnumDeclaration implements Declaration {
         this.qualifiedName = qualifiedName;
         this.constants = constants;
         this.description = description;
+        this.usedInDeclaration = Collections.emptySet();
+    }
+
+    public void usedBy(NestedDeclaration nestedDeclaration) {
+        if (usedInDeclaration.isEmpty()) {
+            usedInDeclaration = new HashSet<>();
+        }
+        usedInDeclaration.add(nestedDeclaration);
+    }
+
+    public boolean isUsed() {
+        return !this.usedInDeclaration.isEmpty();
+    }
+
+    public Set<NestedDeclaration> getUsedInDeclaration() {
+        return usedInDeclaration;
     }
 
     public String getQualifiedName() {

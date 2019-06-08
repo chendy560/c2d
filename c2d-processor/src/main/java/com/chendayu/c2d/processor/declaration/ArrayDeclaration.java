@@ -39,6 +39,15 @@ public class ArrayDeclaration implements Declaration {
         return itemType;
     }
 
+    public Declaration getFinalItemType() {
+        if (itemType.getType() != DeclarationType.ARRAY) {
+            return itemType;
+        } else {
+            ArrayDeclaration arrayItemType = (ArrayDeclaration) this.itemType;
+            return arrayItemType.getFinalItemType();
+        }
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ArrayDeclaration) {

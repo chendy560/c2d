@@ -3,7 +3,7 @@ package com.chendayu.c2d.processor.output;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Set;
 
 import com.chendayu.c2d.processor.Warehouse;
 import com.chendayu.c2d.processor.action.Action;
@@ -17,9 +17,6 @@ import com.chendayu.c2d.processor.declaration.TypeVarDeclaration;
 import com.chendayu.c2d.processor.property.Property;
 
 public class DocWriter {
-
-    private final TreeMap<String, NestedDeclaration> nestedDeclarationMap = new TreeMap<>();
-    private final TreeMap<String, EnumDeclaration> enumDeclarationMap = new TreeMap<>();
 
     private final AdocWriter adoc;
 
@@ -36,13 +33,14 @@ public class DocWriter {
 
         writeResources(warehouse.getResources());
 
-        writeDeclarations();
+        writeDeclarations(warehouse);
     }
 
     private void writeResources(Collection<Resource> resources) {
         adoc.title1("Resources");
 
         for (Resource resource : resources) {
+            adoc.anchor(resource.getLink());
             adoc.title2(resource.getName());
 
             Collection<Action> actions = resource.getActions();
@@ -54,6 +52,7 @@ public class DocWriter {
 
     private void writeActions(Action action) {
         String name = action.getName();
+        adoc.anchor(action.getLink());
         adoc.title3(name);
         adoc.appendLines(action.getDescription());
 
@@ -66,18 +65,12 @@ public class DocWriter {
         List<Property> pathVariables = action.getPathVariables();
         if (!pathVariables.isEmpty()) {
             adoc.title4("Path Variables");
-            for (Property pathVariable : pathVariables) {
-                saveDeclaration(pathVariable.getDeclaration());
-            }
             parameterTable(pathVariables);
         }
 
         List<Property> urlParameters = action.getUrlParameters();
         if (!urlParameters.isEmpty()) {
             adoc.title4("URL Parameters");
-            for (Property property : urlParameters) {
-                saveDeclaration(property.getDeclaration());
-            }
             parameterTable(urlParameters);
         }
 
@@ -85,7 +78,6 @@ public class DocWriter {
         if (requestBody != null) {
             adoc.title4("Request Body");
             writeType(requestBody.getDeclaration());
-            saveDeclaration(requestBody.getDeclaration());
         }
 
         adoc.dualNewLine();
@@ -94,44 +86,76 @@ public class DocWriter {
         if (responseBody != null) {
             adoc.title4("Response Body");
             writeType(responseBody.getDeclaration());
-            saveDeclaration(responseBody.getDeclaration());
         }
 
         adoc.dualNewLine();
     }
 
-    private void writeDeclarations() {
+    private void writeDeclarations(Warehouse warehouse) {
         adoc.title1("Components");
+        writeObjects(warehouse);
+        writeEnums(warehouse);
+    }
 
+    private void writeObjects(Warehouse warehouse) {
         adoc.title2("Objects");
 
-        for (NestedDeclaration od : nestedDeclarationMap.values()) {
-            adoc.anchor(od.getLink());
-            adoc.title3(od.getShortName());
+        for (NestedDeclaration nested : warehouse.getUsedNestedDeclaration()) {
+            adoc.anchor(nested.getLink());
+            adoc.title3(nested.getShortName());
 
-            adoc.appendLines(od.getDescription());
-            List<TypeVarDeclaration> typeParameters = od.getTypeParameters();
+            adoc.appendLines(nested.getDescription());
+            List<TypeVarDeclaration> typeParameters = nested.getTypeParameters();
             if (!typeParameters.isEmpty()) {
                 adoc.title4("Type Parameters");
                 parameterTable(typeParameters);
             }
 
-            Collection<Property> properties = od.accessibleProperties();
+            Collection<Property> properties = nested.accessibleProperties();
             if (!properties.isEmpty()) {
                 adoc.title4("Fields");
                 parameterTable(properties);
             }
-        }
 
+            writeUsedInAction(nested.getUsedInAction());
+            writeUsedInObject(nested.getUsedInDeclaration());
+        }
+    }
+
+    private void writeUsedInAction(Set<Action> usedInAction) {
+        if (!usedInAction.isEmpty()) {
+            adoc.title4("Used in Action");
+            for (Action action : usedInAction) {
+                adoc.link(action.getLink(), action.getFullName());
+                adoc.appendSpace();
+            }
+            adoc.dualNewLine();
+        }
+    }
+
+    private void writeEnums(Warehouse warehouse) {
         adoc.title2("Enums");
-        for (EnumDeclaration ed : enumDeclarationMap.values()) {
-            adoc.anchor(ed.getLink());
-            adoc.title3(ed.getName());
-            List<Property> constants = ed.getConstants();
+        for (EnumDeclaration declaration : warehouse.getUsedEnumDeclaration()) {
+            adoc.anchor(declaration.getLink());
+            adoc.title3(declaration.getName());
+            List<Property> constants = declaration.getConstants();
             if (!constants.isEmpty()) {
                 adoc.title4("Const");
                 parameterTable(constants);
             }
+
+            writeUsedInObject(declaration.getUsedInDeclaration());
+        }
+    }
+
+    private void writeUsedInObject(Set<NestedDeclaration> usedInDeclaration) {
+        if (!usedInDeclaration.isEmpty()) {
+            adoc.title4("Used in Object");
+            for (NestedDeclaration nestedDeclaration : usedInDeclaration) {
+                adoc.link(nestedDeclaration.getLink(), nestedDeclaration.getShortName());
+                adoc.appendSpace();
+            }
+            adoc.dualNewLine();
         }
     }
 
@@ -139,46 +163,6 @@ public class DocWriter {
         String applicationName = warehouse.getApplicationName();
 
         adoc.title0(applicationName + " API Doc");
-    }
-
-    private void saveDeclaration(Declaration declaration) {
-        DeclarationType type = declaration.getType();
-        if (type == DeclarationType.OBJECT) {
-            NestedDeclaration od = (NestedDeclaration) declaration;
-
-            if (nestedDeclarationMap.containsKey(od.getShortName()) && od.getTypeArguments().isEmpty()) {
-                return;
-            }
-            nestedDeclarationMap.put(od.getShortName(), od);
-
-            for (Declaration typeArg : od.getTypeArguments()) {
-                saveDeclaration(typeArg);
-            }
-
-            for (Property property : od.accessibleProperties()) {
-                saveDeclaration(property.getDeclaration());
-            }
-
-            return;
-        }
-
-        if (type == DeclarationType.ARRAY) {
-
-            ArrayDeclaration ad = (ArrayDeclaration) declaration;
-            Declaration componentType = ad.getItemType();
-            saveDeclaration(componentType);
-            return;
-        }
-
-        if (type == DeclarationType.ENUM) {
-            EnumDeclaration ed = (EnumDeclaration) declaration;
-
-            if (enumDeclarationMap.containsKey(ed.getName())) {
-                return;
-            }
-
-            enumDeclarationMap.put(ed.getName(), ed);
-        }
     }
 
     private void parameterTable(List<TypeVarDeclaration> parameters) {
