@@ -27,8 +27,8 @@ public class RequestBodyParameterHandler extends AbstractParameterHandler {
         }
 
         Declaration declaration = declarationExtractor.extract(element);
-        String parameterNaem = element.getSimpleName().toString();
-        List<String> description = action.findParameterDescription(parameterNaem);
+        String parameterName = element.getSimpleName().toString();
+        List<String> description = action.findParameterDescription(parameterName);
         Property property = new Property(description, declaration);
         action.setRequestBody(property);
         return true;
