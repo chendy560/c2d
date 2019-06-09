@@ -5,14 +5,17 @@ package com.chendayu.c2d.processor;
  */
 public enum SupportedContentType {
 
-    APPLICATION_JSON("application/json"),
-    MULTIPART_FORM_DATA("multipart/form-data"),
-    APPLICATION_FORM_URLENCODED("application/x-www-form-urlencoded");
+    APPLICATION_JSON("application/json", false),
+    MULTIPART_FORM_DATA("multipart/form-data", true),
+    APPLICATION_FORM_URLENCODED("application/x-www-form-urlencoded", true);
 
     private final String value;
 
-    SupportedContentType(String value) {
+    private final boolean parameterInBody;
+
+    SupportedContentType(String value, boolean parameterInBody) {
         this.value = value;
+        this.parameterInBody = parameterInBody;
     }
 
     public static SupportedContentType infer(String[] contentTypes) {
@@ -35,5 +38,9 @@ public enum SupportedContentType {
 
     public String getValue() {
         return value;
+    }
+
+    public boolean isParameterInBody() {
+        return parameterInBody;
     }
 }

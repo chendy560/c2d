@@ -34,6 +34,7 @@ public class AdocWriter {
     private static final String TITLE2 = "===";
     private static final String TITLE3 = "====";
     private static final String TITLE4 = "=====";
+    private static final String TITLE5 = "======";
 
     private final Writer writer;
 
@@ -127,7 +128,7 @@ public class AdocWriter {
     /**
      * 插入一个没有意义的注释行，避免文件 include 时的一些意外的格式错误
      */
-    private void safeLine() {
+    public void safeLine() {
         append("// new file begin");
         newLine();
     }
@@ -175,6 +176,13 @@ public class AdocWriter {
      */
     public void title4(String title) {
         title(TITLE4, title);
+    }
+
+    /**
+     * 五级标题
+     */
+    public void title5(String title) {
+        title(TITLE5, title);
     }
 
     /**
@@ -230,7 +238,7 @@ public class AdocWriter {
         for (String s : ss) {
             if (!s.isEmpty()) {
                 append(s);
-                hardNewLine();
+                newLine();
             }
         }
 

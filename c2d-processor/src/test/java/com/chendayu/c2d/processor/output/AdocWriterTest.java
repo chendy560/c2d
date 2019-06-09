@@ -104,6 +104,12 @@ class AdocWriterTest {
     }
 
     @Test
+    void title5() {
+        adocWriter.title5("title");
+        assertResult("====== title\n\n");
+    }
+
+    @Test
     void sourceCodeBegin() {
         adocWriter.sourceCodeBegin("java");
         assertResult("[source,java]\n----\n");
@@ -136,7 +142,7 @@ class AdocWriterTest {
     @Test
     void appendLines() {
         adocWriter.appendLines(Arrays.asList("line1", "line2", "line3"));
-        assertResult("line1 +\nline2 +\nline3 +\n\n");
+        assertResult("line1\nline2\nline3\n\n");
     }
 
     private void assertResult(String expect) {

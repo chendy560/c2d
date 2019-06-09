@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import static com.chendayu.c2d.processor.SupportedContentType.APPLICATION_FORM_URLENCODED;
 import static com.chendayu.c2d.processor.SupportedContentType.MULTIPART_FORM_DATA;
 import static com.chendayu.c2d.processor.util.RequestMappings.findRequestMapping;
 import static org.springframework.http.HttpMethod.DELETE;
@@ -312,14 +313,26 @@ public class ResourceAndActionExtractor extends AbstractExtractor {
     }
 
     private void inferRequestContentType(Action action, String[] consume) {
+        // get 和 delete 没有 body，也就不存在 content-type
+        HttpMethod method = action.getMethod();
+        if (method == GET || method == DELETE) {
+            return;
+        }
+
+        // 当存在 @RequestBody 时，一般就是 application/json 了
+        if (action.hasRequestBody()) {
+            action.setRequestContentType(SupportedContentType.infer(consume));
+            return;
+        }
+
+        // 如果有文件，肯定是 multipart
         if (containsFileParam(action)) {
             action.setRequestContentType(MULTIPART_FORM_DATA);
             return;
         }
 
-        if (action.hasRequestBody()) {
-            action.setRequestContentType(SupportedContentType.infer(consume));
-        }
+        // 最后，无聊的 form_urlencoded
+        action.setRequestContentType(APPLICATION_FORM_URLENCODED);
     }
 
     private void inferResponseContentType(Action action, String[] produce) {

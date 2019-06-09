@@ -12,21 +12,24 @@ import com.chendayu.c2d.processor.declaration.DeclarationType;
 import com.chendayu.c2d.processor.declaration.EnumDeclaration;
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 import com.chendayu.c2d.processor.property.Property;
+import com.chendayu.c2d.processor.util.StringBuilderHolder;
 
 import org.springframework.http.HttpMethod;
 
-public class HttpRequestGenerator {
+public class HttpDataGenerator {
 
     private static final int INDENT_SIZE = 2;
 
-    private static final int NO_INDEX = 0;
+    private static final int NO_INDENT = 0;
 
-    private static final String HTTP1 = "HTTP/1.1";
     private static final char QUERY_STRING_BEGIN = '?';
     private static final char PARAMETER_SPLIT = '&';
     private static final char PARAMETER_BEGIN = '{';
     private static final char PARAMETER_END = '}';
     private static final char EQUAL = '=';
+
+    private static final String FORM_BOUNDARY = "----WebKitFormBoundary7MA4YWxkTrZu0gW";
+    private static final String CONTENT_TYPE_MULTI_PART_WITH_BOUNDARY = "multipart/form-data; boundary=" + FORM_BOUNDARY;
 
     private static final String CONTENT_TYPE = "Content-Type";
 
@@ -34,40 +37,51 @@ public class HttpRequestGenerator {
 
     private static final String HTTP_OK = "200 OK";
 
-    private final StringBuilder builder = new StringBuilder(16 * 1024);
+    private final StringBuilder builder = StringBuilderHolder.resetAndGet();
 
-    private final Map<String, Integer> writeDeclaration = new HashMap<>();
+    private final Map<String, Integer> writtenDeclaration = new HashMap<>();
 
-    public String generate(Action action) {
-        generateRequestLine(action);
-        writeRequest(action);
-        writeResponse(action);
+    public String generateRequest(Action action) {
+
+        boolean parameterInUrl = parameterInUrl(action);
+
+        generateHttpMethod(action);
+        generatePath(action);
+        if (parameterInUrl) {
+            builder.append(QUERY_STRING_BEGIN);
+            generateQueryString(action);
+        }
+        newLine();
+
+        generateRequestBody(action);
         return generateAndCleanup();
     }
 
-    private void generateRequestLine(Action action) {
-        writeHttpMethod(action);
-        writePath(action);
-        writeQueryString(action);
-        writeHttpVersionAndFinish();
+    public String generateResponse(Action action) {
+        generateResponseLine();
+        generateResponseBody(action);
+        return generateAndCleanup();
     }
 
-    private void writeHttpMethod(Action action) {
+    private boolean parameterInUrl(Action action) {
+        SupportedContentType contentType = action.getRequestContentType();
+        return contentType == null || !contentType.isParameterInBody();
+    }
+
+    private void generateHttpMethod(Action action) {
         HttpMethod method = action.getMethod();
         builder.append(method.name()).append(' ');
     }
 
-    private void writePath(Action action) {
+    private void generatePath(Action action) {
         String path = action.getPath();
         builder.append(path);
     }
 
-    private void writeQueryString(Action action) {
+    private void generateQueryString(Action action) {
         List<Property> urlParameters = action.getUrlParameters();
 
         if (!urlParameters.isEmpty()) {
-            builder.append(QUERY_STRING_BEGIN);
-
             for (Property urlParameter : urlParameters) {
                 String name = urlParameter.getDisplayName();
                 builder.append(name)
@@ -81,23 +95,69 @@ public class HttpRequestGenerator {
 
     }
 
-    private void writeHttpVersionAndFinish() {
-        builder.append(' ').append(HTTP1).append('\n');
-    }
+    private void generateRequestBody(Action action) {
+        SupportedContentType contentType = action.getRequestContentType();
+        if (contentType != null) {
+            switch (contentType) {
+                case APPLICATION_JSON:
+                    generateContentType(SupportedContentType.APPLICATION_JSON.getValue());
+                    newLine();
+                    generateJson(action.getRequestBody().getDeclaration(), NO_INDENT);
+                    newLine();
+                    break;
+                case MULTIPART_FORM_DATA:
+                    generateContentType(CONTENT_TYPE_MULTI_PART_WITH_BOUNDARY);
+                    newLine();
+                    generateMultipart(action.getUrlParameters());
+                    newLine();
+                    break;
+                case APPLICATION_FORM_URLENCODED:
+                    generateContentType(SupportedContentType.APPLICATION_FORM_URLENCODED.getValue());
+                    newLine();
+                    generateQueryString(action);
+                    newLine();
+                    break;
+                default:
+                    break;
+            }
 
-    private void writeRequest(Action action) {
-        if (action.hasRequestBody()) {
-            SupportedContentType contentType = action.getRequestContentType();
-            writeHeader(CONTENT_TYPE, contentType.getValue());
-            builder.append('\n');
-
-            writeBody(action.getRequestBody().getDeclaration());
-            builder.append('\n');
+            newLine();
         }
     }
 
-    private void writeHeader(String name, String value) {
-        builder.append(name).append(HEADER_SPLIT).append(value).append('\n');
+    private void generateMultipart(List<Property> parameters) {
+        for (Property parameter : parameters) {
+            generateMultipart(parameter);
+        }
+    }
+
+    private void generateMultipart(Property property) {
+        newLine();
+        builder.append("Content-Disposition: form-data; name=\"")
+                .append(property.getDisplayName())
+                .append('"');
+        if (property.getType() == DeclarationType.FILE) {
+            builder.append("; filename=\"")
+                    .append(property.getDisplayName())
+                    .append('"');
+            newLine();
+            newLine();
+            builder.append(FORM_BOUNDARY);
+        } else {
+            newLine();
+            newLine();
+            builder.append(property.getDisplayName());
+            newLine();
+            builder.append(FORM_BOUNDARY);
+        }
+    }
+
+    private void newLine() {
+        builder.append('\n');
+    }
+
+    private void generateContentType(String value) {
+        builder.append(HttpDataGenerator.CONTENT_TYPE).append(HEADER_SPLIT).append(value).append('\n');
     }
 
     private String generateAndCleanup() {
@@ -106,31 +166,21 @@ public class HttpRequestGenerator {
         return result;
     }
 
-    public void writeBody(Declaration declaration) {
-        generateJson(declaration, NO_INDEX);
+    private void generateResponseLine() {
+        builder.append(HTTP_OK).append('\n');
     }
 
-    private void writeResponse(Action action) {
-        builder.append('\n');
-        writeResponseLine();
-        writeResponseHeaderAndBody(action);
-    }
-
-    private void writeResponseLine() {
-        builder.append(HTTP1).append(' ').append(HTTP_OK).append('\n');
-    }
-
-    private void writeResponseHeaderAndBody(Action action) {
+    private void generateResponseBody(Action action) {
         if (action.hasResponseBody()) {
 
             SupportedContentType contentType = action.getResponseBodyContentType();
-            writeHeader(CONTENT_TYPE, contentType.getValue());
+            generateContentType(contentType.getValue());
 
-            builder.append('\n');
+            newLine();
 
-            writeBody(action.getResponseBody().getDeclaration());
+            generateJson(action.getResponseBody().getDeclaration(), NO_INDENT);
 
-            builder.append('\n');
+            newLine();
         }
     }
 
@@ -176,7 +226,7 @@ public class HttpRequestGenerator {
                 ArrayDeclaration arrayDeclaration = (ArrayDeclaration) declaration;
                 generateJson(arrayDeclaration.getItemType(), indent + 1);
 
-                builder.append('\n');
+                newLine();
 
                 appendIndent(indent);
                 builder.append(']');
@@ -186,22 +236,22 @@ public class HttpRequestGenerator {
 
                 NestedDeclaration nestedDeclaration = (NestedDeclaration) declaration;
                 String qualifiedName = nestedDeclaration.getQualifiedName();
-                int times = writeDeclaration.getOrDefault(qualifiedName, 0);
+                int times = writtenDeclaration.getOrDefault(qualifiedName, 0);
 
                 if (times > 2) {
                     builder.append("null");
                 } else {
 
-                    writeDeclaration.put(qualifiedName, times + 1);
+                    writtenDeclaration.put(qualifiedName, times + 1);
                     for (Property property : nestedDeclaration.accessibleProperties()) {
                         generateJson(property, indent + 1);
                     }
 
                     cut(2); // 去掉结尾多出的一个 逗号 和一个 换行
-                    builder.append('\n'); // 再补上换行
+                    newLine();
                     appendIndent(indent);
                     builder.append('}');
-                    writeDeclaration.put(qualifiedName, times - 1);
+                    writtenDeclaration.put(qualifiedName, times - 1);
                 }
                 break;
 
