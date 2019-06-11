@@ -47,7 +47,7 @@ public class HttpDataGenerator {
 
         generateHttpMethod(action);
         generatePath(action);
-        if (parameterInUrl) {
+        if (parameterInUrl && !action.getUrlParameters().isEmpty()) {
             builder.append(QUERY_STRING_BEGIN);
             generateQueryString(action);
         }
