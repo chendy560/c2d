@@ -163,6 +163,7 @@ public class HttpDataGenerator {
     private String generateAndCleanup() {
         String result = builder.toString();
         builder.setLength(0);
+        writtenDeclaration.clear();
         return result;
     }
 
@@ -232,16 +233,15 @@ public class HttpDataGenerator {
                 builder.append(']');
                 break;
             case OBJECT:
-                builder.append('{').append('\n');
 
                 NestedDeclaration nestedDeclaration = (NestedDeclaration) declaration;
                 String qualifiedName = nestedDeclaration.getQualifiedName();
                 int times = writtenDeclaration.getOrDefault(qualifiedName, 0);
 
-                if (times > 2) {
+                if (times > 1) {
                     builder.append("null");
                 } else {
-
+                    builder.append('{').append('\n');
                     writtenDeclaration.put(qualifiedName, times + 1);
                     for (Property property : nestedDeclaration.accessibleProperties()) {
                         generateJson(property, indent + 1);
@@ -251,7 +251,6 @@ public class HttpDataGenerator {
                     newLine();
                     appendIndent(indent);
                     builder.append('}');
-                    writtenDeclaration.put(qualifiedName, times - 1);
                 }
                 break;
 
