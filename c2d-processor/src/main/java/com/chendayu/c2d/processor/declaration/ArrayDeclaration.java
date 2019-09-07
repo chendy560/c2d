@@ -1,7 +1,5 @@
 package com.chendayu.c2d.processor.declaration;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -14,11 +12,11 @@ public class ArrayDeclaration implements Declaration {
      */
     private final Declaration itemType;
 
-    private final List<String> description;
+    private final String description;
 
     private ArrayDeclaration(Declaration itemType) {
         this.itemType = itemType;
-        this.description = Collections.singletonList("array of " + itemType.getDescription());
+        this.description = "Array of " + itemType.getDescription();
     }
 
     public static ArrayDeclaration arrayOf(Declaration componentType) {
@@ -31,7 +29,7 @@ public class ArrayDeclaration implements Declaration {
     }
 
     @Override
-    public List<String> getDescription() {
+    public String getDescription() {
         return description;
     }
 

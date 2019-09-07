@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.chendayu.c2d.processor.action.Action;
-import com.chendayu.c2d.processor.model.DocComment;
+import com.chendayu.c2d.processor.property.Comment;
 import com.chendayu.c2d.processor.property.Property;
 import com.chendayu.c2d.processor.util.NameConversions;
 
@@ -27,7 +27,7 @@ public class NestedDeclaration implements Declaration {
 
     private String link;
 
-    private List<String> description = Collections.emptyList();
+    private String description = "";
 
     private LinkedHashMap<String, Property> propertyMap = new LinkedHashMap<>();
 
@@ -44,7 +44,7 @@ public class NestedDeclaration implements Declaration {
         this.shortName = typeElement.getSimpleName().toString();
         this.qualifiedName = typeElement.getQualifiedName().toString();
         this.link = NameConversions.componentObjectLink(qualifiedName);
-        this.description = DocComment.create(typeElement).getDescription();
+        this.description = Comment.create(typeElement).getCommentText();
     }
 
     private NestedDeclaration() {
@@ -68,7 +68,7 @@ public class NestedDeclaration implements Declaration {
     }
 
     @Override
-    public List<String> getDescription() {
+    public String getDescription() {
         return description;
     }
 

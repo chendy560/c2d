@@ -3,8 +3,6 @@ package com.chendayu.c2d.processor.property;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.lang.annotation.Annotation;
-import java.util.Collections;
-import java.util.List;
 
 import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
@@ -29,7 +27,7 @@ public class Property {
     /**
      * 字段 / 参数 / 返回值 上的注释
      */
-    private List<String> description;
+    private String description;
 
     /**
      * 类型
@@ -73,15 +71,15 @@ public class Property {
     /**
      * 没有名字的字段，即返回值
      */
-    public Property(List<String> description, Declaration declaration) {
-        this(null, description, declaration);
+    public Property(Declaration declaration) {
+        this(null, "", declaration);
     }
 
     public Property(String originName, Declaration declaration) {
-        this(originName, Collections.emptyList(), declaration);
+        this(originName, "", declaration);
     }
 
-    public Property(String originName, List<String> description, Declaration declaration) {
+    public Property(String originName, String description, Declaration declaration) {
         this.originName = originName;
         this.displayName = originName;
         this.description = description;
@@ -100,11 +98,11 @@ public class Property {
         this.displayName = displayName;
     }
 
-    public List<String> getDescription() {
+    public String getDescription() {
         return description;
     }
 
-    public void setDescription(List<String> description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
@@ -197,7 +195,7 @@ public class Property {
         newProperty.setDisplayName(parent.getDisplayName());
         newProperty.setDeclaration(child.getDeclaration());
 
-        List<String> newDescription = child.getDescription();
+        String newDescription = child.getDescription();
         if (!newDescription.isEmpty()) {
             newProperty.setDescription(newDescription);
         } else {

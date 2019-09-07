@@ -2,7 +2,6 @@ package com.chendayu.c2d.processor.action;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.VariableElement;
-import java.util.List;
 
 import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
@@ -28,8 +27,8 @@ public class RequestBodyParameterHandler extends AbstractParameterHandler {
 
         Declaration declaration = declarationExtractor.extract(element);
         String parameterName = element.getSimpleName().toString();
-        List<String> description = action.findParameterDescription(parameterName);
-        Property property = new Property(description, declaration);
+        String description = action.findParameterDescription(parameterName);
+        Property property = new Property(null, description, declaration);
         action.setRequestBody(property);
         return true;
     }

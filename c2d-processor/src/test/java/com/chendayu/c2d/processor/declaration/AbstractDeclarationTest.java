@@ -2,7 +2,6 @@ package com.chendayu.c2d.processor.declaration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import com.chendayu.c2d.processor.property.Property;
@@ -25,11 +24,7 @@ public abstract class AbstractDeclarationTest {
         this.compiler = new TestCompiler(this.temporaryFolder);
     }
 
-    void checkProperty(Property property, String name, DeclarationType type, String... description) {
-        checkProperty(property, name, type, Arrays.asList(description));
-    }
-
-    void checkProperty(Property property, String name, DeclarationType type, List<String> description) {
+    void checkProperty(Property property, String name, DeclarationType type, String description) {
         assertThat(property).isNotNull();
         assertThat(property.getDisplayName()).isEqualTo(name);
         assertThat(property.getDeclaration().getType()).isEqualTo(type);

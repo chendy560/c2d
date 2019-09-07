@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.chendayu.c2d.processor.Warehouse;
-import com.chendayu.c2d.processor.model.DocComment;
+import com.chendayu.c2d.processor.property.Comment;
 
 public class DeclarationTestProcessor extends AbstractProcessor {
 
@@ -32,7 +32,7 @@ public class DeclarationTestProcessor extends AbstractProcessor {
         this.declarations = new ArrayList<>();
         this.declarationExtractor = new DeclarationExtractor(processingEnv, new Warehouse());
         this.elementUtils = processingEnv.getElementUtils();
-        DocComment.init(processingEnv);
+        Comment.initStatic(processingEnv);
     }
 
     @Override

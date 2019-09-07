@@ -3,7 +3,6 @@ package com.chendayu.c2d.processor.action;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.VariableElement;
 import java.util.Collection;
-import java.util.List;
 
 import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
@@ -26,7 +25,7 @@ public class NoAnnotationParameterHandler extends AbstractParameterHandler {
 
         if (isSimpleDeclaration(declaration) || isSimpleArray(declaration)) {
             String parameterName = element.getSimpleName().toString();
-            List<String> description = action.findParameterDescription(parameterName);
+            String description = action.findParameterDescription(parameterName);
             Property property = new Property(parameterName, description,
                     declaration);
             action.addUrlParameter(property);

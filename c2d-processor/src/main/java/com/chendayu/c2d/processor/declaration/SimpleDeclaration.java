@@ -1,8 +1,5 @@
 package com.chendayu.c2d.processor.declaration;
 
-import java.util.Collections;
-import java.util.List;
-
 public enum SimpleDeclaration implements Declaration {
 
     STRING(DeclarationType.STRING, "string"),
@@ -18,11 +15,11 @@ public enum SimpleDeclaration implements Declaration {
 
     private final DeclarationType type;
 
-    private final List<String> description;
+    private final String description;
 
     SimpleDeclaration(DeclarationType type, String description) {
         this.type = type;
-        this.description = Collections.singletonList(description);
+        this.description = description;
     }
 
     @Override
@@ -31,7 +28,7 @@ public enum SimpleDeclaration implements Declaration {
     }
 
     @Override
-    public List<String> getDescription() {
+    public String getDescription() {
         return description;
     }
 }

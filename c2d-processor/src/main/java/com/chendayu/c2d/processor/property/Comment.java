@@ -1,5 +1,8 @@
 package com.chendayu.c2d.processor.property;
 
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
+import javax.lang.model.util.Elements;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,6 +12,7 @@ import java.util.Map;
  * @see com.sun.tools.javadoc.Comment
  */
 public class Comment {
+
 
     private static final String PARAM_TAG = "@param";
     private static final String RETURN_TAG = "@return";
@@ -24,6 +28,38 @@ public class Comment {
     private static final int TAG_GAP = 2;
     private static final int TAG_NAME = 3;
 
+    private static final Comment empty = new Comment(null) {
+        @Override
+        public String getCommentText() {
+            return "";
+        }
+
+        @Override
+        public String getReturnText() {
+            return "";
+        }
+
+        @Override
+        public String getExample() {
+            return "";
+        }
+
+        @Override
+        public boolean isIgnored() {
+            return false;
+        }
+
+        @Override
+        public String getParamComment(String paramName) {
+            return "";
+        }
+
+        @Override
+        public String getTypeParamComment(String paramName) {
+            return "";
+        }
+    };
+    private static Elements elementUtils;
     private final String commentString;
 
     private String commentText = "";
@@ -39,8 +75,20 @@ public class Comment {
     private boolean ignored;
 
     public Comment(String commentString) {
-        this.commentString = commentString;
+        this.commentString = commentString == null ? "" : commentString;
         init();
+    }
+
+    public static void initStatic(ProcessingEnvironment processingEnv) {
+        elementUtils = processingEnv.getElementUtils();
+    }
+
+    public static Comment create(Element comment) {
+        if (comment == null) {
+            return empty;
+        }
+        String docComment = elementUtils.getDocComment(comment);
+        return new Comment(docComment);
     }
 
     private void init() {  // NOSONAR 对不起，这是我从JDK抄过来的，复杂度爆了就爆了吧

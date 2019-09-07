@@ -1,6 +1,5 @@
 package com.chendayu.c2d.processor.declaration;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.chendayu.c2d.processor.property.Property;
@@ -21,7 +20,7 @@ public class EnumTest extends AbstractDeclarationTest {
 
 
         assertThat(enumDeclaration.getName()).isEqualTo("UserType");
-        assertThat(enumDeclaration.getDescription()).isEqualTo(Collections.singletonList("用户类型"));
+        assertThat(enumDeclaration.getDescription()).isEqualTo("用户类型");
 
         List<Property> constants = enumDeclaration.getConstants();
         assertThat(constants).hasSize(2);
