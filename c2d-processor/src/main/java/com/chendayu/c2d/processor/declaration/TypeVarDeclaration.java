@@ -1,21 +1,19 @@
 package com.chendayu.c2d.processor.declaration;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 public class TypeVarDeclaration implements Declaration {
 
     private final String name;
 
-    private final List<String> description;
+    private final String description;
 
     public TypeVarDeclaration(String name) {
         this.name = name;
-        this.description = Collections.singletonList("type var: " + name);
+        this.description = "type var: " + name;
     }
 
-    public TypeVarDeclaration(String name, List<String> description) {
+    public TypeVarDeclaration(String name, String description) {
         this.name = name;
         this.description = description;
     }
@@ -26,7 +24,7 @@ public class TypeVarDeclaration implements Declaration {
     }
 
     @Override
-    public List<String> getDescription() {
+    public String getDescription() {
         return description;
     }
 

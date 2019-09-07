@@ -2,9 +2,7 @@ package com.chendayu.c2d.processor.app;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -99,7 +97,7 @@ public class FinalTest {
     private void checkDeleteAction(Action action) {
         assertThat(action.getName()).isEqualTo("Delete");
 
-        assertThat(action.getDescription()).isEqualTo(Collections.singletonList("删除用户"));
+        assertThat(action.getDescription()).isEqualTo("删除用户");
 
         assertThat(action.getMethod()).isEqualTo(HttpMethod.DELETE);
 
@@ -117,7 +115,7 @@ public class FinalTest {
     private void checkCreateAction(Action action) {
         assertThat(action.getName()).isEqualTo("Create");
 
-        assertThat(action.getDescription()).isEqualTo(Collections.singletonList("创建用户"));
+        assertThat(action.getDescription()).isEqualTo("创建用户");
 
         assertThat(action.getMethod()).isEqualTo(HttpMethod.POST);
 
@@ -143,7 +141,7 @@ public class FinalTest {
     private void checkGetAction(Action action) {
         assertThat(action.getName()).isEqualTo("Get");
 
-        assertThat(action.getDescription()).isEqualTo(Collections.singletonList("通过id获取用户"));
+        assertThat(action.getDescription()).isEqualTo("通过id获取用户");
 
         assertThat(action.getMethod()).isEqualTo(HttpMethod.GET);
 
@@ -172,7 +170,7 @@ public class FinalTest {
     private void checkListAction(Action action) {
         assertThat(action.getName()).isEqualTo("List");
 
-        assertThat(action.getDescription()).isEqualTo(Collections.singletonList("列举用户"));
+        assertThat(action.getDescription()).isEqualTo("列举用户");
 
         assertThat(action.getMethod()).isEqualTo(HttpMethod.GET);
 
@@ -200,7 +198,7 @@ public class FinalTest {
     private void checkOverwriteAction(Action action) {
         assertThat(action.getName()).isEqualTo("Overwrite");
 
-        assertThat(action.getDescription()).isEqualTo(Collections.singletonList("更新/覆盖用户数据"));
+        assertThat(action.getDescription()).isEqualTo("更新/覆盖用户数据");
 
         assertThat(action.getMethod()).isEqualTo(HttpMethod.PUT);
 
@@ -228,7 +226,7 @@ public class FinalTest {
     private void checkSearchAction(Action action) {
         assertThat(action.getName()).isEqualTo("Search");
 
-        assertThat(action.getDescription()).isEqualTo(Collections.singletonList("搜索用户"));
+        assertThat(action.getDescription()).isEqualTo("搜索用户");
 
         assertThat(action.getMethod()).isEqualTo(HttpMethod.GET);
 
@@ -264,7 +262,7 @@ public class FinalTest {
     private void checkUserPage(NestedDeclaration nestedDeclaration) {
         assertThat(nestedDeclaration.getShortName()).isEqualTo("Page");
         assertThat(nestedDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.Page");
-        assertThat(nestedDeclaration.getDescription()).isEqualTo(Collections.singletonList("数据分页的一页"));
+        assertThat(nestedDeclaration.getDescription()).isEqualTo("数据分页的一页");
 
         List<TypeVarDeclaration> typeParameters = nestedDeclaration.getTypeParameters();
         assertThat(typeParameters).hasSize(1);
@@ -294,7 +292,7 @@ public class FinalTest {
     private void checkUpdateAction(Action action) {
         assertThat(action.getName()).isEqualTo("Update");
 
-        assertThat(action.getDescription()).isEqualTo(Collections.singletonList("局部更新用户数据"));
+        assertThat(action.getDescription()).isEqualTo("局部更新用户数据");
 
         assertThat(action.getMethod()).isEqualTo(HttpMethod.PATCH);
 
@@ -323,7 +321,7 @@ public class FinalTest {
 
         assertThat(nestedDeclaration.getShortName()).isEqualTo("UserUpdateRequest");
         assertThat(nestedDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.UserUpdateRequest");
-        assertThat(nestedDeclaration.getDescription()).isEqualTo(Collections.singletonList("用户更新请求"));
+        assertThat(nestedDeclaration.getDescription()).isEqualTo("用户更新请求");
 
 
         assertThat(nestedDeclaration.getTypeParameters()).isEmpty();
@@ -345,7 +343,7 @@ public class FinalTest {
 
         assertThat(nestedDeclaration.getShortName()).isEqualTo("UserCreateRequest");
         assertThat(nestedDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.UserCreateRequest");
-        assertThat(nestedDeclaration.getDescription()).isEqualTo(Collections.singletonList("用户创建请求"));
+        assertThat(nestedDeclaration.getDescription()).isEqualTo("用户创建请求");
 
 
         assertThat(nestedDeclaration.getTypeParameters()).isEmpty();
@@ -367,7 +365,7 @@ public class FinalTest {
 
         assertThat(nestedDeclaration.getShortName()).isEqualTo("User");
         assertThat(nestedDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.User");
-        assertThat(nestedDeclaration.getDescription()).isEqualTo(Collections.singletonList("用户，就是用户"));
+        assertThat(nestedDeclaration.getDescription()).isEqualTo("用户，就是用户");
 
 
         assertThat(nestedDeclaration.getTypeParameters()).isEmpty();
@@ -397,13 +395,13 @@ public class FinalTest {
     }
 
     private void checkId(Property id) {
-        checkProperty(id, "id", DeclarationType.NUMBER, "就是id", "没错就是id");
+        checkProperty(id, "id", DeclarationType.NUMBER, "就是id\n 没错就是id");
     }
 
     private void checkPet(NestedDeclaration nestedDeclaration) {
         assertThat(nestedDeclaration.getShortName()).isEqualTo("Pet");
         assertThat(nestedDeclaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.Pet");
-        assertThat(nestedDeclaration.getDescription()).isEqualTo(Collections.singletonList("宠物，可能是🐈，可能是🐶"));
+        assertThat(nestedDeclaration.getDescription()).isEqualTo("宠物，可能是🐈，可能是🐶");
 
 
         assertThat(nestedDeclaration.getTypeParameters()).isEmpty();
@@ -434,7 +432,7 @@ public class FinalTest {
     private void checkPetType(EnumDeclaration declaration) {
         assertThat(declaration.getName()).isEqualTo("PetType");
         assertThat(declaration.getQualifiedName()).isEqualTo("com.chendayu.c2d.processor.app.PetType");
-        assertThat(declaration.getDescription()).isEqualTo(Collections.singletonList("宠物类型，有点莫名"));
+        assertThat(declaration.getDescription()).isEqualTo("宠物类型，有点莫名");
 
         List<Property> constants = declaration.getConstants();
         assertThat(constants).hasSize(2);
@@ -446,16 +444,16 @@ public class FinalTest {
         checkProperty(dog, "DOG", DeclarationType.ENUM_CONST, "没错，就是🐶");
     }
 
-    private void checkProperty(Property property, String name, DeclarationType type, String... description) {
+    private void checkProperty(Property property, String name, DeclarationType type, String description) {
         assertThat(property).isNotNull();
         assertThat(property.getDisplayName()).isEqualTo(name);
         assertThat(property.getDeclaration().getType()).isEqualTo(type);
-        assertThat(property.getDescription()).isEqualTo(Arrays.asList(description));
+        assertThat(property.getDescription()).isEqualTo(description);
     }
 
-    private void checkTypeVarDeclaration(TypeVarDeclaration property, String name, String... description) {
+    private void checkTypeVarDeclaration(TypeVarDeclaration property, String name, String description) {
         assertThat(property).isNotNull();
         assertThat(property.getName()).isEqualTo(name);
-        assertThat(property.getDescription()).isEqualTo(Arrays.asList(description));
+        assertThat(property.getDescription()).isEqualTo(description);
     }
 }

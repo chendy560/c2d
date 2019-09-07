@@ -1,6 +1,5 @@
 package com.chendayu.c2d.processor.declaration;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -29,9 +28,9 @@ public class GenericTest extends AbstractDeclarationTest {
         assertThat(typeArg0.getType()).isEqualTo(DeclarationType.STRING);
     }
 
-    private void checkTypeVarDeclaration(TypeVarDeclaration property, String name, String... description) {
+    private void checkTypeVarDeclaration(TypeVarDeclaration property, String name, String description) {
         assertThat(property).isNotNull();
         assertThat(property.getName()).isEqualTo(name);
-        assertThat(property.getDescription()).isEqualTo(Arrays.asList(description));
+        assertThat(property.getDescription()).isEqualTo(description);
     }
 }

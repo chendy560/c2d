@@ -26,13 +26,13 @@ import java.util.Set;
 
 import com.chendayu.c2d.processor.AbstractExtractor;
 import com.chendayu.c2d.processor.Warehouse;
-import com.chendayu.c2d.processor.model.DocComment;
 import com.chendayu.c2d.processor.processor.DescriptionProcessor;
 import com.chendayu.c2d.processor.processor.DocIgnoreProcessor;
 import com.chendayu.c2d.processor.processor.JacksonProcessor;
 import com.chendayu.c2d.processor.processor.LombokProcessor;
 import com.chendayu.c2d.processor.processor.MarkUsageProcessor;
 import com.chendayu.c2d.processor.processor.NestedDeclarationPostProcessor;
+import com.chendayu.c2d.processor.property.Comment;
 import com.chendayu.c2d.processor.property.Property;
 import com.chendayu.c2d.processor.util.NameConversions;
 
@@ -330,8 +330,8 @@ public class DeclarationExtractor extends AbstractExtractor {
         }
 
         String name = typeElement.getSimpleName().toString();
-        List<String> description = DocComment.create(elementUtils.getDocComment(typeElement))
-                .getDescription();
+        String description = Comment.create(typeElement)
+                .getCommentText();
         EnumDeclaration enumDeclaration = new EnumDeclaration(name, qualifiedName, properties, description);
         warehouse.addEnumDeclaration(enumDeclaration);
 
@@ -346,8 +346,8 @@ public class DeclarationExtractor extends AbstractExtractor {
 
         VariableElement variableElement = (VariableElement) element;
         String name = variableElement.getSimpleName().toString();
-        List<String> description = DocComment.create(elementUtils.getDocComment(variableElement))
-                .getDescription();
+        String description = Comment.create(variableElement)
+                .getCommentText();
         return new Property(name, description, ENUM_CONST);
     }
 
@@ -380,7 +380,7 @@ public class DeclarationExtractor extends AbstractExtractor {
             return existsDeclaration;
         }
 
-        DocComment docComment = DocComment.create(elementUtils.getDocComment(typeElement));
+        Comment docComment = Comment.create(typeElement);
         NestedDeclaration result = new NestedDeclaration(typeElement);
 
         // 直接塞进仓库，避免无限递归
@@ -433,7 +433,7 @@ public class DeclarationExtractor extends AbstractExtractor {
         }
     }
 
-    private void processTypeParameters(TypeElement typeElement, DocComment docComment,
+    private void processTypeParameters(TypeElement typeElement, Comment docComment,
                                        NestedDeclaration result) {
         List<? extends TypeParameterElement> typeParameters = typeElement.getTypeParameters();
         if (typeParameters.isEmpty()) {
@@ -444,7 +444,7 @@ public class DeclarationExtractor extends AbstractExtractor {
         ArrayList<TypeVarDeclaration> declarations = new ArrayList<>(typeParameters.size());
         for (TypeParameterElement typeParameter : typeParameters) {
             String name = typeParameter.getSimpleName().toString();
-            List<String> description = docComment.getTypeParam(name);
+            String description = docComment.getTypeParamComment(name);
             TypeVarDeclaration typeVarDeclaration = new TypeVarDeclaration(name, description);
             declarations.add(typeVarDeclaration);
         }

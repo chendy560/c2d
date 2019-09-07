@@ -21,7 +21,7 @@ import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
-import com.chendayu.c2d.processor.model.DocComment;
+import com.chendayu.c2d.processor.property.Comment;
 import com.chendayu.c2d.processor.property.Property;
 import com.chendayu.c2d.processor.util.NameConversions;
 import com.chendayu.c2d.processor.util.StringBuilderHolder;
@@ -260,10 +260,9 @@ public class ResourceAndActionExtractor extends AbstractExtractor {
 
         String methodName = element.getSimpleName().toString();
         String actionName = NameConversions.methodNameToActionName(methodName);
-        String docCommentString = elementUtils.getDocComment(element);
-        DocComment docComment = DocComment.create(docCommentString);
+        Comment comment = Comment.create(element);
 
-        Action action = new Action(resource, actionName, path, method, docComment);
+        Action action = new Action(resource, actionName, path, method, comment);
 
         List<? extends VariableElement> parameters = element.getParameters();
         for (VariableElement parameterElement : parameters) {
@@ -271,10 +270,10 @@ public class ResourceAndActionExtractor extends AbstractExtractor {
         }
 
         TypeMirror returnType = element.getReturnType();
-        List<String> returnComment = docComment.getReturn();
+        String returnComment = comment.getReturnText();
         Declaration declaration = declarationExtractor.extract(returnType);
         if (declaration.getType() == DeclarationType.OBJECT || declaration.getType() == DeclarationType.ARRAY) {
-            Property responseBody = new Property(returnComment, declaration);
+            Property responseBody = new Property(null, returnComment, declaration);
             action.setResponseBody(responseBody);
         }
 

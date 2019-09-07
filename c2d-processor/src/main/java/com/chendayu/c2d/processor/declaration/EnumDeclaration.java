@@ -22,12 +22,12 @@ public class EnumDeclaration implements Declaration {
 
     private final List<Property> constants;
 
-    private final List<String> description;
+    private final String description;
 
     private Set<NestedDeclaration> usedInDeclaration;
 
     public EnumDeclaration(String name, String qualifiedName,
-                           List<Property> constants, List<String> description) {
+                           List<Property> constants, String description) {
         this.name = name;
         this.link = NameConversions.componentEnumLink(qualifiedName);
         this.qualifiedName = qualifiedName;
@@ -67,7 +67,7 @@ public class EnumDeclaration implements Declaration {
         return constants;
     }
 
-    public List<String> getDescription() {
+    public String getDescription() {
         return description;
     }
 

@@ -2,7 +2,6 @@ package com.chendayu.c2d.processor.action;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.VariableElement;
-import java.util.List;
 
 import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationExtractor;
@@ -33,7 +32,7 @@ public class RequestParamParameterHandler extends AbstractParameterHandler {
 
         Declaration declaration = declarationExtractor.extract(element);
         if (isSimpleDeclaration(declaration) || isSimpleArray(declaration)) {
-            List<String> description = action.findParameterDescription(parameterName);
+            String description = action.findParameterDescription(parameterName);
             action.addUrlParameter(new Property(displayName, description, declaration));
         }
         return true;

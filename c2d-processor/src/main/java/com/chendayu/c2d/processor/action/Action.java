@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import com.chendayu.c2d.processor.SupportedContentType;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
-import com.chendayu.c2d.processor.model.DocComment;
+import com.chendayu.c2d.processor.property.Comment;
 import com.chendayu.c2d.processor.property.Property;
 import com.chendayu.c2d.processor.util.NameConversions;
 import com.chendayu.c2d.processor.util.StringBuilderHolder;
@@ -47,12 +47,12 @@ public class Action {
     /**
      * 方法上的注释
      */
-    private final DocComment docComment;
+    private final Comment comment;
 
     /**
      * 操作描述
      */
-    private List<String> description;
+    private String description;
 
     /**
      * 路径参数
@@ -84,7 +84,7 @@ public class Action {
      */
     private SupportedContentType responseBodyContentType;
 
-    public Action(Resource resource, String name, String path, HttpMethod method, DocComment docComment) {
+    public Action(Resource resource, String name, String path, HttpMethod method, Comment comment) {
         this.name = name;
         String resourceName = resource.getName();
         this.fullName = NameConversions.actionFullName(resourceName, name);
@@ -95,8 +95,8 @@ public class Action {
         this.method = method;
         this.link = NameConversions.actionLink(resource.getLink(), name);
 
-        this.docComment = docComment;
-        this.description = docComment.getDescription();
+        this.comment = comment;
+        this.description = comment.getCommentText();
     }
 
     public void addPathVariable(Property property) {
@@ -125,7 +125,7 @@ public class Action {
         return link;
     }
 
-    public List<String> getDescription() {
+    public String getDescription() {
         return description;
     }
 
@@ -183,8 +183,8 @@ public class Action {
      * @param name 参数名
      * @return 参数的注释
      */
-    public List<String> findParameterDescription(String name) {
-        return docComment.getParam(name);
+    public String findParameterDescription(String name) {
+        return comment.getParamComment(name);
     }
 
     public boolean hasRequestBody() {

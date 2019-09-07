@@ -99,7 +99,8 @@ public class DocWriter {
     private void writeAction(Action action) {
         adoc.anchor(action.getLink());
         adoc.title3(action.getName());
-        adoc.appendLines(action.getDescription());
+        adoc.append(action.getDescription());
+        adoc.dualNewLine();
 
         adoc.title4(TITLE_REQUEST);
         adoc.sourceCodeBegin(SOURCE_TYPE_HTTP);
@@ -155,7 +156,8 @@ public class DocWriter {
             adoc.anchor(nested.getLink());
             adoc.title3(nested.getShortName());
 
-            adoc.appendLines(nested.getDescription());
+            adoc.append(nested.getDescription());
+            adoc.dualNewLine();
             List<TypeVarDeclaration> typeParameters = nested.getTypeParameters();
             if (!typeParameters.isEmpty()) {
                 adoc.title4(TITLE_TYPE_PARAMETERS);
@@ -229,7 +231,8 @@ public class DocWriter {
             adoc.append(SMALL_END);
             adoc.newLine();
             adoc.columnBegin();
-            adoc.appendLines(p.getDescription());
+            adoc.append(p.getDescription());
+            adoc.dualNewLine();
         }
 
         adoc.tableBoundary();
@@ -254,7 +257,8 @@ public class DocWriter {
             adoc.append(SMALL_END);
             adoc.newLine();
             adoc.columnBegin();
-            adoc.appendLines(p.getDescription());
+            adoc.append(p.getDescription());
+            adoc.dualNewLine();
         }
 
         adoc.tableBoundary();
