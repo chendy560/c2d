@@ -26,6 +26,7 @@ import java.util.Set;
 
 import com.chendayu.c2d.processor.AbstractExtractor;
 import com.chendayu.c2d.processor.Warehouse;
+import com.chendayu.c2d.processor.processor.ConstraintProcessor;
 import com.chendayu.c2d.processor.processor.DescriptionProcessor;
 import com.chendayu.c2d.processor.processor.DocIgnoreProcessor;
 import com.chendayu.c2d.processor.processor.JacksonProcessor;
@@ -192,6 +193,7 @@ public class DeclarationExtractor extends AbstractExtractor {
     private List<NestedDeclarationPostProcessor> initPostProcessors(ProcessingEnvironment environment) {
         List<NestedDeclarationPostProcessor> processors = new ArrayList<>();
 
+        processors.add(new ConstraintProcessor(environment));
         processors.add(new DocIgnoreProcessor(environment));
         processors.add(new DescriptionProcessor(environment));
         processors.add(new MarkUsageProcessor(environment));

@@ -3,6 +3,8 @@ package com.chendayu.c2d.processor.property;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.List;
 
 import com.chendayu.c2d.processor.declaration.Declaration;
 import com.chendayu.c2d.processor.declaration.DeclarationType;
@@ -33,6 +35,11 @@ public class Property {
      * 类型
      */
     private Declaration declaration;
+
+    /**
+     * 数据校验注解们
+     */
+    private List<Annotation> constraintAnnotations = Collections.emptyList();
 
     /**
      * 是否被忽略
@@ -104,6 +111,14 @@ public class Property {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<Annotation> getConstraintAnnotations() {
+        return constraintAnnotations;
+    }
+
+    public void setConstraintAnnotations(List<Annotation> constraintAnnotations) {
+        this.constraintAnnotations = constraintAnnotations;
     }
 
     public Declaration getDeclaration() {
@@ -194,6 +209,7 @@ public class Property {
         Property newProperty = new Property(parent.getOriginName(), parent.getDeclaration());
         newProperty.setDisplayName(parent.getDisplayName());
         newProperty.setDeclaration(child.getDeclaration());
+        newProperty.setConstraintAnnotations(child.getConstraintAnnotations());
 
         String newDescription = child.getDescription();
         if (!newDescription.isEmpty()) {
@@ -219,6 +235,7 @@ public class Property {
         copy.originName = this.originName;
         copy.displayName = this.displayName;
         copy.description = this.description;
+        copy.constraintAnnotations = this.constraintAnnotations;
         copy.declaration = this.declaration;
         copy.ignored = this.ignored;
         copy.settable = this.settable;
