@@ -1,6 +1,7 @@
 package com.chendayu.c2d.processor.output;
 
 import java.io.Writer;
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +16,7 @@ import com.chendayu.c2d.processor.declaration.EnumDeclaration;
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 import com.chendayu.c2d.processor.declaration.TypeVarDeclaration;
 import com.chendayu.c2d.processor.property.Property;
+import com.chendayu.c2d.processor.validation.ValidationSupport;
 
 public class DocWriter {
 
@@ -256,9 +258,19 @@ public class DocWriter {
             writeType(p.getDeclaration());
             adoc.append(SMALL_END);
             adoc.newLine();
-            adoc.columnBegin();
+            adoc.acolumnBegin();
             adoc.append(p.getDescription());
             adoc.dualNewLine();
+            List<Annotation> constraintAnnotations = p.getConstraintAnnotations();
+            List<String> constraintMessages = ValidationSupport.getMessages(constraintAnnotations);
+            if (!constraintMessages.isEmpty()) {
+                for (String constraintMessage : constraintMessages) {
+                    adoc.append("* ");
+                    adoc.append(constraintMessage);
+                    adoc.newLine();
+                }
+                adoc.dualNewLine();
+            }
         }
 
         adoc.tableBoundary();

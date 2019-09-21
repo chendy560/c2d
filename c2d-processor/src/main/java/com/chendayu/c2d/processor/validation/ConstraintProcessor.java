@@ -1,21 +1,22 @@
-package com.chendayu.c2d.processor.processor;
+package com.chendayu.c2d.processor.validation;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.validation.constraints.NotNull;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
+import com.chendayu.c2d.processor.processor.AbstractNestedDeclarationPostProcessor;
 import com.chendayu.c2d.processor.property.Property;
 
 public class ConstraintProcessor extends AbstractNestedDeclarationPostProcessor {
 
-    private List<Class<? extends Annotation>> annotationClasses = new ArrayList<>();
+    private final Collection<Class<? extends Annotation>> annotationClasses;
 
-    public ConstraintProcessor(ProcessingEnvironment processingEnv) {
+    public ConstraintProcessor(ProcessingEnvironment processingEnv,
+                               Collection<Class<? extends Annotation>> annotationClasses) {
         super(processingEnv);
-        initAnnotationClasses();
+        this.annotationClasses = annotationClasses;
     }
 
     @Override
@@ -32,10 +33,6 @@ public class ConstraintProcessor extends AbstractNestedDeclarationPostProcessor 
             }
         }
         property.setConstraintAnnotations(annotations);
-    }
-
-    private void initAnnotationClasses() {
-        annotationClasses.add(NotNull.class);
     }
 
     @Override
