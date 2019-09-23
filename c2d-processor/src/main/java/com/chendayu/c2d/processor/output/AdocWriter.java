@@ -2,7 +2,6 @@ package com.chendayu.c2d.processor.output;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 
 /**
  * 输出 adoc 的工具类
@@ -14,8 +13,6 @@ public class AdocWriter {
 
     private static final char BOLD = '*';
     private static final char MONOSPACE = '`';
-
-    private static final String HARD_NEW_LINE = " +\n";
 
     private static final String LINK_END = ">>";
     private static final String LINK_BEGIN = "<<";
@@ -213,13 +210,6 @@ public class AdocWriter {
     }
 
     /**
-     * 强行换行
-     */
-    public void hardNewLine() {
-        append(HARD_NEW_LINE);
-    }
-
-    /**
      * append 一段粗体
      */
     public void appendBoldMonospace(String s) {
@@ -228,20 +218,5 @@ public class AdocWriter {
         append(s);
         append(BOLD);
         append(MONOSPACE);
-    }
-
-    /**
-     * append 多行
-     */
-    public void appendLines(List<String> ss) {
-
-        for (String s : ss) {
-            if (!s.isEmpty()) {
-                append(s);
-                newLine();
-            }
-        }
-
-        newLine();
     }
 }

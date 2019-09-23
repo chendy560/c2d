@@ -1,7 +1,6 @@
 package com.chendayu.c2d.processor.output;
 
 import java.io.StringWriter;
-import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -128,21 +127,9 @@ class AdocWriterTest {
     }
 
     @Test
-    void hardNewLine() {
-        adocWriter.hardNewLine();
-        assertResult(" +\n");
-    }
-
-    @Test
     void appendBoldMonospace() {
         adocWriter.appendBoldMonospace("x");
         assertResult("`*x*`");
-    }
-
-    @Test
-    void appendLines() {
-        adocWriter.appendLines(Arrays.asList("line1", "line2", "line3"));
-        assertResult("line1\nline2\nline3\n\n");
     }
 
     private void assertResult(String expect) {
