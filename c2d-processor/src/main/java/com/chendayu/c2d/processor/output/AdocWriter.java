@@ -22,6 +22,7 @@ public class AdocWriter {
     private static final String ANCHOR_END = "]]";
     private static final String TABLE_BOUNDARY = "|===";
     private static final char TABLE_SEPARATOR = '|';
+    private static final String A_TABLE_SEPARATOR = "a|";
     private static final String CODE_BEGIN = "[source,";
     private static final char CODE_END = ']';
     private static final String CODE_BOUNDARY = "----";
@@ -62,6 +63,13 @@ public class AdocWriter {
      */
     public void columnBegin() {
         append(TABLE_SEPARATOR);
+    }
+
+    /**
+     * 一列开始
+     */
+    public void acolumnBegin() {
+        append(A_TABLE_SEPARATOR);
     }
 
     /**

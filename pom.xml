@@ -25,6 +25,8 @@
         <spring.version>5.1.9.RELEASE</spring.version>
         <spring-boot.version>2.1.7.RELEASE</spring-boot.version>
         <jackson.version>2.9.9.2</jackson.version>
+        <validation-api.version>2.0.1.Final</validation-api.version>
+
         <junit-jupiter.version>5.4.2</junit-jupiter.version>
         <assertj.version>3.12.2</assertj.version>
 
@@ -70,6 +72,11 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>${validation-api.version}</version>
             </dependency>
 
             <dependency>

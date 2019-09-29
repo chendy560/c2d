@@ -35,6 +35,8 @@ import com.chendayu.c2d.processor.processor.NestedDeclarationPostProcessor;
 import com.chendayu.c2d.processor.property.Comment;
 import com.chendayu.c2d.processor.property.Property;
 import com.chendayu.c2d.processor.util.NameConversions;
+import com.chendayu.c2d.processor.validation.ConstraintProcessor;
+import com.chendayu.c2d.processor.validation.ValidationSupport;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -192,6 +194,7 @@ public class DeclarationExtractor extends AbstractExtractor {
     private List<NestedDeclarationPostProcessor> initPostProcessors(ProcessingEnvironment environment) {
         List<NestedDeclarationPostProcessor> processors = new ArrayList<>();
 
+        processors.add(new ConstraintProcessor(environment, ValidationSupport.getAnnotations()));
         processors.add(new DocIgnoreProcessor(environment));
         processors.add(new DescriptionProcessor(environment));
         processors.add(new MarkUsageProcessor(environment));

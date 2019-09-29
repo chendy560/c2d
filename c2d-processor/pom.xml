@@ -39,6 +39,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- 参数校验注解 -->
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- 用于测试 lombok 的支持 -->
         <dependency>
             <groupId>org.projectlombok</groupId>
