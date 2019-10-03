@@ -6,7 +6,7 @@ import com.chendayu.c2d.processor.DocIgnore;
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 import com.chendayu.c2d.processor.property.Property;
 
-public class DocIgnoreProcessor extends AbstractNestedDeclarationPostProcessor {
+public class DocIgnoreProcessor extends AbstractNestedDeclarationProcessor {
 
     public DocIgnoreProcessor(ProcessingEnvironment processingEnv) {
         super(processingEnv);

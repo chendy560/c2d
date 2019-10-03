@@ -10,7 +10,7 @@ import com.chendayu.c2d.processor.declaration.EnumDeclaration;
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 import com.chendayu.c2d.processor.property.Property;
 
-public class MarkUsageProcessor extends AbstractNestedDeclarationPostProcessor {
+public class MarkUsageProcessor extends AbstractNestedDeclarationProcessor {
 
     public MarkUsageProcessor(ProcessingEnvironment processingEnv) {
         super(processingEnv);

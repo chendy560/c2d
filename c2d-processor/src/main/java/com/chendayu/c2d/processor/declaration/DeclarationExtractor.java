@@ -17,7 +17,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,7 +30,7 @@ import com.chendayu.c2d.processor.processor.DocIgnoreProcessor;
 import com.chendayu.c2d.processor.processor.JacksonProcessor;
 import com.chendayu.c2d.processor.processor.LombokProcessor;
 import com.chendayu.c2d.processor.processor.MarkUsageProcessor;
-import com.chendayu.c2d.processor.processor.NestedDeclarationPostProcessor;
+import com.chendayu.c2d.processor.processor.NestedDeclarationProcessor;
 import com.chendayu.c2d.processor.property.Comment;
 import com.chendayu.c2d.processor.property.Property;
 import com.chendayu.c2d.processor.util.NameConversions;
@@ -165,7 +164,7 @@ public class DeclarationExtractor extends AbstractExtractor {
     /**
      * 后处理器们
      */
-    private final List<NestedDeclarationPostProcessor> postProcessors;
+    private final List<NestedDeclarationProcessor> postProcessors;
 
     public DeclarationExtractor(ProcessingEnvironment environment, Warehouse warehouse) {
         super(environment, warehouse);
@@ -191,8 +190,8 @@ public class DeclarationExtractor extends AbstractExtractor {
         this.postProcessors = initPostProcessors(environment);
     }
 
-    private List<NestedDeclarationPostProcessor> initPostProcessors(ProcessingEnvironment environment) {
-        List<NestedDeclarationPostProcessor> processors = new ArrayList<>();
+    private List<NestedDeclarationProcessor> initPostProcessors(ProcessingEnvironment environment) {
+        List<NestedDeclarationProcessor> processors = new ArrayList<>();
 
         processors.add(new ConstraintProcessor(environment, ValidationSupport.getAnnotations()));
         processors.add(new DocIgnoreProcessor(environment));
@@ -213,7 +212,7 @@ public class DeclarationExtractor extends AbstractExtractor {
             processors.add(jacksonProcessor);
         }
 
-        processors.sort(Comparator.comparing(NestedDeclarationPostProcessor::getOrder));
+        Collections.sort(processors);
         return Collections.unmodifiableList(processors);
     }
 
@@ -407,7 +406,7 @@ public class DeclarationExtractor extends AbstractExtractor {
     }
 
     private void postProcess(NestedDeclaration result) {
-        for (NestedDeclarationPostProcessor postProcessor : postProcessors) {
+        for (NestedDeclarationProcessor postProcessor : postProcessors) {
             postProcessor.process(result);
         }
     }

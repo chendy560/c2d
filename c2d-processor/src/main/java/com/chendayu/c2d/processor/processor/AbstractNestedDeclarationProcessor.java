@@ -7,12 +7,12 @@ import com.chendayu.c2d.processor.AbstractComponent;
 /**
  * 简单实现一下，把常用api弄进来
  */
-public abstract class AbstractNestedDeclarationPostProcessor extends AbstractComponent
-        implements NestedDeclarationPostProcessor {
+public abstract class AbstractNestedDeclarationProcessor extends AbstractComponent
+        implements NestedDeclarationProcessor {
 
-    public static final int NORMAL_ORDER = 0;
+    private static final int NORMAL_ORDER = 0;
 
-    public AbstractNestedDeclarationPostProcessor(ProcessingEnvironment processingEnv) {
+    public AbstractNestedDeclarationProcessor(ProcessingEnvironment processingEnv) {
         super(processingEnv);
     }
 

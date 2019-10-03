@@ -174,7 +174,7 @@ public class HttpDataGenerator {
     private void generateResponseBody(Action action) {
         if (action.hasResponseBody()) {
 
-            SupportedContentType contentType = action.getResponseBodyContentType();
+            SupportedContentType contentType = action.getResponseContentType();
             generateContentType(contentType.getValue());
 
             newLine();

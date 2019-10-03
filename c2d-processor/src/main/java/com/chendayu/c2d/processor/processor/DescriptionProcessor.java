@@ -8,7 +8,7 @@ import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 import com.chendayu.c2d.processor.property.Comment;
 import com.chendayu.c2d.processor.property.Property;
 
-public class DescriptionProcessor extends AbstractNestedDeclarationPostProcessor {
+public class DescriptionProcessor extends AbstractNestedDeclarationProcessor {
 
     public DescriptionProcessor(ProcessingEnvironment processingEnv) {
         super(processingEnv);

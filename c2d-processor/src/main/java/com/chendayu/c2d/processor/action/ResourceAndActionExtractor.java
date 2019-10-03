@@ -336,7 +336,7 @@ public class ResourceAndActionExtractor extends AbstractExtractor {
 
     private void inferResponseContentType(Action action, String[] produce) {
         if (action.hasResponseBody()) {
-            action.setResponseBodyContentType(SupportedContentType.infer(produce));
+            action.setResponseContentType(SupportedContentType.infer(produce));
         }
     }
 

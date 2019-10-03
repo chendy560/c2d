@@ -3,10 +3,9 @@ package com.chendayu.c2d.processor.processor;
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 
 /**
- * 对象声明后处理器
- * 主要用途应该是增减字段
+ * 对象声明处理器
  */
-public interface NestedDeclarationPostProcessor {
+public interface NestedDeclarationProcessor extends Comparable<NestedDeclarationProcessor> {
 
     /**
      * 处理对象声明
@@ -21,4 +20,9 @@ public interface NestedDeclarationPostProcessor {
      * @return 处理器的优先级，数字越小越靠早被调用
      */
     int getOrder();
+
+    @Override
+    default int compareTo(NestedDeclarationProcessor o) {
+        return Integer.compare(getOrder(), o.getOrder());
+    }
 }

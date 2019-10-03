@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
-import com.chendayu.c2d.processor.processor.AbstractNestedDeclarationPostProcessor;
+import com.chendayu.c2d.processor.processor.AbstractNestedDeclarationProcessor;
 import com.chendayu.c2d.processor.property.Property;
 
-public class ConstraintProcessor extends AbstractNestedDeclarationPostProcessor {
+public class ConstraintProcessor extends AbstractNestedDeclarationProcessor {
 
     private final Collection<Class<? extends Annotation>> annotationClasses;
 
@@ -21,6 +21,9 @@ public class ConstraintProcessor extends AbstractNestedDeclarationPostProcessor 
 
     @Override
     public void process(NestedDeclaration nestedDeclaration) {
+        if (this.annotationClasses.isEmpty()) {
+            return;
+        }
         nestedDeclaration.allProperties().forEach(this::updateConstraint);
     }
 

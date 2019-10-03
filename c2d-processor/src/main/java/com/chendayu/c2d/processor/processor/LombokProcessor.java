@@ -16,7 +16,7 @@ import lombok.Value;
  * 处理 lombok 的 Getter 和 Data 注解
  * 将所有的 field 作为 property 放进 declaration
  */
-public class LombokProcessor extends AbstractNestedDeclarationPostProcessor {
+public class LombokProcessor extends AbstractNestedDeclarationProcessor {
 
     public LombokProcessor(ProcessingEnvironment processingEnv) {
         super(processingEnv);

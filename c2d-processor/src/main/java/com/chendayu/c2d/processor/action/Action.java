@@ -82,7 +82,7 @@ public class Action {
     /**
      * 响应body的内容类型
      */
-    private SupportedContentType responseBodyContentType;
+    private SupportedContentType responseContentType;
 
     public Action(Resource resource, String name, String path, HttpMethod method, Comment comment) {
         this.name = name;
@@ -169,12 +169,12 @@ public class Action {
         this.requestContentType = requestContentType;
     }
 
-    public SupportedContentType getResponseBodyContentType() {
-        return responseBodyContentType;
+    public SupportedContentType getResponseContentType() {
+        return responseContentType;
     }
 
-    public void setResponseBodyContentType(SupportedContentType responseBodyContentType) {
-        this.responseBodyContentType = responseBodyContentType;
+    public void setResponseContentType(SupportedContentType responseContentType) {
+        this.responseContentType = responseContentType;
     }
 
     /**

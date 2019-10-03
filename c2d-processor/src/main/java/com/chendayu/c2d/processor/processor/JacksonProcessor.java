@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 处理 jackson 的一些注解
  * jackson 的注解很多，功能很强，但是我很菜，所以选择我用到了什么就支持什么
  */
-public class JacksonProcessor extends AbstractNestedDeclarationPostProcessor {
+public class JacksonProcessor extends AbstractNestedDeclarationProcessor {
 
     public JacksonProcessor(ProcessingEnvironment processingEnv) {
         super(processingEnv);

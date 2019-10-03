@@ -29,6 +29,7 @@ public class Comment {
     private static final int TAG_NAME = 3;
 
     private static final Comment empty = new Comment(null) {
+
         @Override
         public String getCommentText() {
             return "";
@@ -59,7 +60,9 @@ public class Comment {
             return "";
         }
     };
+
     private static Elements elementUtils;
+
     private final String commentString;
 
     private String commentText = "";
