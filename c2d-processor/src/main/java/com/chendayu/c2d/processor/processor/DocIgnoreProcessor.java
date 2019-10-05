@@ -17,7 +17,7 @@ public class DocIgnoreProcessor extends AbstractNestedDeclarationProcessor {
         for (Property property : nestedDeclaration.allProperties()) {
             DocIgnore docIgnore = property.getAnnotation(DocIgnore.class);
             if (docIgnore != null) {
-                property.setIgnored(docIgnore.value());
+                property.setIgnored(true);
             }
         }
     }

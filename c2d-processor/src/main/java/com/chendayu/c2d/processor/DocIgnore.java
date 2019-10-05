@@ -14,12 +14,4 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.SOURCE)
 public @interface DocIgnore {
-
-    /**
-     * 仿照 {@link com.fasterxml.jackson.annotation.JsonIgnore} 的做法
-     * 用于 "父类 ignore，但是子类不想 ignore" 的场景
-     *
-     * @return 是否忽略，默认为 true，即忽略
-     */
-    boolean value() default true;
 }

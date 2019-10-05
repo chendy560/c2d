@@ -134,7 +134,7 @@ public class ResourceAndActionExtractor extends AbstractExtractor {
      */
     private boolean shouldIgnore(TypeElement typeElement) {
         DocIgnore docIgnore = typeElement.getAnnotation(DocIgnore.class);
-        return docIgnore != null && docIgnore.value();
+        return docIgnore != null;
     }
 
     private String findBasePath(TypeElement typeElement) {
@@ -176,7 +176,7 @@ public class ResourceAndActionExtractor extends AbstractExtractor {
     private Action findAction(Resource resource, ExecutableElement element) {
 
         DocIgnore docIgnore = element.getAnnotation(DocIgnore.class);
-        if (docIgnore != null && docIgnore.value()) {
+        if (docIgnore != null) {
             return null;
         }
 
