@@ -47,6 +47,11 @@ public class Property {
     private boolean ignored;
 
     /**
+     * 样例数据
+     */
+    private String example;
+
+    /**
      * 是否可以设置值，即是否可以作为参数传入
      */
     private boolean settable;
@@ -113,6 +118,20 @@ public class Property {
         this.description = description;
     }
 
+    public void setComment(Comment comment) {
+        String commentText = comment.getCommentText();
+        if (!commentText.isEmpty()) {
+            this.description = commentText;
+        }
+        if (comment.isIgnored()) {
+            this.ignored = true;
+        }
+        String exampleText = comment.getExample();
+        if (exampleText != null && !exampleText.isEmpty()) {
+            this.example = exampleText;
+        }
+    }
+
     public List<Annotation> getConstraintAnnotations() {
         return constraintAnnotations;
     }
@@ -135,6 +154,10 @@ public class Property {
 
     public void setIgnored(boolean ignored) {
         this.ignored = ignored;
+    }
+
+    public String getExample() {
+        return example;
     }
 
     public boolean isSettable() {

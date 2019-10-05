@@ -13,7 +13,6 @@ import java.util.Map;
  */
 public class Comment {
 
-
     private static final String PARAM_TAG = "@param";
     private static final String RETURN_TAG = "@return";
 

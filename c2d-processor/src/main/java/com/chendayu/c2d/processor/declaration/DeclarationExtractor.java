@@ -348,9 +348,8 @@ public class DeclarationExtractor extends AbstractExtractor {
 
         VariableElement variableElement = (VariableElement) element;
         String name = variableElement.getSimpleName().toString();
-        String description = Comment.create(variableElement)
-                .getCommentText();
-        return new Property(name, description, ENUM_CONST);
+        Comment comment = Comment.create(variableElement);
+        return new Property(name, comment.getCommentText(), ENUM_CONST);
     }
 
     private Declaration extractFromArrayType(ArrayType type) {

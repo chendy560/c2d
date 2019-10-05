@@ -31,10 +31,8 @@ public class DescriptionProcessor extends AbstractNestedDeclarationProcessor {
 
         VariableElement field = property.getField();
         if (field != null) {
-            String description = Comment.create(field).getCommentText();
-            if (!description.isEmpty()) {
-                property.setDescription(description);
-            }
+            Comment comment = Comment.create(field);
+            property.setComment(comment);
         }
     }
 
