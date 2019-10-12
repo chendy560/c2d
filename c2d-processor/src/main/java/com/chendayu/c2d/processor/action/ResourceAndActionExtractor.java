@@ -23,6 +23,7 @@ import com.chendayu.c2d.processor.declaration.DeclarationType;
 import com.chendayu.c2d.processor.declaration.NestedDeclaration;
 import com.chendayu.c2d.processor.property.Comment;
 import com.chendayu.c2d.processor.property.Property;
+import com.chendayu.c2d.processor.util.MarkUsageUtils;
 import com.chendayu.c2d.processor.util.NameConversions;
 import com.chendayu.c2d.processor.util.StringBuilderHolder;
 
@@ -282,14 +283,14 @@ public class ResourceAndActionExtractor extends AbstractExtractor {
         if (action.getRequestBody() != null) {
             NestedDeclaration requestBodyDeclaration = findNestedDeclaration(action.getRequestBody().getDeclaration());
             if (requestBodyDeclaration != null) {
-                requestBodyDeclaration.usedBy(action);
+                MarkUsageUtils.markUsage(requestBodyDeclaration, action);
             }
         }
 
         if (action.getResponseBody() != null) {
             NestedDeclaration responseBodyDeclaration = findNestedDeclaration(action.getResponseBody().getDeclaration());
             if (responseBodyDeclaration != null) {
-                responseBodyDeclaration.usedBy(action);
+                MarkUsageUtils.markUsage(responseBodyDeclaration, action);
             }
         }
 
